@@ -17,9 +17,9 @@
     <dependencies>
         <!-- OpenCV -->
         <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacv-platform</artifactId>
-            <version>1.5.12</version>
+            <groupId>org.openpnp</groupId>
+            <artifactId>opencv</artifactId>
+            <version>4.9.0-0</version>
         </dependency>
 
         <!-- OpenJFX (UI Library) -->
@@ -43,24 +43,10 @@
             <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        <!-- For the different platforms -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
-            <classifier>linux</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
-            <classifier>win</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
-            <classifier>mac</classifier>
         </dependency>
     </dependencies>
 
