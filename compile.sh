@@ -1,3 +1,3 @@
 #!/bin/bash
 cd attendence
-mvn package
+mvn compile package
