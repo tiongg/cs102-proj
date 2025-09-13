@@ -1,4 +1,4 @@
-name: Feature Branch
+name: Check compilation
 
 on:
   pull_request:
