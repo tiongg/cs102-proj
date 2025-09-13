@@ -1,0 +1,24 @@
+name: Feature Branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, workflow_dispatch]
+
+jobs:
+  compile:
+    name: Compile Project
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./attendence
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B compile package
+      - name: Maven Verify
+        run: mvn -B clean verify
