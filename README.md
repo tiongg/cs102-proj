@@ -24,6 +24,11 @@ Run the app with:
 mvn compile javafx:run
 ```
 
+Or if you wish to run a different main file:
+```bash
+mvn compile javafx:run -Dexec.mainClass=g1t1.other.MainFile
+```
+
 > [!TIP]
 > Alternatively, we can just do `./dev.sh` in the root folder (Using bash)
 
