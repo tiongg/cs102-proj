@@ -198,4 +198,5 @@ README.html
 .idea
 .exercism
 output/*
-logs/
+logs/**.log
+attendence/logs/**.log
