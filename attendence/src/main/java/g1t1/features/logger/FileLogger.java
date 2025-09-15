@@ -23,10 +23,10 @@ public class FileLogger extends BaseLogger {
             if (newFile.createNewFile()) {
                 this.currentLogPath = fullFilePath;
             } else {
-                System.out.println("Error creating file at " + folderPath + "!");
+                System.out.println("File already exists at " + fullFilePath + "!");
             }
         } catch (Exception e) {
-            System.out.println("Error creating file at " + folderPath + "!");
+            System.out.println("Error creating file at " + folderPath + "! Exception: " + e.getMessage());
         }
     }
 
@@ -35,13 +35,12 @@ public class FileLogger extends BaseLogger {
         LocalDateTime now = LocalDateTime.now();
         String currentDateTime = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(this.currentLogPath, true));
         // Info and error should have additional padding
         // so that messages are aligned with the rest
         boolean hasAdditionalPadding = level == LogLevel.Info || level == LogLevel.Error;
         String padding = "\t".repeat(hasAdditionalPadding ? 2 : 1);
 
-        try (writer) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.currentLogPath, true))) {
             writer.write(String.format("[%s]\t(%s)%s\t%s\n", currentDateTime, level, padding, message));
         }
     }
