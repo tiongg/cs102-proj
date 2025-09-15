@@ -11,7 +11,7 @@ package g1t1.features.logger;
  * }
  * </pre>
  */
-public class Logger {
+public class AppLogger {
     // TODO(TG/Delroy): File logger path should come from settings
     private static BaseLogger logger = new FileLogger("./logs/");
     private static ConsoleLogger consoleLogger = new ConsoleLogger();
