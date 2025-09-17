@@ -197,4 +197,6 @@ README.html
 *.iml
 .idea
 .exercism
-./output/*
+output/*
+logs/**.log
+attendence/logs/**.log

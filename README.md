@@ -24,9 +24,9 @@ Run the app with:
 mvn compile javafx:run
 ```
 
-Or if you wish to run a different main file:
+Or if you wish to run a different main file (without the UI):
 ```bash
-mvn compile javafx:run -Dexec.mainClass=g1t1.other.MainFile
+mvn compile -Dexec.mainClass=g1t1.other.MainFile exec:java
 ```
 
 > [!TIP]
