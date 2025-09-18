@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import g1t1.components.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import g1t1.components.Navbar?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
-            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.ReportsViewController">
+<?import javafx.scene.text.Font?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
+            fx:controller="g1t1.scenes.MyClassesViewController"
+            prefHeight="900.0" prefWidth="1440.0">
     <Navbar/>
     <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <Label text="Past Reports" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
+        <Label text="My Classes" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
             <font>
                 <Font name="Inter Semi Bold" size="26.0"/>
             </font>
         </Label>
     </AnchorPane>
-
 </AnchorPane>
