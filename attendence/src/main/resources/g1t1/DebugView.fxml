@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="1440.0"
+            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.DebugViewController">
+    <children>
+        <Label fx:id="lbl_javaVersion" layoutX="14.0" layoutY="14.0" prefHeight="38.0" prefWidth="244.0"
+               text="Java Version:"/>
+        <Label fx:id="lbl_opencvVersion" layoutX="14.0" layoutY="52.0" prefHeight="38.0" prefWidth="244.0"
+               text="Opencv Version:"/>
+        <Label fx:id="lbl_javafxVersion" layoutX="14.0" layoutY="90.0" prefHeight="38.0" prefWidth="244.0"
+               text="JavaFX Version:"/>
+    </children>
+</AnchorPane>
