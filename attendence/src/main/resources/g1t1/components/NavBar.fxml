@@ -5,41 +5,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import g1t1.models.scenes.Page ?>
 
-<fx:root minHeight="600.0" prefWidth="250.0" style="-fx-border-style: hidden solid hidden hidden; -fx-border-width: 2; -fx-border-color: D9D9D9;" type="AnchorPane" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
-    <VBox prefHeight="200.0" prefWidth="100.0" spacing="12.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="24.0">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" minHeight="600.0"
+         prefWidth="250.0"
+         style="-fx-border-style: hidden solid hidden hidden; -fx-border-width: 2; -fx-border-color: D9D9D9;"
+         type="AnchorPane" AnchorPane.bottomAnchor="0.0"
+         AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/17.0.12">
+    <VBox prefHeight="200.0" prefWidth="100.0" spacing="12.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0"
+          AnchorPane.topAnchor="24.0">
         <Label text="App name">
             <font>
-                <Font name="Inter Regular" size="40.0" />
+                <Font name="Inter Regular" size="40.0"/>
             </font>
         </Label>
         <VBox prefHeight="278.0" prefWidth="178.0" spacing="12.0">
-            <NavItem iconLiteral="far-file-alt" targetPage="PastRecords" text="Past Reports" />
-            <NavItem iconLiteral="ion4-md-school" targetPage="MyClasses" text="My Classes" />
-            <NavItem iconLiteral="gmi-supervisor-account" targetPage="Onboard" text="Onboard" />
-            <NavItem iconLiteral="gmi-play-circle-outline" targetPage="StartSession" text="Start Session" />
+            <NavItem iconLiteral="far-file-alt" targetPage="PastRecords" text="Past Reports"/>
+            <NavItem iconLiteral="ion4-md-school" targetPage="MyClasses" text="My Classes"/>
+            <NavItem iconLiteral="gmi-supervisor-account" targetPage="Onboard" text="Onboard"/>
+            <NavItem iconLiteral="gmi-play-circle-outline" targetPage="StartSession" text="Start Session"/>
 
             <VBox.margin>
-                <Insets />
+                <Insets/>
             </VBox.margin>
         </VBox>
     </VBox>
-    <NavItem iconLiteral="gmi-settings" targetPage="Settings" text="Settings" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0">
+    <NavItem iconLiteral="gmi-settings" targetPage="Settings" text="Settings" AnchorPane.bottomAnchor="24.0"
+             AnchorPane.leftAnchor="24.0">
         <VBox.margin>
-            <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
         </VBox.margin>
     </NavItem>
-
-    <!--    <HBox fx:id="nav_settings" alignment="CENTER_LEFT" onMouseClicked="#handleNavClick" spacing="8"-->
-    <!--          AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0">-->
-    <!--        <FontIcon iconLiteral="gmi-settings" iconSize="18"/>-->
-    <!--        <Label text="Settings" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0">-->
-    <!--            <font>-->
-    <!--                <Font name="Inter Regular" size="20.0"/>-->
-    <!--            </font>-->
-    <!--        </Label>-->
-    <!--        <VBox.margin>-->
-    <!--            <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>-->
-    <!--        </VBox.margin>-->
-    <!--    </HBox>-->
 </fx:root>

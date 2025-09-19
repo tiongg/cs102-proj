@@ -15,7 +15,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 public class NavItem extends HBox {
     private final StringProperty iconLiteralProperty = new SimpleStringProperty();
-    private final ObjectProperty<Page> targetPageProperty = new SimpleObjectProperty<>();
+    // Needs to be a string property if not scene builder throws a tantrum
+    private final StringProperty targetPageProperty = new SimpleStringProperty();
 
     @FXML
     private Label lblNavTitle;
@@ -67,14 +68,14 @@ public class NavItem extends HBox {
     }
 
     public Page getTargetPage() {
-        return targetPageProperty().get();
+        return Page.valueOf(targetPageProperty().get());
     }
 
     public void setTargetPage(Page targetPage) {
-        targetPageProperty().set(targetPage);
+        targetPageProperty().set(targetPage.toString());
     }
 
-    public ObjectProperty<Page> targetPageProperty() {
+    public StringProperty targetPageProperty() {
         return this.targetPageProperty;
     }
 }
