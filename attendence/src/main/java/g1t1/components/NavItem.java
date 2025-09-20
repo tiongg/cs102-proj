@@ -1,9 +1,7 @@
 package g1t1.components;
 
 import g1t1.App;
-import g1t1.models.scenes.Page;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import g1t1.models.scenes.PageName;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -67,12 +65,12 @@ public class NavItem extends HBox {
         return this.iconLiteralProperty;
     }
 
-    public Page getTargetPage() {
-        return Page.valueOf(targetPageProperty().get());
+    public PageName getTargetPage() {
+        return PageName.valueOf(targetPageProperty().get());
     }
 
-    public void setTargetPage(Page targetPage) {
-        targetPageProperty().set(targetPage.toString());
+    public void setTargetPage(PageName targetPageName) {
+        targetPageProperty().set(targetPageName.toString());
     }
 
     public StringProperty targetPageProperty() {

@@ -1,4 +1,6 @@
 package g1t1.scenes;
 
-public class StartSessionViewController {
+import g1t1.models.scenes.PageController;
+
+public class StartSessionViewController extends PageController {
 }

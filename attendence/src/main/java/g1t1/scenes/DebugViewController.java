@@ -1,10 +1,11 @@
 package g1t1.scenes;
 
+import g1t1.models.scenes.PageController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.opencv.core.Core;
 
-public class DebugViewController {
+public class DebugViewController extends PageController {
     @FXML
     Label lbl_javaVersion;
     @FXML

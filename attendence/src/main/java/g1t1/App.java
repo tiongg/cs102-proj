@@ -1,6 +1,7 @@
 package g1t1;
 
 import g1t1.models.scenes.Page;
+import g1t1.models.scenes.PageName;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,9 +19,9 @@ public class App extends Application {
     public static int HEIGHT = 700;
 
     private static App instance;
-    private final HashMap<Page, Parent> scenes = new HashMap<>();
+    private final HashMap<PageName, Page> scenes = new HashMap<>();
     private Scene currentScene;
-    private Page currentPage;
+    private PageName currentPageName;
 
     public static App getInstance() {
         return instance;
@@ -32,17 +33,17 @@ public class App extends Application {
     }
 
     private static void loadScenes() {
-        Map<Page, String> scenePaths = Map.ofEntries(
-                entry(Page.PastRecords, "scenes/ReportsView.fxml"),
-                entry(Page.MyClasses, "scenes/MyClassesView.fxml"),
-                entry(Page.Onboard, "scenes/OnboardView.fxml"),
-                entry(Page.StartSession, "scenes/StartSessionView.fxml"),
-                entry(Page.Settings, "scenes/SettingsView.fxml")
+        Map<PageName, String> scenePaths = Map.ofEntries(
+                entry(PageName.PastRecords, "scenes/ReportsView.fxml"),
+                entry(PageName.MyClasses, "scenes/MyClassesView.fxml"),
+                entry(PageName.Onboard, "scenes/OnboardView.fxml"),
+                entry(PageName.StartSession, "scenes/StartSessionView.fxml"),
+                entry(PageName.Settings, "scenes/SettingsView.fxml")
         );
 
         scenePaths.forEach((key, value) -> {
             try {
-                Parent page = FXMLLoader.load(instance.getClass().getResource(value));
+                Page page = new Page(value);
                 instance.scenes.put(key, page);
             } catch (Exception e) {
                 System.err.println("Error loading " + key + " from " + value);
@@ -51,17 +52,19 @@ public class App extends Application {
         });
     }
 
-    public static void changePage(Page newPage) {
-        Parent root = instance.scenes.get(newPage);
-        instance.currentPage = newPage;
-        instance.currentScene.setRoot(root);
+    public static void changePage(PageName newPageName) {
+        Page page = instance.scenes.get(newPageName);
+        instance.currentPageName = newPageName;
+        instance.currentScene.setRoot(page.getRoot());
+        page.getController().onMount();
     }
 
     @Override
     public void start(Stage stage) {
-        Scene scene = new Scene(instance.scenes.get(Page.PastRecords), WIDTH, HEIGHT);
+        Page pastRecordsPage = instance.scenes.get(PageName.PastRecords);
+        Scene scene = new Scene(pastRecordsPage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
-        changePage(Page.PastRecords);
+        changePage(PageName.PastRecords);
         stage.setScene(scene);
         stage.show();
     }
