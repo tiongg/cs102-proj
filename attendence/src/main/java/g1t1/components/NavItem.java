@@ -1,8 +1,8 @@
 package g1t1.components;
 
-import g1t1.App;
 import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
+import g1t1.utils.events.OnNavigateEvent;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -31,6 +31,14 @@ public class NavItem extends HBox {
             icon.setIconLiteral(((StringProperty) e).getValue());
         });
 
+        Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
+            if (e.getNewPage().getPageName() == this.getTargetPage()) {
+                selected();
+            } else {
+                unselected();
+            }
+        });
+
         try {
             loader.load();
         } catch (Exception e) {
@@ -41,6 +49,17 @@ public class NavItem extends HBox {
     @FXML
     private void handleNavClick(MouseEvent event) {
         Router.changePage(getTargetPage());
+    }
+
+    private void selected() {
+        this.lblNavTitle.setStyle("-fx-font-weight: bold;");
+        this.lblNavTitle.setUnderline(true);
+    }
+
+    private void unselected() {
+        // Reset style
+        this.lblNavTitle.setStyle("");
+        this.lblNavTitle.setUnderline(false);
     }
 
     public String getText() {
