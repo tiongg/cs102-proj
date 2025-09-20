@@ -15,6 +15,8 @@ public class Router {
 
     public static void initialize() {
         Map<PageName, String> scenePaths = Map.ofEntries(
+                entry(PageName.Login, "scenes/LoginView.fxml"),
+                entry(PageName.Register, "scenes/RegisterView.fxml"),
                 entry(PageName.PastRecords, "scenes/ReportsView.fxml"),
                 entry(PageName.MyClasses, "scenes/MyClassesView.fxml"),
                 entry(PageName.Onboard, "scenes/OnboardView.fxml"),

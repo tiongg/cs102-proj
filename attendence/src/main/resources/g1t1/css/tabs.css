@@ -1,0 +1,6 @@
+.hidden-tabs {
+    -fx-tab-max-height: 0 ;
+}
+.hidden-tabs .tab-header-area {
+    visibility: hidden ;
+}

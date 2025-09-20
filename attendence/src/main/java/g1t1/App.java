@@ -10,8 +10,9 @@ import javafx.stage.Stage;
 import nu.pattern.OpenCV;
 
 public class App extends Application {
-    public static int WIDTH = 1440;
-    public static int HEIGHT = 700;
+    public static final int WIDTH = 1440;
+    public static final int HEIGHT = 700;
+    private static final PageName initialPage = PageName.Login;
 
     private static App instance;
     private Scene currentScene;
@@ -30,11 +31,14 @@ public class App extends Application {
         App.instance = this;
         Router.initialize();
 
-        Page pastRecordsPage = Router.scenes.get(PageName.PastRecords);
-        Scene scene = new Scene(pastRecordsPage.getRoot(), WIDTH, HEIGHT);
+        Page basePage = Router.scenes.get(initialPage);
+        Scene scene = new Scene(basePage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
+        scene.getStylesheets().add(getClass().getResource("css/app.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("css/stepper.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("css/tabs.css").toExternalForm());
 
-        Router.changePage(PageName.PastRecords);
+        Router.changePage(initialPage);
         stage.setScene(scene);
         stage.show();
     }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
+           xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.LoginViewController">
+    <VBox alignment="TOP_CENTER" layoutX="670.0" layoutY="331.0" maxHeight="300.0" maxWidth="465.0" prefHeight="300.0"
+          prefWidth="465.0" spacing="16.0"
+          style="-fx-background-color: #D7D7D7; -fx-border-radius: 24; -fx-background-radius: 24;">
+        <padding>
+            <Insets bottom="48.0" left="48.0" right="48.0" top="48.0"/>
+        </padding>
+        <Label text="APP NAME">
+            <font>
+                <Font name="Inter Semi Bold" size="32.0"/>
+            </font>
+        </Label>
+        <VBox>
+            <Label text="Teacher ID"/>
+            <TextField/>
+        </VBox>
+        <VBox layoutX="58.0" layoutY="114.0">
+            <Label text="Password"/>
+            <PasswordField/>
+        </VBox>
+        <Label alignment="CENTER_RIGHT" onMouseClicked="#goToRegister" text="I don't have an account"
+               textAlignment="RIGHT" underline="true">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </Label>
+    </VBox>
+</StackPane>
