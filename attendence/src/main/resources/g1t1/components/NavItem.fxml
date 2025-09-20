@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<fx:root xmlns:fx="http://javafx.com/fxml"
-         xmlns="http://javafx.com/javafx"
-         type="HBox"
-         alignment="CENTER_LEFT"
-         spacing="8"
-         onMouseClicked="#handleNavClick"
-         prefHeight="36.0"
->
+<fx:root xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER_LEFT" onMouseClicked="#handleNavClick" prefHeight="36.0" spacing="8"
+         type="HBox" xmlns="http://javafx.com/javafx/17.0.12">
     <FontIcon fx:id="icon" iconLiteral="far-file-alt" iconSize="18"/>
     <Label fx:id="lblNavTitle" text="Past Reports">
         <font>
@@ -23,4 +18,7 @@
     <padding>
         <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
     </padding>
+    <cursor>
+        <Cursor fx:constant="HAND"/>
+    </cursor>
 </fx:root>
