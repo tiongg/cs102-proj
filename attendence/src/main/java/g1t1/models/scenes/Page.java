@@ -7,14 +7,16 @@ import javafx.scene.Parent;
 import java.io.IOException;
 
 public class Page {
-    private Parent root;
-    private PageController controller;
+    private final Parent root;
+    private final PageController controller;
+    private final PageName pageName;
 
     // From root!!
-    public Page(String path) throws IOException {
+    public Page(PageName pageName, String path) throws IOException {
         FXMLLoader loader = new FXMLLoader(App.getInstance().getClass().getResource(path));
         this.root = loader.load();
         this.controller = loader.getController();
+        this.pageName = pageName;
     }
 
     public Parent getRoot() {
@@ -23,5 +25,9 @@ public class Page {
 
     public PageController getController() {
         return this.controller;
+    }
+
+    public PageName getPageName() {
+        return this.pageName;
     }
 }

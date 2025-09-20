@@ -2,6 +2,7 @@ package g1t1.components;
 
 import g1t1.App;
 import g1t1.models.scenes.PageName;
+import g1t1.models.scenes.Router;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -29,6 +30,7 @@ public class NavItem extends HBox {
         iconLiteralProperty.addListener(e -> {
             icon.setIconLiteral(((StringProperty) e).getValue());
         });
+
         try {
             loader.load();
         } catch (Exception e) {
@@ -38,7 +40,7 @@ public class NavItem extends HBox {
 
     @FXML
     private void handleNavClick(MouseEvent event) {
-        App.changePage(getTargetPage());
+        Router.changePage(getTargetPage());
     }
 
     public String getText() {
