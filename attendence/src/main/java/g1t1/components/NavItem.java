@@ -27,8 +27,8 @@ public class NavItem extends HBox {
         loader.setController(this);
         loader.setRoot(this);
 
-        iconLiteralProperty.addListener(e -> {
-            icon.setIconLiteral(((StringProperty) e).getValue());
+        iconLiteralProperty.addListener((observable, oldValue, newValue) -> {
+            icon.setIconLiteral(newValue);
         });
 
         Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {

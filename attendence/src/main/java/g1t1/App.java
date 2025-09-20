@@ -27,6 +27,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+        App.instance = this;
+        Router.initialize();
+
         Page pastRecordsPage = Router.scenes.get(PageName.PastRecords);
         Scene scene = new Scene(pastRecordsPage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
@@ -38,9 +41,6 @@ public class App extends Application {
 
     @Override
     public void init() {
-        App.instance = this;
-        Router.initialize();
-
         // Listen to router change events and navigate accordingly
         Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
             instance.currentScene.setRoot(e.getNewPage().getRoot());
