@@ -34,7 +34,9 @@ public class App extends Application {
         Page basePage = Router.scenes.get(initialPage);
         Scene scene = new Scene(basePage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
+        
         scene.getStylesheets().add(getClass().getResource("css/app.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("css/button.css").toExternalForm());
         scene.getStylesheets().add(getClass().getResource("css/stepper.css").toExternalForm());
         scene.getStylesheets().add(getClass().getResource("css/tabs.css").toExternalForm());
 

@@ -5,6 +5,8 @@ import g1t1.components.stepper.StepperControl;
 import g1t1.models.scenes.PageController;
 import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -15,6 +17,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 public class RegisterViewController extends PageController {
+    private final BooleanProperty canNext = new SimpleBooleanProperty(false);
+
     @FXML
     private StepperControl stepper;
     @FXML
@@ -28,52 +32,48 @@ public class RegisterViewController extends PageController {
     @FXML
     private HBox nextButton;
 
-    private boolean canNext = false;
-    private final ChangeListener<Boolean> validationChangeListener = (observableValue, oldValue, newValue) -> {
-        canNext = newValue;
-    };
-    private RegistrationStep prevStep;
-
     @Override
     public void onMount() {
-        stepper.currentIndexProperty().addListener((obv, oldNumber, newNumber) -> {
+        stepper.currentIndexProperty().addListener((obv, oldIndex, newIndex) -> {
             if (stepper.isLast()) {
                 nextText.setText("Login!");
             } else {
                 nextText.setText("Next");
             }
 
-            if (newNumber.intValue() == 0) {
+            if (newIndex.intValue() == 0) {
                 backText.setText("Login");
             } else {
                 backText.setText("Back");
             }
-
+            tabs.getSelectionModel().select(newIndex.intValue());
             updateButtonListeners();
         });
 
         updateButtonListeners();
+        canNext.addListener((obs, oldValue, newValue) -> {
+            if (newValue) {
+                nextButton.getStyleClass().remove("disabled");
+            } else {
+                nextButton.getStyleClass().add("disabled");
+            }
+        });
     }
 
     private void updateButtonListeners() {
-        if (prevStep != null) {
-            prevStep.validProperty().removeListener(validationChangeListener);
-        }
+        canNext.unbind();
         RegistrationStep step = (RegistrationStep) tabs.getSelectionModel().getSelectedItem();
-        prevStep = step;
-        step.validProperty().addListener(validationChangeListener);
+        canNext.bind(step.validProperty());
     }
 
 
     public void next() {
-        if (!canNext) {
+        if (!canNext.get()) {
             return;
         }
 
         if (!stepper.isLast()) {
             stepper.next();
-            int newIndex = stepper.getCurrentIndex();
-            tabs.getSelectionModel().select(newIndex);
         } else {
             // TODO: Auth logic
             Router.changePage(PageName.PastRecords);
@@ -83,7 +83,6 @@ public class RegisterViewController extends PageController {
     public void prev() {
         if (stepper.getCurrentIndex() != 0) {
             stepper.previous();
-            tabs.getSelectionModel().select(stepper.getCurrentIndex());
         } else {
             Router.changePage(PageName.Login);
         }

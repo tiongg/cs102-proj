@@ -4,5 +4,5 @@
 }
 
 .disabled {
-    -fx-background-color: "#f2f2f2";
+    -fx-opacity: 0.6;
 }

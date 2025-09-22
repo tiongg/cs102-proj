@@ -36,6 +36,8 @@ public class RegisterDetails extends Tab implements RegistrationStep {
         teacherIdInput.textProperty().addListener(e -> updateIsValid());
         nameInput.textProperty().addListener(e -> updateIsValid());
         emailInput.textProperty().addListener(e -> updateIsValid());
+
+        updateIsValid();
     }
 
     private void reset() {
