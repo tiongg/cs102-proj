@@ -52,7 +52,7 @@ public class NavItem extends HBox {
     }
 
     private void selected() {
-        this.lblNavTitle.setStyle("-fx-font-weight: bold;");
+        this.lblNavTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 20px;");
         this.lblNavTitle.setUnderline(true);
     }
 

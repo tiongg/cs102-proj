@@ -58,4 +58,8 @@ public class StepperControl extends Control {
     public void previous() {
         setCurrentIndex(getCurrentIndex() - 1);
     }
+
+    public boolean isLast() {
+        return currentIndexProperty().get() == labels.size() - 1;
+    }
 }

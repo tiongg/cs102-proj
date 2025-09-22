@@ -11,7 +11,7 @@ import nu.pattern.OpenCV;
 
 public class App extends Application {
     public static final int WIDTH = 1440;
-    public static final int HEIGHT = 700;
+    public static final int HEIGHT = 750;
     private static final PageName initialPage = PageName.Login;
 
     private static App instance;

@@ -2,3 +2,7 @@
     -fx-font-family: "Inter";
     -fx-font-size: 14px;
 }
+
+.disabled {
+    -fx-background-color: "#f2f2f2";
+}
