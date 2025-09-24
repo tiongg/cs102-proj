@@ -1,33 +1,49 @@
 package g1t1;
 
+import g1t1.models.scenes.Page;
+import g1t1.models.scenes.PageName;
+import g1t1.models.scenes.Router;
+import g1t1.utils.events.OnNavigateEvent;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nu.pattern.OpenCV;
 
 public class App extends Application {
-    @Override
-    public void start(Stage stage) {
-        String javaVersion = System.getProperty("java.version");
-        String javafxVersion = System.getProperty("javafx.version");
+    public static int WIDTH = 1440;
+    public static int HEIGHT = 700;
 
-        Label lblJavaVersion = new Label("Java version: " + javaVersion);
-        Label lblJavaFxVersion = new Label("JavaFX version: " + javafxVersion);
-        Label lblOpencvVersion = new Label("Opencv version: " + org.opencv.core.Core.VERSION);
+    private static App instance;
+    private Scene currentScene;
 
-        VBox vbox = new VBox(lblJavaVersion, lblJavaFxVersion, lblOpencvVersion);
-        vbox.setSpacing(12);
-
-        Scene scene = new Scene(new StackPane(vbox), 640, 480);
-        stage.setScene(scene);
-        stage.show();
+    public static App getInstance() {
+        return instance;
     }
 
     public static void main(String[] args) {
         OpenCV.loadLocally();
         launch();
+    }
+
+    @Override
+    public void start(Stage stage) {
+        App.instance = this;
+        Router.initialize();
+
+        Page pastRecordsPage = Router.scenes.get(PageName.PastRecords);
+        Scene scene = new Scene(pastRecordsPage.getRoot(), WIDTH, HEIGHT);
+        instance.currentScene = scene;
+
+        Router.changePage(PageName.PastRecords);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @Override
+    public void init() {
+        // Listen to router change events and navigate accordingly
+        Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
+            instance.currentScene.setRoot(e.getNewPage().getRoot());
+        });
     }
 }
