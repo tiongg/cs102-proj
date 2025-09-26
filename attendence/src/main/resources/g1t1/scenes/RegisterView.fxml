@@ -22,7 +22,7 @@
     <TabPane fx:id="tabs" layoutX="330.0" layoutY="128.0" prefHeight="700.0" prefWidth="780.0" styleClass="hidden-tabs"
              tabClosingPolicy="UNAVAILABLE" tabMaxHeight="50.0" tabMaxWidth="150.0" AnchorPane.bottomAnchor="128.0"
              AnchorPane.topAnchor="128.0">
-        <RegisterDetails/>
+        <TeacherRegisterDetails/>
         <PasswordDetails/>
         <FaceDetails/>
         <RegistrationDone/>

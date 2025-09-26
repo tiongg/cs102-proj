@@ -1,5 +1,7 @@
 package g1t1.components.register;
 
+import g1t1.models.ids.TeacherID;
+import g1t1.models.interfaces.HasDetails;
 import g1t1.models.scenes.Router;
 import g1t1.utils.events.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
@@ -8,9 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 
-public class RegisterDetails extends Tab implements RegistrationStep {
+public class TeacherRegisterDetails extends Tab implements RegistrationStep<HasDetails<TeacherID>> {
     private final BooleanProperty validProperty = new SimpleBooleanProperty(false);
     @FXML
     private TextField teacherIdInput;
@@ -19,7 +20,7 @@ public class RegisterDetails extends Tab implements RegistrationStep {
     @FXML
     private TextField emailInput;
 
-    public RegisterDetails() {
+    public TeacherRegisterDetails() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("RegisterDetails.fxml"));
         loader.setController(this);
         loader.setRoot(this);
@@ -57,5 +58,24 @@ public class RegisterDetails extends Tab implements RegistrationStep {
     @Override
     public BooleanProperty validProperty() {
         return validProperty;
+    }
+
+    @Override
+    public void setProperty(HasDetails<TeacherID> target) {
+        target.setEmail(this.getEmail());
+        target.setName(this.getName());
+        target.setId(new TeacherID(getTeacherId()));
+    }
+
+    public String getTeacherId() {
+        return this.teacherIdInput.getText();
+    }
+
+    public String getName() {
+        return this.nameInput.getText();
+    }
+
+    public String getEmail() {
+        return this.emailInput.getText();
     }
 }

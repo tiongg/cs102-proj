@@ -1,5 +1,6 @@
 package g1t1.components.register;
 
+import g1t1.models.interfaces.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.utils.events.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
@@ -7,7 +8,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 
-public class FaceDetails extends Tab implements RegistrationStep {
+public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
+    private final BooleanProperty isValid = new SimpleBooleanProperty(true);
+
     public FaceDetails() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("FaceDetails.fxml"));
         loader.setController(this);
@@ -24,6 +27,11 @@ public class FaceDetails extends Tab implements RegistrationStep {
 
     @Override
     public BooleanProperty validProperty() {
-        return new SimpleBooleanProperty();
+        return this.isValid;
+    }
+
+    @Override
+    public void setProperty(HasFaces value) {
+        
     }
 }

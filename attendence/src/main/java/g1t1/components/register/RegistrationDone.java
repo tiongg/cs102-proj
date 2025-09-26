@@ -1,5 +1,6 @@
 package g1t1.components.register;
 
+import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.Router;
 import g1t1.utils.events.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
@@ -7,7 +8,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 
-public class RegistrationDone extends Tab implements RegistrationStep {
+public class RegistrationDone extends Tab implements RegistrationStep<HasProperty> {
+    private final BooleanProperty validProperty = new SimpleBooleanProperty(true);
+
     public RegistrationDone() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("RegistrationDone.fxml"));
         loader.setController(this);
@@ -19,11 +22,22 @@ public class RegistrationDone extends Tab implements RegistrationStep {
         }
 
         Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
+            reset();
         });
+    }
+
+    private void reset() {
+
     }
 
     @Override
     public BooleanProperty validProperty() {
-        return new SimpleBooleanProperty();
+        return this.validProperty;
+    }
+
+    // No data to add on. Ignore
+    @Override
+    public void setProperty(HasProperty value) {
+        // no op
     }
 }
