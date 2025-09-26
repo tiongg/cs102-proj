@@ -7,15 +7,19 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 
 public class PasswordDetails extends Tab implements RegistrationStep<HasPassword> {
     private final BooleanProperty validProperty = new SimpleBooleanProperty(false);
     @FXML
-    private TextField passwordInput;
+    private PasswordField passwordInput;
     @FXML
-    private TextField confirmPasswordInput;
+    private PasswordField confirmPasswordInput;
+    @FXML
+    private Label lblErrorMessage;
 
     public PasswordDetails() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("PasswordDetails.fxml"));
@@ -33,6 +37,7 @@ public class PasswordDetails extends Tab implements RegistrationStep<HasPassword
 
         passwordInput.textProperty().addListener((e) -> updateValidProperty());
         confirmPasswordInput.textProperty().addListener((e) -> updateValidProperty());
+        lblErrorMessage.visibleProperty().bind(validProperty.not());
     }
 
     private void reset() {
