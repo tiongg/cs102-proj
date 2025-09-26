@@ -20,16 +20,6 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
     private FaceData thumbnailFace;
 
     @Override
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public void setFaceData(List<FaceData> faceData) {
-        this.faceData = faceData;
-    }
-
-    @Override
     public void setThumbnail(FaceData thumbnail) {
         this.thumbnailFace = thumbnail;
     }
@@ -45,11 +35,6 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
     }
 
     @Override
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
     public String toString() {
         return "RegisterTeacher{" +
                 "password='" + password + '\'' +
@@ -59,4 +44,42 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
                 '}';
     }
 
+    public TeacherID getTeacherID() {
+        return teacherID;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<FaceData> getFaceData() {
+        return faceData;
+    }
+
+    @Override
+    public void setFaceData(List<FaceData> faceData) {
+        this.faceData = faceData;
+    }
+
+    public FaceData getThumbnailFace() {
+        return thumbnailFace;
+    }
 }

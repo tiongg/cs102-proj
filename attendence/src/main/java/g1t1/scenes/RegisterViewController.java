@@ -53,8 +53,17 @@ public class RegisterViewController extends PageController {
             } else {
                 backText.setText("Back");
             }
+
             getCurrentStep().setProperty(this.registerTeacher);
             tabs.getSelectionModel().select(newIndex.intValue());
+
+            // Set property for last step BEFORE the button press
+            // so that it is able to render the details
+            // This is an abuse of the has property interface
+            if (stepper.isLast()) {
+                getCurrentStep().setProperty(this.registerTeacher);
+            }
+
             updateButtonListeners();
         });
 
@@ -83,8 +92,8 @@ public class RegisterViewController extends PageController {
         if (!stepper.isLast()) {
             stepper.next();
         } else {
-            System.out.println("Registered user:");
-            System.out.println(this.registerTeacher);
+//            System.out.println("Registered user:");
+//            System.out.println(this.registerTeacher);
             // TODO: Auth logic
             Router.changePage(PageName.PastRecords);
         }
