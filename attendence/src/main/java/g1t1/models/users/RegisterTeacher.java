@@ -1,8 +1,8 @@
 package g1t1.models.users;
 
 import g1t1.models.ids.TeacherID;
-import g1t1.models.interfaces.HasFaces;
 import g1t1.models.interfaces.HasDetails;
+import g1t1.models.interfaces.HasFaces;
 import g1t1.models.interfaces.HasPassword;
 
 import java.util.List;
