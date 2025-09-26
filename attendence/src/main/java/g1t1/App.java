@@ -12,7 +12,7 @@ import nu.pattern.OpenCV;
 public class App extends Application {
     public static final int WIDTH = 1440;
     public static final int HEIGHT = 750;
-    private static final PageName initialPage = PageName.Login;
+    private static final PageName initialPage = PageName.PastRecords;
 
     private static App instance;
     private Scene currentScene;
@@ -34,7 +34,7 @@ public class App extends Application {
         Page basePage = Router.scenes.get(initialPage);
         Scene scene = new Scene(basePage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
-        
+
         scene.getStylesheets().add(getClass().getResource("css/app.css").toExternalForm());
         scene.getStylesheets().add(getClass().getResource("css/button.css").toExternalForm());
         scene.getStylesheets().add(getClass().getResource("css/stepper.css").toExternalForm());
