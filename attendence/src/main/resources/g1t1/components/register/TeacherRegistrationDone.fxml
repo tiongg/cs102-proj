@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<fx:root xmlns:fx="http://javafx.com/fxml"
+         xmlns="http://javafx.com/javafx"
+         type="Tab"
+         text="Registration Done"
+>
+    <AnchorPane prefHeight="500.0" prefWidth="782.0">
+        <VBox layoutX="2.0" layoutY="40.0" maxWidth="-Infinity" prefWidth="780.0" spacing="32.0"
+              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
+            <Label text="We're done! Please confirm your details before submitting." textFill="#a6a6a6"/>
+
+            <HBox spacing="24" style="-fx-border-color: #d7d7d7; -fx-border-radius: 24px;">
+                <VBox alignment="CENTER">
+                    <VBox alignment="TOP_CENTER" style="-fx-border-color: #d9d9d9; -fx-border-radius: 8px;">
+                        <ImageView pickOnBounds="true" preserveRatio="true"
+                                   fitHeight="256" fitWidth="256"
+                                   cache="true">
+                            <Image url="@/g1t1/images/empty-avatar.png"/>
+                        </ImageView>
+                        <VBox.margin>
+                            <Insets left="16.0" right="16.0" top="16.0"/>
+                        </VBox.margin>
+                        <padding>
+                            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+                        </padding>
+                    </VBox>
+                    <Label fx:id="lblName" text="Teacher name">
+                        <font>
+                            <Font name="Inter Semi Bold" size="16.0"/>
+                        </font>
+                    </Label>
+                    <Label text="Teacher">
+                        <font>
+                            <Font name="Inter Regular" size="12.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox alignment="CENTER_LEFT" fillWidth="false" prefHeight="290.0" prefWidth="417.0"
+                      spacing="12" HBox.hgrow="ALWAYS">
+                    <VBox prefHeight="43.0" prefWidth="400">
+                        <Label text="Teacher ID">
+                            <font>
+                                <Font name="Inter Semi Bold" size="16.0"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="lblId">
+                            <font>
+                                <Font name="Inter Regular" size="16.0"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                    <VBox prefHeight="43.0" prefWidth="400">
+                        <Label text="Email">
+                            <font>
+                                <Font name="Inter Semi Bold" size="16.0"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="lblEmail">
+                            <font>
+                                <Font name="Inter Regular" size="16.0"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                    <HBox.margin>
+                        <Insets bottom="48.0" top="16.0"/>
+                    </HBox.margin>
+                </VBox>
+                <padding>
+                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+                </padding>
+            </HBox>
+        </VBox>
+    </AnchorPane>
+</fx:root>
