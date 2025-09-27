@@ -5,8 +5,6 @@ import g1t1.models.interfaces.HasDetails;
 import g1t1.models.interfaces.HasFaces;
 import g1t1.models.interfaces.HasPassword;
 
-import java.util.List;
-
 /**
  * User/Teacher created from the registration step
  */
@@ -16,11 +14,11 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
     private String email;
     private String password;
 
-    private List<FaceData> faceData;
-    private FaceData thumbnailFace;
+    private FaceData faceData;
+    private byte[] thumbnailFace;
 
     @Override
-    public void setThumbnail(FaceData thumbnail) {
+    public void setThumbnail(byte[] thumbnail) {
         this.thumbnailFace = thumbnail;
     }
 
@@ -70,16 +68,16 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
         this.password = password;
     }
 
-    public List<FaceData> getFaceData() {
+    public FaceData getFaceData() {
         return faceData;
     }
 
     @Override
-    public void setFaceData(List<FaceData> faceData) {
+    public void setFaceData(FaceData faceData) {
         this.faceData = faceData;
     }
 
-    public FaceData getThumbnailFace() {
+    public byte[] getThumbnailFace() {
         return thumbnailFace;
     }
 }

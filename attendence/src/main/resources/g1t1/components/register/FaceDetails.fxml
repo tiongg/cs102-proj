@@ -24,7 +24,7 @@
                     <VBox alignment="TOP_CENTER" style="-fx-border-color: #d9d9d9; -fx-border-radius: 8px;">
                         <ImageView pickOnBounds="true" preserveRatio="true"
                                    fitHeight="256" fitWidth="256"
-                                   cache="true">
+                                   cache="true" fx:id="ivCameraView">
                             <Image url="@/g1t1/images/empty-avatar.png"/>
                         </ImageView>
                         <VBox.margin>

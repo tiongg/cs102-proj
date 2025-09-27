@@ -6,5 +6,21 @@ import javafx.beans.property.BooleanProperty;
 public interface RegistrationStep<T extends HasProperty> {
     public BooleanProperty validProperty();
 
-    public void setProperty(T value);
+    /*
+    Set property of target registrant
+     */
+    public default void setProperty(T value) {
+    }
+
+    /*
+    When tab is stepped to
+     */
+    public default void onMount(Object currentRegistrant) {
+    }
+
+    /*
+    When tab is stepped off
+     */
+    public default void onUnmount() {
+    }
 }

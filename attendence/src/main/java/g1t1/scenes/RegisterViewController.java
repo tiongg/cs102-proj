@@ -9,15 +9,10 @@ import g1t1.models.scenes.Router;
 import g1t1.models.users.RegisterTeacher;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 
 public class RegisterViewController extends PageController {
     private final BooleanProperty canNext = new SimpleBooleanProperty(false);
@@ -55,14 +50,9 @@ public class RegisterViewController extends PageController {
             }
 
             getCurrentStep().setProperty(this.registerTeacher);
+            getCurrentStep().onUnmount();
             tabs.getSelectionModel().select(newIndex.intValue());
-
-            // Set property for last step BEFORE the button press
-            // so that it is able to render the details
-            // This is an abuse of the has property interface
-            if (stepper.isLast()) {
-                getCurrentStep().setProperty(this.registerTeacher);
-            }
+            getCurrentStep().onMount(this.registerTeacher);
 
             updateButtonListeners();
         });
