@@ -14,7 +14,7 @@ If this prints out a version, you are good to go!
 
 # Running the app
 
-First, ensure we are in the right directory
+From the root directory (`cs102-proj`), navigate to the attendance folder:
 ```bash
 cd attendence
 ```
@@ -34,7 +34,7 @@ mvn compile -Dexec.mainClass=g1t1.other.MainFile exec:java
 
 # Building
 
-First, ensure we are in the right directory
+From the root directory (`cs102-proj`), navigate to the attendance folder:
 ```bash
 cd attendence
 ```
