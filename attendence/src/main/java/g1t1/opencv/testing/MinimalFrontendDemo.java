@@ -1,21 +1,5 @@
 package g1t1.opencv.testing;
 
-import g1t1.models.users.Student;
-import g1t1.models.users.FaceData;
-import g1t1.opencv.FaceRecognitionService;
-import g1t1.opencv.events.FaceEventListener;
-import g1t1.opencv.events.StudentDetectedEvent;
-import g1t1.opencv.events.AttendanceSessionEvent;
-
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,17 +7,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import g1t1.models.users.FaceData;
+import g1t1.models.users.Student;
+import g1t1.opencv.FaceRecognitionService;
+import g1t1.opencv.events.AttendanceSessionEvent;
+import g1t1.opencv.events.FaceEventListener;
+import g1t1.opencv.events.StudentDetectedEvent;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 /**
  * Minimal JavaFX Frontend Demo
  *
  * PURPOSE: Demonstrates REAL JavaFX integration with face recognition system.
  * Shows how UI components update in real-time based on face detection events.
  *
- * HOW TO RUN:
- * cd attendence && mvn compile javafx:run -Djavafx.mainClass="g1t1.opencv.testing.MinimalFrontendDemo"
+ * HOW TO RUN: cd attendence && mvn compile javafx:run
+ * -Djavafx.mainClass="g1t1.opencv.testing.MinimalFrontendDemo"
  */
 public class MinimalFrontendDemo extends Application {
-
     // UI Components
     private Button startButton;
     private Button stopButton;
@@ -46,7 +48,6 @@ public class MinimalFrontendDemo extends Application {
     private FaceRecognitionService faceService;
     private List<Student> enrolledStudents;
 
-    @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Face Recognition Frontend Demo");
 
@@ -105,16 +106,8 @@ public class MinimalFrontendDemo extends Application {
         logTextArea.setPrefHeight(120);
         logTextArea.setEditable(false);
 
-        root.getChildren().addAll(
-            titleLabel,
-            buttonBox,
-            statusLabel,
-            attendanceLabel,
-            attendanceListView,
-            totalCountLabel,
-            logLabel,
-            logTextArea
-        );
+        root.getChildren().addAll(titleLabel, buttonBox, statusLabel, attendanceLabel, attendanceListView,
+                totalCountLabel, logLabel, logTextArea);
 
         return root;
     }
@@ -165,10 +158,8 @@ public class MinimalFrontendDemo extends Application {
         @Override
         public void onStudentDetected(StudentDetectedEvent event) {
             Platform.runLater(() -> {
-                String studentInfo = String.format("%s (ID: %s) - %.1f%% confidence",
-                    event.getStudent().getName(),
-                    event.getStudent().getId().toString(),
-                    event.getConfidence());
+                String studentInfo = String.format("%s (ID: %s) - %.1f%% confidence", event.getStudent().getName(),
+                        event.getStudent().getId().toString(), event.getConfidence());
 
                 // Update attendance list (avoid duplicates by checking if already exists)
                 if (!attendanceListView.getItems().contains(studentInfo)) {
@@ -207,7 +198,8 @@ public class MinimalFrontendDemo extends Application {
         enrolledStudents = new ArrayList<>();
         File baseDir = new File("test-photos");
 
-        if (!baseDir.exists()) return;
+        if (!baseDir.exists())
+            return;
 
         File[] studentDirs = baseDir.listFiles(File::isDirectory);
         if (studentDirs != null) {
@@ -230,8 +222,7 @@ public class MinimalFrontendDemo extends Application {
         List<byte[]> photos = new ArrayList<>();
         File folder = new File(folderPath);
 
-        File[] files = folder.listFiles((dir, name) ->
-            name.toLowerCase().matches(".*\\.(jpg|jpeg)$"));
+        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().matches(".*\\.(jpg|jpeg)$"));
 
         if (files != null) {
             Arrays.sort(files);
@@ -248,8 +239,7 @@ public class MinimalFrontendDemo extends Application {
     }
 
     private Student createStudent(String id, String name, List<byte[]> photos) {
-        Student student = new Student(id, name, "CS102", "T01",
-                                    name.toLowerCase() + "@school.edu", "12345678");
+        Student student = new Student(id, name, "CS102", "T01", name.toLowerCase() + "@school.edu", "12345678");
         FaceData faceData = new FaceData();
         faceData.setFaceImages(photos);
         student.setFaceData(faceData);
