@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextField;
 
 public class PasswordDetails extends Tab implements RegistrationStep<HasPassword> {
     private final BooleanProperty validProperty = new SimpleBooleanProperty(false);

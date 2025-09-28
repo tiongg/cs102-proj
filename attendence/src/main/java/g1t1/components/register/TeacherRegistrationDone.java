@@ -3,6 +3,7 @@ package g1t1.components.register;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.RegisterTeacher;
+import g1t1.utils.ImageUtils;
 import g1t1.utils.events.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -10,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.image.ImageView;
 
 public class TeacherRegistrationDone extends Tab implements RegistrationStep<HasProperty> {
     private final BooleanProperty validProperty = new SimpleBooleanProperty(true);
@@ -19,6 +21,8 @@ public class TeacherRegistrationDone extends Tab implements RegistrationStep<Has
     private Label lblId;
     @FXML
     private Label lblEmail;
+    @FXML
+    private ImageView ivThumbnail;
 
     public TeacherRegistrationDone() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("TeacherRegistrationDone.fxml"));
@@ -45,11 +49,11 @@ public class TeacherRegistrationDone extends Tab implements RegistrationStep<Has
     }
 
     @Override
-    public void setProperty(HasProperty value) {
-        // Not exactly the proper use...
-        RegisterTeacher registrationDetails = (RegisterTeacher) value;
+    public void onMount(Object currentRegistrant) {
+        RegisterTeacher registrationDetails = (RegisterTeacher) currentRegistrant;
         lblName.setText(registrationDetails.getFullName());
         lblId.setText(registrationDetails.getTeacherID().toString());
         lblEmail.setText(registrationDetails.getEmail());
+        ivThumbnail.setImage(ImageUtils.bytesToImage(registrationDetails.getThumbnailFace()));
     }
 }

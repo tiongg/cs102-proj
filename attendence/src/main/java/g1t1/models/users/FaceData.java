@@ -1,4 +1,5 @@
 package g1t1.models.users;
+
 import java.util.List;
 
 /**
@@ -9,6 +10,10 @@ public class FaceData {
     private List<byte[]> faceImages; // JPEG-encoded face images
 
     public FaceData() {
+    }
+
+    public FaceData(List<byte[]> faceImages) {
+        this.faceImages = faceImages;
     }
 
     public List<byte[]> getFaceImages() {

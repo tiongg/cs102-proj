@@ -3,29 +3,86 @@ package g1t1.components.register;
 import g1t1.models.interfaces.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
+import g1t1.opencv.config.FaceConfig;
+import g1t1.utils.ImageUtils;
+import g1t1.utils.ThreadWithRunnable;
 import g1t1.utils.events.OnNavigateEvent;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.image.ImageView;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
 
-import java.util.ArrayList;
-import java.util.List;
+class CameraRunnable implements Runnable {
+    private static final int TARGET_SIZE = 256;
+    private final VideoCapture camera;
+    private final ImageView display;
+    private final Object frameLock = new Object();
+    private final Mat currentFrame = new Mat();
+
+    public CameraRunnable(ImageView display) {
+        this.camera = new VideoCapture(FaceConfig.getInstance().getCameraIndex());
+        this.display = display;
+    }
+
+    @Override
+    public void run() {
+        Mat frame = new Mat();
+        while (camera.isOpened()) {
+            if (Thread.currentThread().isInterrupted()) {
+                camera.release();
+                break;
+            }
+
+            if (!camera.read(frame) || frame.empty()) {
+                continue;
+            }
+            Mat croppedFrame = ImageUtils.cropToSquare(frame, TARGET_SIZE);
+
+            // Update the shared frame
+            synchronized (frameLock) {
+                croppedFrame.copyTo(currentFrame);
+            }
+
+            Platform.runLater(() -> {
+                display.setImage(ImageUtils.matToImage(croppedFrame));
+            });
+        }
+    }
+
+    public byte[] getCurrentFrame() {
+        synchronized (frameLock) {
+            if (!currentFrame.empty()) {
+                MatOfByte buffer = new MatOfByte();
+                Imgcodecs.imencode(".png", currentFrame, buffer);
+                return buffer.toArray();
+            }
+        }
+        return new byte[]{};
+    }
+}
 
 public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
     private final BooleanProperty isValid = new SimpleBooleanProperty(true);
-    private final IntegerProperty photosTaken = new SimpleIntegerProperty(0);
-    private final List<FaceData> faceData = new ArrayList<>();
+    private final ListProperty<byte[]> photosTaken = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final int REQUIRED_PICTURE_COUNT = 15;
-
-    private FaceData thumbnailImage;
+    private ThreadWithRunnable<CameraRunnable> cameraDaemon;
+    private byte[] thumbnailImage;
 
     @FXML
     private Label lblTakenPictures;
+    @FXML
+    private ImageView ivCameraView;
 
     public FaceDetails() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("FaceDetails.fxml"));
@@ -41,8 +98,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
             reset();
         });
 
-        lblTakenPictures.textProperty().bind(photosTaken.map(x -> String.format("%d / %d", x.intValue(), REQUIRED_PICTURE_COUNT)));
-        isValid.bind(photosTaken.map(x -> x.intValue() >= REQUIRED_PICTURE_COUNT));
+        lblTakenPictures.textProperty().bind(photosTaken.map(x -> String.format("%d / %d", x.size(), REQUIRED_PICTURE_COUNT)));
+        isValid.bind(photosTaken.map(x -> x.size() >= REQUIRED_PICTURE_COUNT));
     }
 
     @Override
@@ -52,20 +109,36 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
 
     @Override
     public void setProperty(HasFaces target) {
-        target.setFaceData(this.faceData);
+        target.setFaceData(new FaceData(this.photosTaken.get()));
+        target.setThumbnail(this.thumbnailImage);
+    }
+
+    @Override
+    public void onUnmount() {
+        cameraDaemon.interrupt();
+        cameraDaemon = null;
+    }
+
+    @Override
+    public void onMount(Object _target) {
+        CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView);
+        this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
+        this.cameraDaemon.setDaemon(true);
+        this.cameraDaemon.start();
     }
 
     private void reset() {
-        this.photosTaken.set(0);
-        this.faceData.clear();
+        this.photosTaken.clear();
         thumbnailImage = null;
     }
 
     public void takePicture() {
-        this.photosTaken.set(this.photosTaken.get() + 1);
-
-        // TODO: Take picture somehow
-
-        thumbnailImage = null;
+        byte[] frame = this.cameraDaemon.getRunnable().getCurrentFrame();
+        // First image taken is thumbnail
+        if (thumbnailImage == null) {
+            // Clone incase processing pipeline modifies original buffer
+            thumbnailImage = frame.clone();
+        }
+        this.photosTaken.add(frame);
     }
 }
