@@ -21,6 +21,7 @@ public class Router {
                 entry(PageName.MyClasses, "scenes/MyClassesView.fxml"),
                 entry(PageName.Onboard, "scenes/OnboardView.fxml"),
                 entry(PageName.StartSession, "scenes/StartSessionView.fxml"),
+                entry(PageName.DuringSession, "scenes/DuringSessionView.fxml"),
                 entry(PageName.Settings, "scenes/SettingsView.fxml")
         );
 

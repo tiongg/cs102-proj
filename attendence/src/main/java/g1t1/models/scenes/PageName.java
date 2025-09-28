@@ -7,6 +7,9 @@ public enum PageName {
     PastRecords,
     MyClasses,
     Onboard,
+
     StartSession,
+    DuringSession,
+
     Settings
 }
