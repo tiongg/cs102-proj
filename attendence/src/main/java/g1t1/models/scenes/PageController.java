@@ -6,4 +6,11 @@ public abstract class PageController {
      */
     public void onMount() {
     }
+
+    /**
+     * Called when a page is swapped off
+     */
+    public void onUnmount() {
+
+    }
 }
