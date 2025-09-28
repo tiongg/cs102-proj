@@ -3,15 +3,19 @@ package g1t1.opencv;
 import g1t1.features.logger.AppLogger;
 import g1t1.models.users.Student;
 import g1t1.opencv.config.FaceConfig;
-import g1t1.opencv.events.*;
+import g1t1.opencv.events.AttendanceSessionEvent;
+import g1t1.opencv.events.EventEmitter;
+import g1t1.opencv.events.StudentDetectedEvent;
 import g1t1.opencv.models.*;
-import g1t1.opencv.services.*;
-import g1t1.opencv.services.recognition.*;
+import g1t1.opencv.services.FaceDetector;
+import g1t1.opencv.services.MaskDetector;
 import g1t1.opencv.services.liveness.LivenessChecker;
+import g1t1.opencv.services.recognition.HistogramRecognizer;
+import g1t1.opencv.services.recognition.MaskAwareRecognizer;
+import g1t1.opencv.services.recognition.Recognizer;
 import org.opencv.core.*;
-import org.opencv.highgui.*;
-import org.opencv.imgproc.*;
-import org.opencv.videoio.*;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.videoio.VideoCapture;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FaceRecognitionService {
     private static FaceRecognitionService instance;
+    private final int FRAME_SKIP_INTERVAL = 2;
+    private final long RECOGNITION_CACHE_DURATION = 2000;
     private EventEmitter eventEmitter;
     private boolean isRunning;
     private List<Student> enrolledStudents;
@@ -37,13 +43,10 @@ public class FaceRecognitionService {
     private Set<String> loggedStudents;
     private Map<String, Boolean> maskCache;
     private Map<String, Long> lastMaskCheckTime;
-
     private int frameSkipCounter = 0;
-    private final int FRAME_SKIP_INTERVAL = 2;
     private List<DetectedFace> cachedFaces = new ArrayList<>();
     private Map<String, RecognitionResult> recognitionCache = new ConcurrentHashMap<>();
     private Map<String, Long> recognitionCacheTime = new ConcurrentHashMap<>();
-    private final long RECOGNITION_CACHE_DURATION = 2000;
 
     private FaceRecognitionService() {
         this.eventEmitter = new EventEmitter();
@@ -90,10 +93,9 @@ public class FaceRecognitionService {
 
         // Emit session started event
         eventEmitter.emitAttendanceSessionEvent(
-            new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED)
+                new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED)
         );
 
-        startCameraProcessing();
     }
 
     /**
@@ -112,11 +114,9 @@ public class FaceRecognitionService {
         if (currentSession != null) {
             currentSession.endSession();
             eventEmitter.emitAttendanceSessionEvent(
-                new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_ENDED)
+                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_ENDED)
             );
         }
-
-        stopCameraProcessing();
 
         histogramRecognizer.cleanup();
         maskAwareRecognizer.cleanup();
@@ -159,134 +159,75 @@ public class FaceRecognitionService {
         return currentSession;
     }
 
-    private void startCameraProcessing() {
-        camera = new VideoCapture(FaceConfig.getInstance().getCameraIndex());
-        if (!camera.isOpened()) {
-            if (FaceConfig.getInstance().isLoggingEnabled()) {
-                AppLogger.log("Failed to open camera");
-            }
-            return;
+    public void processFrame(Mat frame, List<DetectionBoundingBox> boxes) {
+        List<DetectedFace> detectedFaces;
+        if (frameSkipCounter % FRAME_SKIP_INTERVAL == 0) {
+            Mat smallFrame = new Mat();
+            double scaleFactor = 0.5;
+            Imgproc.resize(frame, smallFrame, new Size(frame.cols() * scaleFactor, frame.rows() * scaleFactor));
+
+            List<DetectedFace> smallDetections = faceDetector.detectFaces(smallFrame);
+            detectedFaces = scaleDetectedFaces(smallDetections, 1.0 / scaleFactor);
+            cachedFaces = detectedFaces;
+            frameSkipCounter = 0;
+
+            smallFrame.release();
+        } else {
+            detectedFaces = cachedFaces;
         }
+        frameSkipCounter++;
 
-        processingThread = new Thread(this::processFrames);
-        processingThread.start();
-    }
-
-    private void stopCameraProcessing() {
-        if (processingThread != null) {
-            try {
-                processingThread.join(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        if (camera != null && camera.isOpened()) {
-            camera.release();
-        }
-    }
-
-    private void processFrames() {
-        Mat frame = new Mat();
-
-        while (isRunning && camera.isOpened()) {
-            if (!camera.read(frame) || frame.empty()) {
-                continue;
-            }
-
-            List<DetectedFace> detectedFaces;
-            if (frameSkipCounter % FRAME_SKIP_INTERVAL == 0) {
-                Mat smallFrame = new Mat();
-                double scaleFactor = 0.5;
-                Imgproc.resize(frame, smallFrame, new Size(frame.cols() * scaleFactor, frame.rows() * scaleFactor));
-
-                List<DetectedFace> smallDetections = faceDetector.detectFaces(smallFrame);
-                detectedFaces = scaleDetectedFaces(smallDetections, 1.0 / scaleFactor);
-                cachedFaces = detectedFaces;
-
-                smallFrame.release();
-            } else {
-                detectedFaces = cachedFaces;
-            }
-            frameSkipCounter++;
-
-            // Draw detection boxes and try recognition
-            Mat displayFrame = frame.clone();
-            for (DetectedFace detectedFace : detectedFaces) {
-                Rect box = detectedFace.getBoundingBox();
-                if (box != null) {
-                    Imgproc.rectangle(displayFrame,
+        // Draw detection boxes and try recognition
+        boxes.clear();
+        for (DetectedFace detectedFace : detectedFaces) {
+            Rect box = detectedFace.getBoundingBox();
+            if (box != null) {
+                boxes.add(new DetectionBoundingBox(
                         new Point(box.x, box.y),
                         new Point(box.x + box.width, box.y + box.height),
-                        new Scalar(0, 255, 0), 2);
+                        new Scalar(0, 255, 0), 2));
 
-                    Mat faceRegion = faceDetector.extractFaceRegion(frame, detectedFace);
-                    if (!faceRegion.empty()) {
-                        boolean isLive = true;
-                        String livenessInfo = "";
+                Mat faceRegion = faceDetector.extractFaceRegion(frame, detectedFace);
+                if (!faceRegion.empty()) {
+                    boolean isLive = true;
+                    String livenessInfo = "";
 
-                        if (FaceConfig.getInstance().isLivenessEnabled()) {
-                            LivenessResult livenessResult = livenessChecker.checkLiveness(faceRegion);
-                            isLive = livenessResult.isLive();
-                            livenessInfo = isLive ? "" : " (PHOTO?)";
-                        }
+                    if (FaceConfig.getInstance().isLivenessEnabled()) {
+                        LivenessResult livenessResult = livenessChecker.checkLiveness(faceRegion);
+                        isLive = livenessResult.isLive();
+                        livenessInfo = isLive ? "" : " (PHOTO?)";
+                    }
 
-                        if (isLive) {
-                            RecognitionResult result = getCachedOrNewRecognition(faceRegion, enrolledStudents,
-                                                                                String.valueOf(detectedFace.getFaceId()));
+                    if (isLive) {
+                        RecognitionResult result = getCachedOrNewRecognition(faceRegion, enrolledStudents,
+                                String.valueOf(detectedFace.getFaceId()));
 
-                            if (result != null) {
-                                Student recognizedStudent = result.getMatchedStudent();
-                                double confidence = result.getConfidence();
+                        if (result != null) {
+                            Student recognizedStudent = result.getMatchedStudent();
+                            double confidence = result.getConfidence();
 
-                                if (confidence >= FaceConfig.getInstance().getDisplayThreshold()) {
-                                    Imgproc.rectangle(displayFrame,
+                            if (confidence >= FaceConfig.getInstance().getDisplayThreshold()) {
+                                boxes.add(new DetectionBoundingBox(
                                         new Point(box.x, box.y),
                                         new Point(box.x + box.width, box.y + box.height),
-                                        new Scalar(255, 0, 0), 3);
+                                        new Scalar(255, 0, 0), 3,
+                                        recognizedStudent.getName(), livenessInfo, confidence));
 
-                                    String nameLabel = recognizedStudent.getName() +
-                                                     " (" + String.format("%.1f%%", confidence) + ")" + livenessInfo;
-                                    Imgproc.putText(displayFrame, nameLabel,
-                                        new Point(box.x, box.y - 10),
-                                        Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
-                                        new Scalar(255, 0, 0), 2);
-
-                                    handleRecognitionResult(recognizedStudent, confidence);
-                                }
+                                handleRecognitionResult(recognizedStudent, confidence);
                             }
-                        } else {
-                            Imgproc.rectangle(displayFrame,
+                        }
+                    } else {
+                        // Liveliness check failed
+                        boxes.add(new DetectionBoundingBox(
                                 new Point(box.x, box.y),
                                 new Point(box.x + box.width, box.y + box.height),
-                                new Scalar(0, 0, 255), 3);
-
-                            Imgproc.putText(displayFrame, "PHOTO DETECTED",
-                                new Point(box.x, box.y - 10),
-                                Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
-                                new Scalar(0, 0, 255), 2);
-                        }
-                        faceRegion.release();
+                                new Scalar(0, 0, 255), 3, true
+                        ));
                     }
+                    faceRegion.release();
                 }
             }
-
-            // Show camera window
-            HighGui.imshow("Face Recognition - Green=Detection, Blue=Recognition", displayFrame);
-            HighGui.waitKey(1);
-            displayFrame.release();
-
-            try {
-                int targetFps = FaceConfig.getInstance().getTargetFps();
-                int sleepMs = Math.max(1, 1000 / targetFps);
-                Thread.sleep(sleepMs);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
         }
-
-        frame.release();
     }
 
     private void handleRecognitionResult(Student student, double confidence) {
@@ -301,14 +242,14 @@ public class FaceRecognitionService {
             loggedStudents.add(studentId);
             if (FaceConfig.getInstance().isLoggingEnabled()) {
                 AppLogger.log("Student detected: " + student.getName() +
-                            " (ID: " + studentId + ", Section: " + student.getModuleSection() + ")");
+                        " (ID: " + studentId + ", Section: " + student.getModuleSection() + ")");
             }
         }
 
         if (isNewStudent || (confidence - previousMaxConfidence >= 1.0)) {
             eventEmitter.emitStudentDetected(new StudentDetectedEvent(student, confidence));
             eventEmitter.emitAttendanceSessionEvent(
-                new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.STUDENT_UPDATED)
+                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.STUDENT_UPDATED)
             );
         }
     }
@@ -351,10 +292,10 @@ public class FaceRecognitionService {
             Rect smallBox = smallFace.getBoundingBox();
             if (smallBox != null) {
                 Rect scaledBox = new Rect(
-                    (int) (smallBox.x * scale),
-                    (int) (smallBox.y * scale),
-                    (int) (smallBox.width * scale),
-                    (int) (smallBox.height * scale)
+                        (int) (smallBox.x * scale),
+                        (int) (smallBox.y * scale),
+                        (int) (smallBox.width * scale),
+                        (int) (smallBox.height * scale)
                 );
                 DetectedFace scaledFace = new DetectedFace(scaledBox, smallFace.getConfidence(), smallFace.getFaceId());
                 scaledFaces.add(scaledFace);
@@ -374,7 +315,7 @@ public class FaceRecognitionService {
         Long cacheTime = recognitionCacheTime.get(faceId);
 
         if (cached != null && cacheTime != null &&
-            (currentTime - cacheTime) < RECOGNITION_CACHE_DURATION) {
+                (currentTime - cacheTime) < RECOGNITION_CACHE_DURATION) {
             return cached; // Return cached result
         }
 

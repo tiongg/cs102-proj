@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            xmlns="http://javafx.com/javafx"
-            fx:controller="g1t1.scenes.DuringSessionViewController"
-            prefHeight="750.0" prefWidth="1440.0">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="750.0" prefWidth="1440.0"
+            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.DuringSessionViewController">
+    <ImageView fx:id="ivCameraView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"
+               AnchorPane.rightAnchor="350.0"/>
+    <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" prefWidth="350">
 
+    </VBox>
 </AnchorPane>
