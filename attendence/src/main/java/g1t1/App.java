@@ -12,7 +12,7 @@ import nu.pattern.OpenCV;
 public class App extends Application {
     public static final int WIDTH = 1440;
     public static final int HEIGHT = 750;
-    private static final PageName initialPage = PageName.Login;
+    private static final PageName initialPage = PageName.PastRecords;
 
     private static App instance;
     private Scene currentScene;
@@ -42,6 +42,7 @@ public class App extends Application {
 
         Router.changePage(initialPage);
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
