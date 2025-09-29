@@ -15,10 +15,10 @@ import g1t1.opencv.services.recognition.MaskAwareRecognizer;
 import g1t1.opencv.services.recognition.Recognizer;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Main entry point for face recognition system.
@@ -37,8 +37,6 @@ public class FaceRecognitionService {
     private MaskAwareRecognizer maskAwareRecognizer;
     private MaskDetector maskDetector;
     private LivenessChecker livenessChecker;
-    private VideoCapture camera;
-    private Thread processingThread;
     private AttendanceSession currentSession;
     private Set<String> loggedStudents;
     private Map<String, Boolean> maskCache;
@@ -95,7 +93,6 @@ public class FaceRecognitionService {
         eventEmitter.emitAttendanceSessionEvent(
                 new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED)
         );
-
     }
 
     /**

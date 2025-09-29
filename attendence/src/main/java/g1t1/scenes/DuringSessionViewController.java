@@ -9,6 +9,7 @@ import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
@@ -22,11 +23,14 @@ class CameraRunnable implements Runnable {
     private final ImageView display;
     private final FaceRecognitionService service;
     private final List<DetectionBoundingBox> boxes = new ArrayList<>();
+    private final int msPerProcess; // milliseconds between processing steps
+    private long previousTick; // previous timestamp frame was processed
 
     public CameraRunnable(ImageView display) {
         this.camera = new VideoCapture(FaceConfig.getInstance().getCameraIndex());
         this.display = display;
         this.service = FaceRecognitionService.getInstance();
+        this.msPerProcess = 1 / FaceConfig.getInstance().getTargetFps() * 1000;
     }
 
     @Override
@@ -42,7 +46,11 @@ class CameraRunnable implements Runnable {
                 continue;
             }
 
-            this.service.processFrame(frame, this.boxes);
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - previousTick >= msPerProcess) {
+                previousTick = currentTime;
+                this.service.processFrame(frame, this.boxes);
+            }
             for (DetectionBoundingBox boundingBox : this.boxes) {
                 boundingBox.drawOnFrame(frame);
             }
@@ -54,12 +62,17 @@ class CameraRunnable implements Runnable {
     }
 }
 
-
 public class DuringSessionViewController extends PageController {
     private ThreadWithRunnable<CameraRunnable> cameraDaemon;
 
     @FXML
     private ImageView ivCameraView;
+
+    @FXML
+    private void initialize() {
+        ivCameraView.fitWidthProperty().bind(ivCameraView.getParent().layoutBoundsProperty().map(bounds -> bounds.getWidth() - 350));
+        ivCameraView.fitHeightProperty().bind(ivCameraView.getParent().layoutBoundsProperty().map(Bounds::getHeight));
+    }
 
     @Override
     public void onMount() {

@@ -24,41 +24,35 @@ public class ImageUtils {
         return new Image(new ByteArrayInputStream(frame));
     }
 
-    public static Mat cropToSquare(Mat source, int targetSize) {
+    public static Mat cropToFit(Mat source, int targetWidth, int targetHeight) {
         int height = source.rows();
         int width = source.cols();
 
+        double targetAspect = (double) targetWidth / targetHeight;
+        double currentAspect = (double) width / height;
+
         Mat result = new Mat();
 
-        if (width == height) {
-            // Already square, just resize if needed
-            if (width != targetSize) {
-                Imgproc.resize(source, result, new Size(targetSize, targetSize));
-            } else {
-                result = source.clone();
-            }
-        } else if (width > height) {
-            // Landscape: crop width to match height
-            int startX = (width - height) / 2;
-            Rect cropRect = new Rect(startX, 0, height, height);
-            Mat cropped = new Mat(source, cropRect);
+        // Same aspect ratio, just resize
+        if (Math.abs(targetAspect - currentAspect) < 0.01) {
+            Imgproc.resize(source, result, new Size(targetWidth, targetHeight));
+            return result;
+        }
 
-            if (height != targetSize) {
-                Imgproc.resize(cropped, result, new Size(targetSize, targetSize));
-            } else {
-                result = cropped.clone();
-            }
+        if (currentAspect > targetAspect) {
+            // Current image is wider - crop the width
+            int cropWidth = (int) (height * targetAspect);
+            int startX = (width - cropWidth) / 2;
+            Rect cropRect = new Rect(startX, 0, cropWidth, height);
+            Mat cropped = new Mat(source, cropRect);
+            Imgproc.resize(cropped, result, new Size(targetWidth, targetHeight));
         } else {
-            // Portrait: crop height to match width
-            int startY = (height - width) / 2;
-            Rect cropRect = new Rect(0, startY, width, width);
+            // Current image is taller - crop the height
+            int cropHeight = (int) (width / targetAspect);
+            int startY = (height - cropHeight) / 2;
+            Rect cropRect = new Rect(0, startY, width, cropHeight);
             Mat cropped = new Mat(source, cropRect);
-
-            if (width != targetSize) {
-                Imgproc.resize(cropped, result, new org.opencv.core.Size(targetSize, targetSize));
-            } else {
-                result = cropped.clone();
-            }
+            Imgproc.resize(cropped, result, new Size(targetWidth, targetHeight));
         }
 
         return result;

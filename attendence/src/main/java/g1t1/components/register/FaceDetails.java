@@ -47,7 +47,7 @@ class CameraRunnable implements Runnable {
             if (!camera.read(frame) || frame.empty()) {
                 continue;
             }
-            Mat croppedFrame = ImageUtils.cropToSquare(frame, TARGET_SIZE);
+            Mat croppedFrame = ImageUtils.cropToFit(frame, TARGET_SIZE, TARGET_SIZE);
 
             // Update the shared frame
             synchronized (frameLock) {
