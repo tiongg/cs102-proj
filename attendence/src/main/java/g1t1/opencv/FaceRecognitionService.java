@@ -1,29 +1,41 @@
 package g1t1.opencv;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
 import g1t1.features.logger.AppLogger;
 import g1t1.models.users.Student;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.events.AttendanceSessionEvent;
 import g1t1.opencv.events.EventEmitter;
 import g1t1.opencv.events.StudentDetectedEvent;
-import g1t1.opencv.models.*;
+import g1t1.opencv.models.AttendanceSession;
+import g1t1.opencv.models.DetectedFace;
+import g1t1.opencv.models.DetectionBoundingBox;
+import g1t1.opencv.models.LivenessResult;
+import g1t1.opencv.models.RecognitionResult;
 import g1t1.opencv.services.FaceDetector;
 import g1t1.opencv.services.MaskDetector;
 import g1t1.opencv.services.liveness.LivenessChecker;
 import g1t1.opencv.services.recognition.HistogramRecognizer;
 import g1t1.opencv.services.recognition.MaskAwareRecognizer;
 import g1t1.opencv.services.recognition.Recognizer;
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
- * Main entry point for face recognition system.
- * Frontend calls start() and stop() methods.
- * Provides global event emitter for system-wide event listening.
+ * Main entry point for face recognition system. Frontend calls start() and
+ * stop() methods. Provides global event emitter for system-wide event
+ * listening.
  */
 public class FaceRecognitionService {
     private static FaceRecognitionService instance;
@@ -67,8 +79,8 @@ public class FaceRecognitionService {
     }
 
     /**
-     * Start face recognition with enrolled students.
-     * Frontend calls this to begin attendance session.
+     * Start face recognition with enrolled students. Frontend calls this to begin
+     * attendance session.
      */
     public void start(List<Student> students) {
         if (isRunning) {
@@ -91,13 +103,12 @@ public class FaceRecognitionService {
 
         // Emit session started event
         eventEmitter.emitAttendanceSessionEvent(
-                new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED)
-        );
+                new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED));
     }
 
     /**
-     * Stop face recognition and cleanup resources.
-     * Frontend calls this to end attendance session.
+     * Stop face recognition and cleanup resources. Frontend calls this to end
+     * attendance session.
      */
     public void stop() {
         if (!isRunning) {
@@ -111,8 +122,7 @@ public class FaceRecognitionService {
         if (currentSession != null) {
             currentSession.endSession();
             eventEmitter.emitAttendanceSessionEvent(
-                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_ENDED)
-            );
+                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_ENDED));
         }
 
         histogramRecognizer.cleanup();
@@ -128,8 +138,8 @@ public class FaceRecognitionService {
     }
 
     /**
-     * Get global event emitter for listening to face recognition events.
-     * Other parts of the system use this to listen for student detections.
+     * Get global event emitter for listening to face recognition events. Other
+     * parts of the system use this to listen for student detections.
      */
     public EventEmitter getEventEmitter() {
         return eventEmitter;
@@ -176,13 +186,12 @@ public class FaceRecognitionService {
 
         // Draw detection boxes and try recognition
         boxes.clear();
+
         for (DetectedFace detectedFace : detectedFaces) {
             Rect box = detectedFace.getBoundingBox();
             if (box != null) {
-                boxes.add(new DetectionBoundingBox(
-                        new Point(box.x, box.y),
-                        new Point(box.x + box.width, box.y + box.height),
-                        new Scalar(0, 255, 0), 2));
+                DetectionBoundingBox boundingBox = new DetectionBoundingBox(new Point(box.x, box.y),
+                        new Point(box.x + box.width, box.y + box.height), 2);
 
                 Mat faceRegion = faceDetector.extractFaceRegion(frame, detectedFace);
                 if (!faceRegion.empty()) {
@@ -204,23 +213,17 @@ public class FaceRecognitionService {
                             double confidence = result.getConfidence();
 
                             if (confidence >= FaceConfig.getInstance().getDisplayThreshold()) {
-                                boxes.add(new DetectionBoundingBox(
-                                        new Point(box.x, box.y),
-                                        new Point(box.x + box.width, box.y + box.height),
-                                        new Scalar(255, 0, 0), 3,
-                                        recognizedStudent.getName(), livenessInfo, confidence));
+                                boundingBox.setStudent(recognizedStudent.getName(), livenessInfo, confidence);
 
                                 handleRecognitionResult(recognizedStudent, confidence);
                             }
                         }
                     } else {
                         // Liveliness check failed
-                        boxes.add(new DetectionBoundingBox(
-                                new Point(box.x, box.y),
-                                new Point(box.x + box.width, box.y + box.height),
-                                new Scalar(0, 0, 255), 3, true
-                        ));
+                        boundingBox.setPicture();
                     }
+
+                    boxes.add(boundingBox);
                     faceRegion.release();
                 }
             }
@@ -238,16 +241,15 @@ public class FaceRecognitionService {
         if (confidence >= FaceConfig.getInstance().getRecognitionThreshold() && !loggedStudents.contains(studentId)) {
             loggedStudents.add(studentId);
             if (FaceConfig.getInstance().isLoggingEnabled()) {
-                AppLogger.log("Student detected: " + student.getName() +
-                        " (ID: " + studentId + ", Section: " + student.getModuleSection() + ")");
+                AppLogger.log("Student detected: " + student.getName() + " (ID: " + studentId + ", Section: "
+                        + student.getModuleSection() + ")");
             }
         }
 
         if (isNewStudent || (confidence - previousMaxConfidence >= 1.0)) {
             eventEmitter.emitStudentDetected(new StudentDetectedEvent(student, confidence));
             eventEmitter.emitAttendanceSessionEvent(
-                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.STUDENT_UPDATED)
-            );
+                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.STUDENT_UPDATED));
         }
     }
 
@@ -288,12 +290,8 @@ public class FaceRecognitionService {
         for (DetectedFace smallFace : smallFaces) {
             Rect smallBox = smallFace.getBoundingBox();
             if (smallBox != null) {
-                Rect scaledBox = new Rect(
-                        (int) (smallBox.x * scale),
-                        (int) (smallBox.y * scale),
-                        (int) (smallBox.width * scale),
-                        (int) (smallBox.height * scale)
-                );
+                Rect scaledBox = new Rect((int) (smallBox.x * scale), (int) (smallBox.y * scale),
+                        (int) (smallBox.width * scale), (int) (smallBox.height * scale));
                 DetectedFace scaledFace = new DetectedFace(scaledBox, smallFace.getConfidence(), smallFace.getFaceId());
                 scaledFaces.add(scaledFace);
             }
@@ -311,8 +309,7 @@ public class FaceRecognitionService {
         RecognitionResult cached = recognitionCache.get(faceId);
         Long cacheTime = recognitionCacheTime.get(faceId);
 
-        if (cached != null && cacheTime != null &&
-                (currentTime - cacheTime) < RECOGNITION_CACHE_DURATION) {
+        if (cached != null && cacheTime != null && (currentTime - cacheTime) < RECOGNITION_CACHE_DURATION) {
             return cached; // Return cached result
         }
 
