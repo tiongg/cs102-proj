@@ -1,4 +1,4 @@
-package g1t1.opencv.events;
+package g1t1.utils.events.opencv;
 
 import g1t1.opencv.models.AttendanceSession;
 
@@ -7,6 +7,10 @@ import g1t1.opencv.models.AttendanceSession;
  * Provides complete session state for real-time attendance tracking.
  */
 public class AttendanceSessionEvent {
+    // Event types
+    public static final String SESSION_STARTED = "SESSION_STARTED";
+    public static final String STUDENT_UPDATED = "STUDENT_UPDATED";
+    public static final String SESSION_ENDED = "SESSION_ENDED";
     private final AttendanceSession session;
     private final String eventType;
     private final long timestamp;
@@ -34,9 +38,4 @@ public class AttendanceSessionEvent {
         return String.format("AttendanceSessionEvent{type=%s, studentsDetected=%d}",
                 eventType, session.getTotalStudentsDetected());
     }
-
-    // Event types
-    public static final String SESSION_STARTED = "SESSION_STARTED";
-    public static final String STUDENT_UPDATED = "STUDENT_UPDATED";
-    public static final String SESSION_ENDED = "SESSION_ENDED";
 }

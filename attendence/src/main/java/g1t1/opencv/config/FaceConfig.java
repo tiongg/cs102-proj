@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Configuration manager for face recognition system.
- * Loads configuration from properties file with fallback defaults.
+ * Configuration manager for face recognition system. Loads configuration from
+ * properties file with fallback defaults.
  */
 public class FaceConfig {
     private static FaceConfig instance;
@@ -25,8 +25,7 @@ public class FaceConfig {
 
     private void loadProperties() {
         properties = new Properties();
-        try (InputStream input = getClass().getClassLoader()
-                .getResourceAsStream("face-recognition.properties")) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("face-recognition.properties")) {
             if (input != null) {
                 properties.load(input);
             }

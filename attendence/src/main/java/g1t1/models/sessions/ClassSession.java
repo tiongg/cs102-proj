@@ -1,17 +1,10 @@
 package g1t1.models.sessions;
 
-import java.util.ArrayList;
+import g1t1.models.BaseEntity;
+
 import java.util.Date;
 
-import g1t1.models.BaseEntity;
-import g1t1.models.users.Student;
-import g1t1.models.users.Teacher;
-
 enum SessionStatus {
-    /**
-     * Newly created session. Start session first!
-     */
-    Invalid,
     /**
      * Active session. End session to save.
      */
@@ -27,8 +20,30 @@ enum SessionStatus {
  */
 public class ClassSession extends BaseEntity {
     private ModuleSection moduleSection;
-    private Teacher teacher;
-    private ArrayList<Student> students;
+    private int week;
     private Date startTime;
     private SessionStatus sessionStatus;
+
+    public ClassSession(ModuleSection moduleSection, int week) {
+        this.moduleSection = moduleSection;
+        this.sessionStatus = SessionStatus.Active;
+        this.startTime = new Date();
+        this.week = week;
+    }
+
+    public void endSession() {
+        this.sessionStatus = SessionStatus.Ended;
+    }
+
+    public ModuleSection getModuleSection() {
+        return this.moduleSection;
+    }
+
+    public Date getStartTime() {
+        return this.startTime;
+    }
+
+    public int getWeek() {
+        return this.week;
+    }
 }

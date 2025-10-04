@@ -32,10 +32,8 @@ public class RegisterViewController extends PageController {
     @FXML
     private HBox nextButton;
 
-    @Override
-    public void onMount() {
-        this.registerTeacher = new RegisterTeacher();
-
+    @FXML
+    public void initialize() {
         stepper.currentIndexProperty().addListener((obv, oldIndex, newIndex) -> {
             if (stepper.isLast()) {
                 nextText.setText("Login!");
@@ -65,6 +63,11 @@ public class RegisterViewController extends PageController {
                 nextButton.getStyleClass().add("disabled");
             }
         });
+    }
+
+    @Override
+    public void onMount() {
+        this.registerTeacher = new RegisterTeacher();
     }
 
     private void updateButtonListeners() {

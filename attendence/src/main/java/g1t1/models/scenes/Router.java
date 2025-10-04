@@ -1,7 +1,7 @@
 package g1t1.models.scenes;
 
 import g1t1.utils.EventEmitter;
-import g1t1.utils.events.OnNavigateEvent;
+import g1t1.utils.events.routing.OnNavigateEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +21,7 @@ public class Router {
                 entry(PageName.MyClasses, "scenes/MyClassesView.fxml"),
                 entry(PageName.Onboard, "scenes/OnboardView.fxml"),
                 entry(PageName.StartSession, "scenes/StartSessionView.fxml"),
+                entry(PageName.DuringSession, "scenes/DuringSessionView.fxml"),
                 entry(PageName.Settings, "scenes/SettingsView.fxml")
         );
 
@@ -36,6 +37,9 @@ public class Router {
     }
 
     public static void changePage(PageName newPageName) {
+        if (getCurrentPage() != null) {
+            getCurrentPage().getController().onMount();
+        }
         Page page = scenes.get(newPageName);
         currentPage = page;
         emitter.emit(new OnNavigateEvent(page));

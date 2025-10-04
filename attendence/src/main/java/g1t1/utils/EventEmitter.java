@@ -1,24 +1,30 @@
 package g1t1.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class EventEmitter<EventType> {
-    private final Map<Class<? extends EventType>, ArrayList<Consumer<EventType>>> listeners = new HashMap<>();
+    private final ConcurrentHashMap<Class<? extends EventType>, CopyOnWriteArrayList<Consumer<EventType>>> listeners =
+            new ConcurrentHashMap<>();
 
     public <T extends EventType> void subscribe(Class<T> eventClass, Consumer<T> listener) {
-        listeners.computeIfAbsent(eventClass, k -> new ArrayList<>())
+        listeners.computeIfAbsent(eventClass, k -> new CopyOnWriteArrayList<>())
                 .add((Consumer<EventType>) listener);
     }
 
     public <T extends EventType> void emit(T eventData) {
         Class<? extends EventType> eventClass = (Class<? extends EventType>) eventData.getClass();
-        if (listeners.containsKey(eventClass)) {
-            for (Consumer<EventType> listener : listeners.get(eventClass)) {
+        CopyOnWriteArrayList<Consumer<EventType>> eventListeners = listeners.get(eventClass);
+        if (eventListeners != null) {
+            for (Consumer<EventType> listener : eventListeners) {
                 listener.accept(eventData);
             }
         }
+    }
+
+    public <T extends EventType> boolean unsubscribe(Class<T> eventClass, Consumer<T> listener) {
+        CopyOnWriteArrayList<Consumer<EventType>> eventListeners = listeners.get(eventClass);
+        return eventListeners != null && eventListeners.remove(listener);
     }
 }

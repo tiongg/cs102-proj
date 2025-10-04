@@ -2,7 +2,7 @@ package g1t1.components.register;
 
 import g1t1.models.interfaces.HasPassword;
 import g1t1.models.scenes.Router;
-import g1t1.utils.events.OnNavigateEvent;
+import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
