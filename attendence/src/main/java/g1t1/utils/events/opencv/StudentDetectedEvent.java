@@ -1,4 +1,4 @@
-package g1t1.opencv.events;
+package g1t1.utils.events.opencv;
 
 import g1t1.models.users.Student;
 

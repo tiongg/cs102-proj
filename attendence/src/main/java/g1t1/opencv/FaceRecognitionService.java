@@ -3,9 +3,6 @@ package g1t1.opencv;
 import g1t1.features.logger.AppLogger;
 import g1t1.models.users.Student;
 import g1t1.opencv.config.FaceConfig;
-import g1t1.opencv.events.AttendanceSessionEvent;
-import g1t1.opencv.events.EventEmitter;
-import g1t1.opencv.events.StudentDetectedEvent;
 import g1t1.opencv.models.*;
 import g1t1.opencv.services.FaceDetector;
 import g1t1.opencv.services.MaskDetector;
@@ -13,6 +10,9 @@ import g1t1.opencv.services.liveness.LivenessChecker;
 import g1t1.opencv.services.recognition.HistogramRecognizer;
 import g1t1.opencv.services.recognition.MaskAwareRecognizer;
 import g1t1.opencv.services.recognition.Recognizer;
+import g1t1.utils.EventEmitter;
+import g1t1.utils.events.opencv.AttendanceSessionEvent;
+import g1t1.utils.events.opencv.StudentDetectedEvent;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -31,7 +31,7 @@ public class FaceRecognitionService {
     private static FaceRecognitionService instance;
     private final int FRAME_SKIP_INTERVAL = 2;
     private final long RECOGNITION_CACHE_DURATION = 2000;
-    private EventEmitter eventEmitter;
+    private EventEmitter<Object> eventEmitter;
     private boolean isRunning;
     private List<Student> enrolledStudents;
     private FaceDetector faceDetector;
@@ -92,8 +92,7 @@ public class FaceRecognitionService {
         maskAwareRecognizer.precomputeEnrollmentData(students);
 
         // Emit session started event
-        eventEmitter.emitAttendanceSessionEvent(
-                new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED));
+        eventEmitter.emit(new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED));
     }
 
     /**
@@ -111,8 +110,7 @@ public class FaceRecognitionService {
         // End current session
         if (currentSession != null) {
             currentSession.endSession();
-            eventEmitter.emitAttendanceSessionEvent(
-                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_ENDED));
+            eventEmitter.emit(new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_ENDED));
         }
 
         histogramRecognizer.cleanup();
@@ -131,7 +129,7 @@ public class FaceRecognitionService {
      * Get global event emitter for listening to face recognition events. Other
      * parts of the system use this to listen for student detections.
      */
-    public EventEmitter getEventEmitter() {
+    public EventEmitter<Object> getEventEmitter() {
         return eventEmitter;
     }
 
@@ -237,9 +235,8 @@ public class FaceRecognitionService {
         }
 
         if (isNewStudent || (confidence - previousMaxConfidence >= 1.0)) {
-            eventEmitter.emitStudentDetected(new StudentDetectedEvent(student, confidence));
-            eventEmitter.emitAttendanceSessionEvent(
-                    new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.STUDENT_UPDATED));
+            eventEmitter.emit(new StudentDetectedEvent(student, confidence));
+            eventEmitter.emit(new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.STUDENT_UPDATED));
         }
     }
 

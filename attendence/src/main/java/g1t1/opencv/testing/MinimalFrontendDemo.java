@@ -1,5 +1,19 @@
 package g1t1.opencv.testing;
 
+import g1t1.models.users.FaceData;
+import g1t1.models.users.Student;
+import g1t1.opencv.FaceRecognitionService;
+import g1t1.utils.events.opencv.AttendanceSessionEvent;
+import g1t1.utils.events.opencv.StudentDetectedEvent;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,31 +21,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import g1t1.models.users.FaceData;
-import g1t1.models.users.Student;
-import g1t1.opencv.FaceRecognitionService;
-import g1t1.opencv.events.AttendanceSessionEvent;
-import g1t1.opencv.events.FaceEventListener;
-import g1t1.opencv.events.StudentDetectedEvent;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
 /**
  * Minimal JavaFX Frontend Demo
- *
+ * <p>
  * PURPOSE: Demonstrates REAL JavaFX integration with face recognition system.
  * Shows how UI components update in real-time based on face detection events.
- *
+ * <p>
  * HOW TO RUN: cd attendence && mvn compile javafx:run
  * -Djavafx.mainClass="g1t1.opencv.testing.MinimalFrontendDemo"
  */
@@ -47,6 +42,10 @@ public class MinimalFrontendDemo extends Application {
     // Face Recognition Service
     private FaceRecognitionService faceService;
     private List<Student> enrolledStudents;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Face Recognition Frontend Demo");
@@ -121,7 +120,26 @@ public class MinimalFrontendDemo extends Application {
             }
 
             // Set up event listener BEFORE starting service
-            faceService.getEventEmitter().addListener(new FrontendEventListener());
+            faceService.getEventEmitter().subscribe(StudentDetectedEvent.class, (event) -> {
+                Platform.runLater(() -> {
+                    String studentInfo = String.format("%s (ID: %s) - %.1f%% confidence", event.getStudent().getName(),
+                            event.getStudent().getId().toString(), event.getConfidence());
+
+                    // Update attendance list (avoid duplicates by checking if already exists)
+                    if (!attendanceListView.getItems().contains(studentInfo)) {
+                        attendanceListView.getItems().add(studentInfo);
+                    }
+
+                    logMessage("DETECTED: " + studentInfo);
+                });
+            });
+
+            faceService.getEventEmitter().subscribe(AttendanceSessionEvent.class, (event) -> {
+                Platform.runLater(() -> {
+                    totalCountLabel.setText("Total Detected: " + event.getSession().getTotalStudentsDetected());
+                    logMessage("Session updated: " + event.getEventType());
+                });
+            });
 
             // Start recognition service
             faceService.start(enrolledStudents);
@@ -148,35 +166,6 @@ public class MinimalFrontendDemo extends Application {
                 logMessage("Face recognition stopped");
             });
         });
-    }
-
-    /**
-     * Real JavaFX Event Listener - Updates UI components in real-time
-     */
-    private class FrontendEventListener implements FaceEventListener {
-
-        @Override
-        public void onStudentDetected(StudentDetectedEvent event) {
-            Platform.runLater(() -> {
-                String studentInfo = String.format("%s (ID: %s) - %.1f%% confidence", event.getStudent().getName(),
-                        event.getStudent().getId().toString(), event.getConfidence());
-
-                // Update attendance list (avoid duplicates by checking if already exists)
-                if (!attendanceListView.getItems().contains(studentInfo)) {
-                    attendanceListView.getItems().add(studentInfo);
-                }
-
-                logMessage("DETECTED: " + studentInfo);
-            });
-        }
-
-        @Override
-        public void onAttendanceSessionUpdated(AttendanceSessionEvent event) {
-            Platform.runLater(() -> {
-                totalCountLabel.setText("Total Detected: " + event.getSession().getTotalStudentsDetected());
-                logMessage("Session updated: " + event.getEventType());
-            });
-        }
     }
 
     private void logMessage(String message) {
@@ -257,9 +246,5 @@ public class MinimalFrontendDemo extends Application {
             faceService.stop();
         }
         super.stop();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
