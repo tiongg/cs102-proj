@@ -14,9 +14,7 @@
                 <Font name="Inter Semi Bold" size="26.0"/>
             </font>
         </Label>
-        <Button layoutX="434.0" layoutY="437.0" mnemonicParsing="false" onAction="#startSession"
-                prefWidth="211.0"
-                text="Start session"/>
+
         <VBox layoutX="124.0" layoutY="118.0" prefHeight="184.0" prefWidth="950.0" spacing="32.0"
               AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0"
               AnchorPane.topAnchor="120.0">
@@ -61,5 +59,9 @@
                 </VBox>
             </HBox>
         </VBox>
+
+        <Button layoutX="434.0" layoutY="437.0" mnemonicParsing="false" onAction="#startSession"
+                prefWidth="211.0"
+                text="Start session" fx:id="btnStartSession"/>
     </AnchorPane>
 </AnchorPane>

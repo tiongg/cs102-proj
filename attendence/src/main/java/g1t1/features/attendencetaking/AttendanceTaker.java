@@ -1,14 +1,26 @@
 package g1t1.features.attendencetaking;
 
+import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.opencv.FaceRecognitionService;
 
 public class AttendanceTaker {
-    public static void start(ModuleSection moduleSection) {
+    private static ClassSession currentSession;
+
+    public static void start(ModuleSection moduleSection, int week) {
         FaceRecognitionService.getInstance().start(moduleSection.getStudents());
+        currentSession = new ClassSession(moduleSection, week);
     }
 
     public static void stop() {
         FaceRecognitionService.getInstance().stop();
+        currentSession.endSession();
+        // Save to db first!!
+
+        currentSession = null;
+    }
+
+    public static ClassSession getCurrentSession() {
+        return currentSession;
     }
 }

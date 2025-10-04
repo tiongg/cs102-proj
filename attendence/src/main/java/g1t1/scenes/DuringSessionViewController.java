@@ -2,6 +2,8 @@ package g1t1.scenes;
 
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.models.scenes.PageController;
+import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.ModuleSection;
 import g1t1.opencv.FaceRecognitionService;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.DetectionBoundingBox;
@@ -10,6 +12,7 @@ import g1t1.utils.ThreadWithRunnable;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
@@ -64,6 +67,8 @@ class CameraRunnable implements Runnable {
 
 public class DuringSessionViewController extends PageController {
     private ThreadWithRunnable<CameraRunnable> cameraDaemon;
+    @FXML
+    private Label lblModule, lblSection, lblWeek, lblTimeStart, lblRemainingTime, lblPresent;
 
     @FXML
     private ImageView ivCameraView;
@@ -77,6 +82,13 @@ public class DuringSessionViewController extends PageController {
 
     @Override
     public void onMount() {
+        ClassSession session = AttendanceTaker.getCurrentSession();
+        // Requires an ongoing attendence session!!
+        if (session == null) {
+            return;
+        }
+        assignLabels(session);
+
         CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView);
         this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
         this.cameraDaemon.setDaemon(true);
@@ -87,5 +99,17 @@ public class DuringSessionViewController extends PageController {
     public void onUnmount() {
         this.cameraDaemon.interrupt();
         AttendanceTaker.stop();
+    }
+
+    private void assignLabels(ClassSession session) {
+        ModuleSection section = session.getModuleSection();
+
+        this.lblModule.setText(section.getModule());
+        this.lblSection.setText(section.getSection());
+
+        this.lblWeek.setText(String.format("Week %d", session.getWeek()));
+//        this.lblTimeStart.setText(section.getStartTime());
+
+        this.lblPresent.setText(String.format("%d / %d", 0, section.getStudents().size()));
     }
 }

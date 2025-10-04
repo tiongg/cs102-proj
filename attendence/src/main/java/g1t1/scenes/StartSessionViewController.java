@@ -9,10 +9,12 @@ import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Teacher;
 import g1t1.testing.MockDb;
 import g1t1.utils.events.authentication.OnLoginEvent;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 
@@ -30,8 +32,11 @@ public class StartSessionViewController extends PageController {
     private MenuButton classMenu;
 
     @FXML
+    private Button btnStartSession;
+
+    @FXML
     public void startSession() {
-        AttendanceTaker.start(classValue.get());
+        AttendanceTaker.start(classValue.get(), weekValue.get());
         Router.changePage(PageName.DuringSession);
     }
 
@@ -65,5 +70,8 @@ public class StartSessionViewController extends PageController {
                 });
             }
         });
+
+        BooleanBinding shouldDisable = classValue.isNull().or(weekValue.lessThanOrEqualTo(0));
+        btnStartSession.disableProperty().bind(shouldDisable);
     }
 }
