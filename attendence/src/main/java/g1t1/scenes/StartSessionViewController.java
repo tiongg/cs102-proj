@@ -46,7 +46,7 @@ public class StartSessionViewController extends PageController {
         for (int i = 1; i <= TOTAL_WEEKS; i++) {
             MenuItem item = new MenuItem(String.format("Week %d", i));
             weekMenu.getItems().add(item);
-            item.setStyle("-fx-pref-width: 400px");
+            item.setStyle("-fx-pref-width: 385px");
 
             // Needed else index won't stick
             int week = i;
@@ -62,7 +62,7 @@ public class StartSessionViewController extends PageController {
             for (ModuleSection section : sections) {
                 MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
                 classMenu.getItems().add(item);
-                item.setStyle("-fx-pref-width: 400px");
+                item.setStyle("-fx-pref-width: 385px");
 
                 item.setOnAction(ae -> {
                     classMenu.setText(item.getText());
