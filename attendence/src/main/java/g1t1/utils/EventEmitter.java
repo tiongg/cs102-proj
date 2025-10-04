@@ -23,7 +23,6 @@ public class EventEmitter<EventType> {
         }
     }
 
-    // Added unsubscribe for completeness
     public <T extends EventType> boolean unsubscribe(Class<T> eventClass, Consumer<T> listener) {
         CopyOnWriteArrayList<Consumer<EventType>> eventListeners = listeners.get(eventClass);
         return eventListeners != null && eventListeners.remove(listener);

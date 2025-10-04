@@ -1,4 +1,4 @@
-package g1t1.opencv.testing;
+package g1t1.testing;
 
 import g1t1.models.users.FaceData;
 import g1t1.models.users.Student;
@@ -28,7 +28,7 @@ import java.util.List;
  * Shows how UI components update in real-time based on face detection events.
  * <p>
  * HOW TO RUN: cd attendence && mvn compile javafx:run
- * -Djavafx.mainClass="g1t1.opencv.testing.MinimalFrontendDemo"
+ * -Djavafx.mainClass="g1t1.testing.MinimalFrontendDemo"
  */
 public class MinimalFrontendDemo extends Application {
     // UI Components

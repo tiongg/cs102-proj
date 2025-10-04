@@ -1,4 +1,4 @@
-package g1t1.opencv.testing;
+package g1t1.testing;
 
 import g1t1.models.users.FaceData;
 import g1t1.models.users.Student;
@@ -25,7 +25,7 @@ import java.util.List;
  * <p>
  * HOW TO RUN:
  * 1. Add student photos to test-photos/[name]/ folders
- * 2. Run: mvn compile exec:java -Dexec.mainClass="g1t1.opencv.testing.SystemValidationTest"
+ * 2. Run: mvn compile exec:java -Dexec.mainClass="g1t1.testing.SystemValidationTest"
  * <p>
  * EXPECTED OUTPUT:
  * - Service starts and stops successfully
