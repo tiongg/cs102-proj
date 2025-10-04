@@ -1,5 +1,10 @@
 package g1t1.models.sessions;
 
+import g1t1.models.users.Student;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Module & Section. Used to uniquely identify a class.
  */
@@ -7,12 +12,14 @@ public class ModuleSection {
     /**
      * Module of the class. i.e CS102
      */
-    private String module;
+    private final String module;
 
     /**
      * Section of the class. i.e G1
      */
-    private String section;
+    private final String section;
+
+    private final List<Student> students = new ArrayList<>();
 
     public ModuleSection(String module, String section) {
         this.module = module;
@@ -31,6 +38,14 @@ public class ModuleSection {
      */
     public String getSection() {
         return section;
+    }
+
+    public void addStudent(Student student) {
+        this.students.add(student);
+    }
+
+    public List<Student> getStudents() {
+        return this.students;
     }
 
     @Override

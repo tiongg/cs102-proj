@@ -8,8 +8,8 @@ import org.opencv.imgproc.Imgproc;
 public class DetectionBoundingBox {
     private final Point p1;
     private final Point p2;
-    private Scalar color;
     private final int thickness;
+    private Scalar color;
     private String name;
     private String livenessInfo;
     private double confidence;
@@ -18,15 +18,15 @@ public class DetectionBoundingBox {
     public DetectionBoundingBox(Point p1, Point p2, int thickness) {
         this.p1 = p1;
         this.p2 = p2;
-        this.color = new Scalar(0, 255, 0);
+        this.color = new Scalar(0, 0, 255);
         this.thickness = thickness;
     }
 
     public void setStudent(String name, String liveness, double confidence) {
         this.name = name;
-        this.livenessInfo = livenessInfo;
+        this.livenessInfo = liveness;
         this.confidence = confidence;
-        this.color = new Scalar(0, 0, 255);
+        this.color = new Scalar(0, 255, 0);
     }
 
     public void setPicture() {

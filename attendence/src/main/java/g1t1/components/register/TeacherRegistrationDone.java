@@ -4,7 +4,7 @@ import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.RegisterTeacher;
 import g1t1.utils.ImageUtils;
-import g1t1.utils.events.OnNavigateEvent;
+import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;

@@ -2,14 +2,14 @@ package g1t1.components;
 
 import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
-import g1t1.utils.events.OnNavigateEvent;
+import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class NavItem extends HBox {
@@ -32,7 +32,7 @@ public class NavItem extends HBox {
         });
 
         Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
-            if (e.getNewPage().getPageName() == this.getTargetPage()) {
+            if (e.newPage().getPageName() == this.getTargetPage()) {
                 selected();
             } else {
                 unselected();

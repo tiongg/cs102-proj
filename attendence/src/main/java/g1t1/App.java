@@ -3,7 +3,7 @@ package g1t1;
 import g1t1.models.scenes.Page;
 import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
-import g1t1.utils.events.OnNavigateEvent;
+import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -12,7 +12,7 @@ import nu.pattern.OpenCV;
 public class App extends Application {
     public static final int WIDTH = 1440;
     public static final int HEIGHT = 750;
-    private static final PageName initialPage = PageName.PastRecords;
+    private static final PageName initialPage = PageName.Login;
 
     private static App instance;
     private Scene currentScene;
@@ -50,7 +50,7 @@ public class App extends Application {
     public void init() {
         // Listen to router change events and navigate accordingly
         Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
-            instance.currentScene.setRoot(e.getNewPage().getRoot());
+            instance.currentScene.setRoot(e.newPage().getRoot());
         });
     }
 }

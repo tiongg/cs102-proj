@@ -6,7 +6,7 @@ import g1t1.models.users.FaceData;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
-import g1t1.utils.events.OnNavigateEvent;
+import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;

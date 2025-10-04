@@ -1,36 +1,26 @@
 package g1t1.opencv;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-
 import g1t1.features.logger.AppLogger;
 import g1t1.models.users.Student;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.events.AttendanceSessionEvent;
 import g1t1.opencv.events.EventEmitter;
 import g1t1.opencv.events.StudentDetectedEvent;
-import g1t1.opencv.models.AttendanceSession;
-import g1t1.opencv.models.DetectedFace;
-import g1t1.opencv.models.DetectionBoundingBox;
-import g1t1.opencv.models.LivenessResult;
-import g1t1.opencv.models.RecognitionResult;
+import g1t1.opencv.models.*;
 import g1t1.opencv.services.FaceDetector;
 import g1t1.opencv.services.MaskDetector;
 import g1t1.opencv.services.liveness.LivenessChecker;
 import g1t1.opencv.services.recognition.HistogramRecognizer;
 import g1t1.opencv.services.recognition.MaskAwareRecognizer;
 import g1t1.opencv.services.recognition.Recognizer;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Main entry point for face recognition system. Frontend calls start() and
@@ -212,7 +202,7 @@ public class FaceRecognitionService {
                             Student recognizedStudent = result.getMatchedStudent();
                             double confidence = result.getConfidence();
 
-                            if (confidence >= FaceConfig.getInstance().getDisplayThreshold()) {
+                            if (confidence >= 5) {
                                 boundingBox.setStudent(recognizedStudent.getName(), livenessInfo, confidence);
 
                                 handleRecognitionResult(recognizedStudent, confidence);

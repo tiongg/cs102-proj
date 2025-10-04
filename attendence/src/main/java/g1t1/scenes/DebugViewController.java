@@ -12,7 +12,8 @@ public class DebugViewController extends PageController {
     Label lbl_opencvVersion;
     @FXML
     Label lbl_javafxVersion;
-
+    
+    @FXML
     public void initialize() {
         String javaVersion = System.getProperty("java.version");
         String javafxVersion = System.getProperty("javafx.version");

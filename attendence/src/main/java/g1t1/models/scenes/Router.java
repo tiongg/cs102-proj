@@ -1,7 +1,7 @@
 package g1t1.models.scenes;
 
 import g1t1.utils.EventEmitter;
-import g1t1.utils.events.OnNavigateEvent;
+import g1t1.utils.events.routing.OnNavigateEvent;
 
 import java.util.HashMap;
 import java.util.Map;
