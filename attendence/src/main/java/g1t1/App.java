@@ -1,5 +1,7 @@
 package g1t1;
 
+import java.net.URL;
+
 import g1t1.models.scenes.Page;
 import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
@@ -8,12 +10,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import nu.pattern.OpenCV;
-
-import java.net.URL;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class App extends Application {
     public static final int WIDTH = 1440;
@@ -40,7 +36,7 @@ public class App extends Application {
         Page basePage = Router.scenes.get(initialPage);
         Scene scene = new Scene(basePage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
-        
+
         loadCss(scene);
         Router.changePage(initialPage);
         stage.setScene(scene);
@@ -57,21 +53,16 @@ public class App extends Application {
     }
 
     private void loadCss(Scene scene) {
-        try {
-            URL cssFolderUrl = getClass().getResource("css/");
-            if (cssFolderUrl != null) {
-                Path cssFolderPath = Paths.get(cssFolderUrl.toURI());
-                try (DirectoryStream<Path> stream = Files.newDirectoryStream(cssFolderPath, "*.css")) {
-                    for (Path file : stream) {
-                        String cssFilePath = file.toUri().toURL().toExternalForm();
-                        scene.getStylesheets().add(cssFilePath);
-                    }
-                }
+        String[] cssFiles = { "css/app.css", "css/button.css", "css/date-picker.css", "css/stepper.css",
+                "css/tabs.css", };
+
+        for (String cssFile : cssFiles) {
+            URL url = getClass().getResource(cssFile);
+            if (url != null) {
+                scene.getStylesheets().add(url.toExternalForm());
             } else {
-                System.err.println("CSS folder not found in resources.");
+                System.err.println("CSS not found: " + cssFile);
             }
-        } catch (Exception e) {
-            System.err.println("Error loading CSS files: " + e.getMessage());
         }
     }
 }
