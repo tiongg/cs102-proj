@@ -1,5 +1,9 @@
 package g1t1.scenes;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import g1t1.components.TimePicker;
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.features.authentication.AuthenticationContext;
@@ -19,10 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class StartSessionViewController extends PageController {
     private final int TOTAL_WEEKS = 13;
@@ -49,7 +49,8 @@ public class StartSessionViewController extends PageController {
         LocalDate localDate = dpClassDate.getValue();
         LocalDateTime sessionStartTime = tpStartTime.addToDate(localDate);
 
-//        System.out.println(sessionStartTime.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm")));
+        // System.out.println(sessionStartTime.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy
+        // HH:mm")));
         AttendanceTaker.start(classValue.get(), weekValue.get());
         Router.changePage(PageName.DuringSession);
     }
@@ -73,6 +74,7 @@ public class StartSessionViewController extends PageController {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
             Teacher user = e.user();
             List<ModuleSection> sections = MockDb.getUserModuleSections(user.getID());
+            classMenu.getItems().clear();
             for (ModuleSection section : sections) {
                 MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
                 classMenu.getItems().add(item);

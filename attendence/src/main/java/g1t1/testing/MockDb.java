@@ -1,15 +1,19 @@
 package g1t1.testing;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import g1t1.models.ids.TeacherID;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.Student;
 import g1t1.models.users.Teacher;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
 
 /**
  * Mock database class for testing
@@ -22,18 +26,15 @@ public class MockDb {
         Teacher newTeacher = new Teacher("123", "Dr Zhang", "ZZY@goat.com", new FaceData());
         teachers.add(newTeacher);
 
-        teacherClasses.put(newTeacher.getID(), new ArrayList<>(
-                Arrays.asList(
-                        new ModuleSection("CS 102", "G1"),
-                        new ModuleSection("CS 102", "G2")
-                )
-        ));
+        teacherClasses.put(newTeacher.getID(),
+                new ArrayList<>(Arrays.asList(new ModuleSection("CS 102", "G1"), new ModuleSection("CS 102", "G2"))));
 
         loadEnrolledStudents();
     }
 
     public static List<ModuleSection> getUserModuleSections(TeacherID id) {
-        return teacherClasses.get(id);
+        // First one
+        return teacherClasses.get(teacherClasses.keySet().iterator().next());
     }
 
     private static void loadEnrolledStudents() {
