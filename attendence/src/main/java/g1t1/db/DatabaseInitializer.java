@@ -14,7 +14,7 @@ public class DatabaseInitializer {
     private static final String URL = "jdbc:sqlite:database.db";
 
     public void init() {
-        try (Connection connection = connect(URL)) {
+        try (Connection connection = connect()) {
             try (var stmt = connection.createStatement()) {
                 stmt.execute("PRAGMA foreign_keys = ON");
             } 
@@ -39,7 +39,7 @@ public class DatabaseInitializer {
         } 
     }
 
-    public Connection connect(String url) throws SQLException {
+    public Connection connect() throws SQLException {
         /**
          * Obtain a JDBC connection from the given URL.
          *
@@ -60,9 +60,9 @@ public class DatabaseInitializer {
          */
         
         Connection connection = null;
-        connection = DriverManager.getConnection(url);
+        connection = DriverManager.getConnection(URL);
         if (connection == null) {
-            throw new SQLException("DriverManager returned null for URL: " + url);
+            throw new SQLException("DriverManager returned null for URL: " + URL);
         }
         return connection;
     }
@@ -85,7 +85,7 @@ public class DatabaseInitializer {
          */
 
         try {
-            Connection connection = connect(URL);
+            Connection connection = connect();
             return DSL.using(connection, SQLDialect.SQLITE);
         } catch (SQLException err) {
             // log error here
@@ -126,7 +126,7 @@ public class DatabaseInitializer {
          * Create the `students` table if missing.
          *
          * Columns
-         * - student_id     VARCHAR(36), PK, not null. Matriculation number.
+         * - student_id     VARCHAR(8), PK, not null. Student Matriculation number.
          * - full_name      VARCHAR(255), not null. Full name as per student ID card.
          * - email          VARCHAR(255), not null. Unique per user. Case-insensitive at application layer.
          *
@@ -137,7 +137,7 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("students")
-            .column("student_id", SQLDataType.VARCHAR(36).notNull())
+            .column("student_id", SQLDataType.VARCHAR(8).notNull())
             .column("full_name", SQLDataType.VARCHAR(255).notNull())
             .column("email", SQLDataType.VARCHAR(255).notNull())
             .constraints(
