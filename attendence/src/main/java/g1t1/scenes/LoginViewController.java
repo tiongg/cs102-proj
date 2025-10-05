@@ -6,6 +6,7 @@ import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -15,6 +16,9 @@ public class LoginViewController extends PageController {
 
     @FXML
     private PasswordField passwordInput;
+
+    @FXML
+    private Label lblInvalidCredentials;
 
     @FXML
     public void goToRegister() {
@@ -30,6 +34,9 @@ public class LoginViewController extends PageController {
 
     @FXML
     public void login() {
-        AuthenticationContext.loginTeacher(emailInput.getText(), passwordInput.getText());
+        boolean success = AuthenticationContext.loginTeacher(emailInput.getText(), passwordInput.getText());
+        if (!success) {
+            lblInvalidCredentials.setVisible(true);
+        }
     }
 }

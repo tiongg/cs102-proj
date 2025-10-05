@@ -9,6 +9,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import nu.pattern.OpenCV;
 
+import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class App extends Application {
     public static final int WIDTH = 1440;
     public static final int HEIGHT = 750;
@@ -34,12 +40,8 @@ public class App extends Application {
         Page basePage = Router.scenes.get(initialPage);
         Scene scene = new Scene(basePage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
-
-        scene.getStylesheets().add(getClass().getResource("css/app.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource("css/button.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource("css/stepper.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource("css/tabs.css").toExternalForm());
-
+        
+        loadCss(scene);
         Router.changePage(initialPage);
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -52,5 +54,24 @@ public class App extends Application {
         Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
             instance.currentScene.setRoot(e.newPage().getRoot());
         });
+    }
+
+    private void loadCss(Scene scene) {
+        try {
+            URL cssFolderUrl = getClass().getResource("css/");
+            if (cssFolderUrl != null) {
+                Path cssFolderPath = Paths.get(cssFolderUrl.toURI());
+                try (DirectoryStream<Path> stream = Files.newDirectoryStream(cssFolderPath, "*.css")) {
+                    for (Path file : stream) {
+                        String cssFilePath = file.toUri().toURL().toExternalForm();
+                        scene.getStylesheets().add(cssFilePath);
+                    }
+                }
+            } else {
+                System.err.println("CSS folder not found in resources.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading CSS files: " + e.getMessage());
+        }
     }
 }

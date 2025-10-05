@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import g1t1.components.Navbar?>
+<?import g1t1.components.TimePicker?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
@@ -16,21 +17,20 @@
         </Label>
 
         <VBox layoutX="124.0" layoutY="118.0" prefHeight="184.0" prefWidth="950.0" spacing="32.0"
-              AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0"
-              AnchorPane.topAnchor="120.0">
+              AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="120.0">
             <HBox spacing="32.0">
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Class"/>
-                    <MenuButton mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
-                                styleClass="flat-input" text="Select class..." fx:id="classMenu">
+                    <MenuButton fx:id="classMenu" mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
+                                styleClass="flat-input" text="Select class...">
                         <items>
                         </items>
                     </MenuButton>
                 </VBox>
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Week"/>
-                    <MenuButton mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
-                                styleClass="flat-input" text="Select week..." fx:id="weekMenu">
+                    <MenuButton fx:id="weekMenu" mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
+                                styleClass="flat-input" text="Select week...">
                         <items>
                         </items>
                     </MenuButton>
@@ -38,30 +38,19 @@
             </HBox>
             <HBox spacing="32.0">
                 <VBox prefHeight="43.0" prefWidth="400">
-                    <Label text="Date">
-                        <font>
-                            <Font name="Inter Semi Bold" size="12.0"/>
-                        </font>
-                    </Label>
-                    <TextField styleClass="flat-input">
-                        <font>
-                            <Font name="Inter Semi Bold" size="16.0"/>
-                        </font>
-                    </TextField>
+                    <Label text="Date"/>
+                    <DatePicker editable="false" prefHeight="34.0" prefWidth="Infinity" style="-fx-font-size: 16px"
+                                styleClass="flat-input" fx:id="dpClassDate">
+                    </DatePicker>
                 </VBox>
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Start Time"/>
-                    <TextField styleClass="flat-input">
-                        <font>
-                            <Font name="Inter Semi Bold" size="16.0"/>
-                        </font>
-                    </TextField>
+                    <TimePicker fx:id="tpStartTime" prefHeight="40.0" prefWidth="Infinity" style="-fx-font-size: 16px"/>
                 </VBox>
             </HBox>
         </VBox>
 
-        <Button layoutX="434.0" layoutY="437.0" mnemonicParsing="false" onAction="#startSession"
-                prefWidth="211.0"
-                text="Start session" fx:id="btnStartSession"/>
+        <Button fx:id="btnStartSession" layoutX="434.0" layoutY="437.0" mnemonicParsing="false" onAction="#startSession"
+                prefWidth="211.0" text="Start session"/>
     </AnchorPane>
 </AnchorPane>

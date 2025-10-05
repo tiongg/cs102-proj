@@ -33,6 +33,10 @@ public class MockDb {
     }
 
     public static Teacher loginUser(String email, String password) {
+        if (email.equals("123") && password.equals("123")) {
+            return null;
+        }
+
         return teachers.getFirst();
     }
 

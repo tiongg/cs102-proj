@@ -11,15 +11,16 @@ public class AuthenticationContext {
 
     private static Teacher currentUser;
 
-    public static void loginTeacher(String email, String password) {
+    public static boolean loginTeacher(String email, String password) {
         Teacher teacher = MockDb.loginUser(email, password);
         // Authentication failed
         if (teacher == null) {
-            return;
+            return false;
         }
 
         emitter.emit(new OnLoginEvent(teacher));
         currentUser = teacher;
+        return true;
     }
 
     public static void logout() {
