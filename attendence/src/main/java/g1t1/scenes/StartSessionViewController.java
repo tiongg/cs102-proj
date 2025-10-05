@@ -1,5 +1,6 @@
 package g1t1.scenes;
 
+import g1t1.components.TimePicker;
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
@@ -15,9 +16,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class StartSessionViewController extends PageController {
@@ -32,10 +36,20 @@ public class StartSessionViewController extends PageController {
     private MenuButton classMenu;
 
     @FXML
+    private DatePicker dpClassDate;
+
+    @FXML
+    private TimePicker tpStartTime;
+
+    @FXML
     private Button btnStartSession;
 
     @FXML
     public void startSession() {
+        LocalDate localDate = dpClassDate.getValue();
+        LocalDateTime sessionStartTime = tpStartTime.addToDate(localDate);
+
+//        System.out.println(sessionStartTime.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm")));
         AttendanceTaker.start(classValue.get(), weekValue.get());
         Router.changePage(PageName.DuringSession);
     }
@@ -73,5 +87,12 @@ public class StartSessionViewController extends PageController {
 
         BooleanBinding shouldDisable = classValue.isNull().or(weekValue.lessThanOrEqualTo(0));
         btnStartSession.disableProperty().bind(shouldDisable);
+    }
+
+    @Override
+    public void onMount() {
+        LocalDateTime dt = LocalDateTime.now();
+        tpStartTime.getHourProperty().set(dt.getHour());
+        tpStartTime.getMinuteProperty().set(dt.getMinute());
     }
 }

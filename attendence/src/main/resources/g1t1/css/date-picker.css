@@ -1,0 +1,12 @@
+.date-picker .text-field {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+
+.date-picker .arrow-button {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-background-color: -fx-text-box-border, -fx-control-inner-background;
+}

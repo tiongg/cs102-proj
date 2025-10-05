@@ -7,6 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class TimePicker extends HBox {
     private final IntegerProperty hourProperty = new SimpleIntegerProperty(0);
     private final IntegerProperty minuteProperty = new SimpleIntegerProperty(0);
@@ -92,5 +95,9 @@ public class TimePicker extends HBox {
 
     public IntegerProperty getStepProperty() {
         return this.stepProperty;
+    }
+
+    public LocalDateTime addToDate(LocalDate originalDt) {
+        return originalDt.atTime(this.getHourProperty().get(), this.getMinuteProperty().get());
     }
 }
