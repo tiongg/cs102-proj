@@ -2,8 +2,6 @@ package g1t1.db.students;
 
 import org.jooq.impl.DSL;
 
-import g1t1.db.users.User;
-
 import org.jooq.DSLContext;
 import org.jooq.Table;
 import org.jooq.Field;
@@ -24,19 +22,18 @@ public class StudentRepositoryJooq implements StudentRepository {
     public StudentRepositoryJooq(DSLContext dsl) { this.dsl = dsl; }
 
     @Override
-    public String create(String fullName, String email) {
-        String uuid = java.util.UUID.randomUUID().toString(); // e.g. "1e5d...-..."
+    public String create(String studentId, String fullName, String email) {
         dsl.insertInto(STUDENTS_TABLE)
-            .set(STUDENT_ID, uuid)
+            .set(STUDENT_ID, studentId)
             .set(FULL_NAME, fullName)
             .set(EMAIL, email)
             .execute();
-        return uuid;
+        return studentId;
     }
 
     @Override
     public List<Student> fetchAllStudents() {
-        return DSL.select(STUDENT_ID, FULL_NAME, EMAIL)
+        return dsl.select(STUDENT_ID, FULL_NAME, EMAIL)
             .from(STUDENTS_TABLE)
             .fetch(record -> new Student(
                 record.get(STUDENT_ID),
@@ -46,7 +43,7 @@ public class StudentRepositoryJooq implements StudentRepository {
     }
 
     @Override 
-    public Optional<Student> findById(String studentId) {
+    public Optional<Student> fetchStudentById(String studentId) {
         return dsl.select(STUDENT_ID, FULL_NAME, EMAIL)
             .from(STUDENTS_TABLE)
             .where(STUDENT_ID.eq(studentId))
@@ -58,7 +55,7 @@ public class StudentRepositoryJooq implements StudentRepository {
     }
 
     @Override
-    public Optional<Student> findByEmail(String email) {
+    public Optional<Student> fetchStudentByEmail(String email) {
         return dsl.select(STUDENT_ID, FULL_NAME, EMAIL)
             .from(STUDENTS_TABLE)
             .where(EMAIL.eq(email))
