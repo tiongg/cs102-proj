@@ -2,23 +2,35 @@
 
 <?import g1t1.components.Navbar?>
 <?import g1t1.components.TimePicker?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
             xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.StartSessionViewController">
     <Navbar/>
-    <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
-                AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <Label text="Start Session" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
+    <StackPane layoutX="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0"
+               AnchorPane.topAnchor="0.0">
+        <Label alignment="TOP_LEFT" text="Start Session" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0"
+               StackPane.alignment="TOP_LEFT">
             <font>
                 <Font name="Inter Semi Bold" size="26.0"/>
             </font>
+            <StackPane.margin>
+                <Insets bottom="32.0" left="40.0" right="32.0" top="32.0"/>
+            </StackPane.margin>
         </Label>
 
-        <VBox layoutX="124.0" layoutY="118.0" prefHeight="184.0" prefWidth="950.0" spacing="32.0"
-              AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="120.0">
-            <HBox spacing="32.0">
+        <Button fx:id="btnStartSession" alignment="CENTER" mnemonicParsing="false" onAction="#startSession"
+                prefWidth="240.0" text="Start session" StackPane.alignment="BOTTOM_CENTER">
+            <StackPane.margin>
+                <Insets bottom="120.0"/>
+            </StackPane.margin>
+        </Button>
+
+        <VBox alignment="TOP_CENTER" layoutX="124.0" layoutY="118.0" spacing="32.0" AnchorPane.leftAnchor="120.0"
+              AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="120.0" StackPane.alignment="CENTER">
+            <HBox alignment="TOP_CENTER" spacing="32.0">
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Class"/>
                     <MenuButton fx:id="classMenu" mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
@@ -36,11 +48,11 @@
                     </MenuButton>
                 </VBox>
             </HBox>
-            <HBox spacing="32.0">
+            <HBox alignment="TOP_CENTER" spacing="32.0">
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Date"/>
-                    <DatePicker editable="false" prefHeight="34.0" prefWidth="Infinity" style="-fx-font-size: 16px"
-                                styleClass="flat-input" fx:id="dpClassDate">
+                    <DatePicker fx:id="dpClassDate" editable="false" prefHeight="34.0" prefWidth="Infinity"
+                                style="-fx-font-size: 16px" styleClass="flat-input">
                     </DatePicker>
                 </VBox>
                 <VBox prefHeight="43.0" prefWidth="400">
@@ -48,9 +60,9 @@
                     <TimePicker fx:id="tpStartTime" prefHeight="40.0" prefWidth="Infinity" style="-fx-font-size: 16px"/>
                 </VBox>
             </HBox>
+            <StackPane.margin>
+                <Insets bottom="48.0" left="48.0" right="48.0" top="200.0"/>
+            </StackPane.margin>
         </VBox>
-
-        <Button fx:id="btnStartSession" layoutX="434.0" layoutY="437.0" mnemonicParsing="false" onAction="#startSession"
-                prefWidth="211.0" text="Start session"/>
-    </AnchorPane>
+    </StackPane>
 </AnchorPane>
