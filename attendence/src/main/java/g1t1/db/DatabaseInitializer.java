@@ -13,6 +13,10 @@ import java.sql.Connection;
 public class DatabaseInitializer {
     private static final String URL = "jdbc:sqlite:database.db";
 
+    public static void main(String[] args){
+        DatabaseInitializer db = new DatabaseInitializer();
+        db.init();
+    }
     public void init() {
         try {
             Connection connection = connect(URL);
@@ -149,7 +153,7 @@ public class DatabaseInitializer {
             .constraints(
                 DSL.constraint("pk_section").primaryKey("section_id"),
                 DSL.constraint("unique_module_id_term_section_number")
-                    .unique("module_id", "term", "section_code"),
+                    .unique("module_id", "term", "section_number"),
                 DSL.constraint("fk_module_section_module_id")
                     .foreignKey("module_id")
                     .references("modules", "module_id")
