@@ -55,6 +55,7 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
         <!-- Icon pack -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
