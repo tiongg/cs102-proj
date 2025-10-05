@@ -27,6 +27,7 @@ public class DatabaseInitializer {
 
                 createUsersTable(context);
                 createStudentsTable(context);
+                createUserFaceImagesTable(context);
                 createStudentFaceImagesTable(context);
                 createModuleSectionsTable(context);
                 createEnrollmentsTable(context);
@@ -101,7 +102,7 @@ public class DatabaseInitializer {
          * Create the `students` table if missing.
          *
          * Columns
-         * - student_id     VARCHAR, PK, not null. Matriculation number.
+         * - student_id     INT UNSIGNED, PK, not null. Matriculation number.
          * - full_name      VARCHAR(255), not null. Full name as per student ID card.
          * - email          VARCHAR(255), not null. Unique per user. Case-insensitive at application layer.
          *
@@ -121,6 +122,39 @@ public class DatabaseInitializer {
             )
             .execute();
     }
+
+    private void createUserFaceImagesTable(DSLContext context) {
+        /**
+         * Create the `user_face_images` table if missing.
+         *
+         * Columns
+         * - face_image_id  INT UNSIGNED, PK, not null. Surrogate key for each image.
+         * - user_id        INT UNSIGNED, not null. FK → users.user_id.
+         * - face_image     BLOB, not null. Raw face image bytes.
+         *
+         * Constraints
+         * - pk_user_face_images: primary key on face_image_id.
+         * - fk_user_id: foreign key (user_id) → users(user_id) ON DELETE CASCADE.
+         *
+         * Notes
+         * - Models a 1:N relationship from users to face images.
+         * - Store multiple images per user by inserting multiple rows with the same user_id.
+         * 
+         */
+
+        context.createTableIfNotExists("user_face_images")
+        .column("face_image_id", SQLDataType.INTEGERUNSIGNED.notNull())
+        .column("user_id", SQLDataType.INTEGERUNSIGNED.notNull())
+        .column("face_image", SQLDataType.BLOB.notNull())
+        .constraints(
+            DSL.constraint("pk_user_face_images").primaryKey("face_image_id"),
+            DSL.constraint("fk_user_id")
+                .foreignKey("user_id")
+                .references("users", "user_id")
+                .onDeleteCascade()
+        )
+        .execute();
+    }
     
     private void createStudentFaceImagesTable(DSLContext context) {
         /**
@@ -132,7 +166,7 @@ public class DatabaseInitializer {
          * - face_image     BLOB, not null. Raw face image bytes.
          *
          * Constraints
-         * - pk_student_face_data: primary key on face_image_id.
+         * - pk_student_face_images: primary key on face_image_id.
          * - fk_student_id: foreign key (student_id) → students(student_id) ON DELETE CASCADE.
          *
          * Notes
@@ -146,7 +180,7 @@ public class DatabaseInitializer {
             .column("student_id", SQLDataType.INTEGERUNSIGNED.notNull())
             .column("face_image", SQLDataType.BLOB.notNull())
             .constraints(
-                DSL.constraint("pk_student_face_data").primaryKey("face_image_id"),
+                DSL.constraint("pk_student_face_images").primaryKey("face_image_id"),
                 DSL.constraint("fk_student_id")
                     .foreignKey("student_id")
                     .references("students", "student_id")
@@ -170,7 +204,7 @@ public class DatabaseInitializer {
          * - room               VARCHAR, not null. Location identifier.
          *
          * Constraints
-         * - pk_module_section: primary key on module_section_id.
+         * - pk_module_sections: primary key on module_section_id.
          * - unique_module_title_section_number_term: unique on (module_title, section_number, term) to prevent duplicate module sections during the same term.
          *
          */
@@ -249,7 +283,7 @@ public class DatabaseInitializer {
          * Constraints
          * - pk_sessions: primary key on session_id.
          * - fk_sessions_module_section_id: foreign key (module_section_id) → module_sections(module_section_id) ON DELETE CASCADE.
-         * - unique_module_sections_date_week: unique on (module_section_id, date, week) to prevent duplicate sessions.
+         * - unique_module_section_id_date_week: unique on (module_section_id, date, week) to prevent duplicate sessions.
          * - ck_sessions_status: check status ∈ {"ongoing","completed"}.
          * 
          */
@@ -299,7 +333,7 @@ public class DatabaseInitializer {
         .column("status", SQLDataType.VARCHAR(16).notNull())
         .column("recorded_timestamp", SQLDataType.TIMESTAMP.defaultValue(DSL.currentTimestamp()).notNull())
         .constraints(
-            DSL.constraint("pk_attendances").primaryKey("session_id", "enrollment_id"),
+            DSL.constraint("pk_attendance").primaryKey("session_id", "enrollment_id"),
             DSL.constraint("fk_attendance_session_id")
                 .foreignKey("session_id").references("sessions", "session_id")
                 .onDeleteCascade(),
