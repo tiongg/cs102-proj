@@ -3,7 +3,6 @@ package g1t1.testing;
 import g1t1.models.ids.TeacherID;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.FaceData;
-import g1t1.models.users.RegisterTeacher;
 import g1t1.models.users.Student;
 import g1t1.models.users.Teacher;
 
@@ -31,20 +30,6 @@ public class MockDb {
         ));
 
         loadEnrolledStudents();
-    }
-
-    public static Teacher loginUser(String email, String password) {
-        if (email.equals("123") && password.equals("123")) {
-            return null;
-        }
-
-        return teachers.getFirst();
-    }
-
-    public static Teacher registerTeacher(RegisterTeacher registrationInfo) {
-        Teacher teacher = registrationInfo.toTeacher();
-        teachers.add(teacher);
-        return teacher;
     }
 
     public static List<ModuleSection> getUserModuleSections(TeacherID id) {
