@@ -13,11 +13,6 @@ import java.sql.Connection;
 public class DatabaseInitializer {
     private static final String URL = "jdbc:sqlite:database.db";
 
-    public static void main(String[] args){
-        DatabaseInitializer db = new DatabaseInitializer();
-        db.init();
-    }
-
     public void init() {
         try (Connection connection = connect(URL)) {
             try (var stmt = connection.createStatement()) {
@@ -77,7 +72,7 @@ public class DatabaseInitializer {
          * Create the `users` table if missing.
          *
          * Columns
-         * - user_id        INT UNSIGNED, PK, not null. Surrogate key.
+         * - user_id        VARCHAR(36), PK, not null. Surrogate key.
          * - full_name      VARCHAR(255), not null. Human-readable display name.
          * - email          VARCHAR(255), not null. Unique per user. Case-insensitive at application layer.
          * - password_hash  VARCHAR(255), not null. Stores a salted password hash.
@@ -89,7 +84,7 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("users")
-            .column("user_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("user_id", SQLDataType.VARCHAR(36).notNull())
             .column("full_name", SQLDataType.VARCHAR(255).notNull())
             .column("email", SQLDataType.VARCHAR(255).notNull())
             .column("password_hash", SQLDataType.VARCHAR(255).notNull())
@@ -105,7 +100,7 @@ public class DatabaseInitializer {
          * Create the `students` table if missing.
          *
          * Columns
-         * - student_id     INT UNSIGNED, PK, not null. Matriculation number.
+         * - student_id     VARCHAR(36), PK, not null. Matriculation number.
          * - full_name      VARCHAR(255), not null. Full name as per student ID card.
          * - email          VARCHAR(255), not null. Unique per user. Case-insensitive at application layer.
          *
@@ -116,7 +111,7 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("students")
-            .column("student_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("student_id", SQLDataType.VARCHAR(36).notNull())
             .column("full_name", SQLDataType.VARCHAR(255).notNull())
             .column("email", SQLDataType.VARCHAR(255).notNull())
             .constraints(
@@ -131,8 +126,8 @@ public class DatabaseInitializer {
          * Create the `user_face_images` table if missing.
          *
          * Columns
-         * - face_image_id  INT UNSIGNED, PK, not null. Surrogate key for each image.
-         * - user_id        INT UNSIGNED, not null. FK → users.user_id.
+         * - face_image_id  VARCHAR(36), PK, not null. Surrogate key for each image.
+         * - user_id        VARCHAR(36), not null. FK → users.user_id.
          * - face_image     BLOB, not null. Raw face image bytes.
          *
          * Constraints
@@ -146,8 +141,8 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("user_face_images")
-        .column("face_image_id", SQLDataType.INTEGERUNSIGNED.notNull())
-        .column("user_id", SQLDataType.INTEGERUNSIGNED.notNull())
+        .column("face_image_id", SQLDataType.VARCHAR(36).notNull())
+        .column("user_id", SQLDataType.VARCHAR(36).notNull())
         .column("face_image", SQLDataType.BLOB.notNull())
         .constraints(
             DSL.constraint("pk_user_face_images").primaryKey("face_image_id"),
@@ -164,8 +159,8 @@ public class DatabaseInitializer {
          * Create the `student_face_images` table if missing.
          *
          * Columns
-         * - face_image_id  INT UNSIGNED, PK, not null. Surrogate key for each image.
-         * - student_id     INT UNSIGNED, not null. FK → students.student_id.
+         * - face_image_id  VARCHAR(36), PK, not null. Surrogate key for each image.
+         * - student_id     VARCHAR(36), not null. FK → students.student_id.
          * - face_image     BLOB, not null. Raw face image bytes.
          *
          * Constraints
@@ -179,8 +174,8 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("student_face_images")
-            .column("face_image_id", SQLDataType.INTEGERUNSIGNED.notNull())
-            .column("student_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("face_image_id", SQLDataType.VARCHAR(36).notNull())
+            .column("student_id", SQLDataType.VARCHAR(36).notNull())
             .column("face_image", SQLDataType.BLOB.notNull())
             .constraints(
                 DSL.constraint("pk_student_face_images").primaryKey("face_image_id"),
@@ -197,7 +192,7 @@ public class DatabaseInitializer {
          * Create the `module_sections` table if missing.
          *
          * Columns
-         * - module_section_id  INT UNSIGNED, PK, not null. Surrogate key.
+         * - module_section_id  VARCHAR(36), PK, not null. Surrogate key.
          * - module_title       VARCHAR, not null. Title of the module (e.g, "CS102 Programming Fundamentals II").
          * - section_number     VARCHAR(3), not null. Short code per module (e.g., "G1").
          * - term               VARCHAR, not null. Academic term label (e.g., "AY24/25 Term 1").
@@ -205,7 +200,7 @@ public class DatabaseInitializer {
          * - start_time         VARCHAR(8), not null. Time string "HH:MM AM/PM".
          * - end_time           VARCHAR(8), not null. Time string "HH:MM AM/PM".
          * - room               VARCHAR, not null. Location identifier.
-         * - teacher_user_id    INT UNSIGNED, not null. FK → users.user_id.
+         * - teacher_user_id    VARCHAR(36), not null. FK → users.user_id.
          *
          * Constraints
          * - pk_module_sections: primary key on module_section_id.
@@ -218,7 +213,7 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("module_sections")
-            .column("module_section_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("module_section_id", SQLDataType.VARCHAR(36).notNull())
             .column("module_title", SQLDataType.VARCHAR.notNull())
             .column("section_number", SQLDataType.VARCHAR(3).notNull())
             .column("term", SQLDataType.VARCHAR.notNull())
@@ -226,7 +221,7 @@ public class DatabaseInitializer {
             .column("start_time", SQLDataType.VARCHAR(8).notNull()) 
             .column("end_time", SQLDataType.VARCHAR(8).notNull())   
             .column("room", SQLDataType.VARCHAR.notNull())
-            .column("teacher_user_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("teacher_user_id", SQLDataType.VARCHAR(36).notNull())
             .constraints(
                 DSL.constraint("pk_module_sections").primaryKey("module_section_id"),
                 DSL.constraint("unique_module_title_section_number_term")
@@ -243,9 +238,9 @@ public class DatabaseInitializer {
          * Create the `enrollments` table if missing.
          *
          * Columns
-         * - enrollment_id      INT UNSIGNED, PK, not null. Surrogate key.
-         * - module_section_id  INT UNSIGNED, not null. FK to module_sections.module_section_id.
-         * - student_id         INT UNSIGNED, not null. FK to student.student_id.
+         * - enrollment_id      VARCHAR(36), PK, not null. Surrogate key.
+         * - module_section_id  VARCHAR(36), not null. FK to module_sections.module_section_id.
+         * - student_id         VARCHAR(36), not null. FK to student.student_id.
          *
          * Constraints
          * - pk_enrollment: primary key on enrollment_id.
@@ -260,9 +255,9 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("enrollments")
-               .column("enrollment_id", SQLDataType.INTEGERUNSIGNED.notNull())
-               .column("module_section_id", SQLDataType.INTEGERUNSIGNED.notNull())
-               .column("student_id", SQLDataType.INTEGERUNSIGNED.notNull())
+               .column("enrollment_id", SQLDataType.VARCHAR(36).notNull())
+               .column("module_section_id", SQLDataType.VARCHAR(36).notNull())
+               .column("student_id", SQLDataType.VARCHAR(36).notNull())
                .constraints(
                    DSL.constraint("pk_enrollments").primaryKey("enrollment_id"),
                    DSL.constraint("unique_module_section_id_student_id").unique("module_section_id", "student_id"),
@@ -283,12 +278,12 @@ public class DatabaseInitializer {
          * Create the `sessions` table if missing.
          *
          * Columns
-         * - session_id         INT UNSIGNED, PK, auto-increment, not null. Surrogate key.
-         * - module_section_id  INT UNSIGNED, not null. FK → module_sections.module_section_id.
+         * - session_id         VARCHAR(36), PK, not null. Surrogate key.
+         * - module_section_id  VARCHAR(36), not null. FK → module_sections.module_section_id.
          * - date               DATE, not null. Calendar date of the meeting.
          * - week               TINYINT UNSIGNED, not null. 1–13 inclusive.
          * - start_time         TIMESTAMP, not null. Start timestamp.
-         * - end_time           TIMESTAMP, not null. End timestamp.
+         * - end_time           TIMESTAMP, nullable. End timestamp.
          * - status             VARCHAR(16), not null. {"ongoing","completed"}.
          * - created_at         TIMESTAMP, not null. Default CURRENT_TIMESTAMP.
          *
@@ -301,12 +296,12 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("sessions")
-            .column("session_id", SQLDataType.INTEGERUNSIGNED.identity(true).notNull())
-            .column("module_section_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("session_id", SQLDataType.VARCHAR(36).notNull())
+            .column("module_section_id", SQLDataType.VARCHAR(36).notNull())
             .column("date", SQLDataType.DATE.notNull())
             .column("week", SQLDataType.TINYINTUNSIGNED.notNull())
             .column("start_time", SQLDataType.TIMESTAMP.notNull())
-            .column("end_time", SQLDataType.TIMESTAMP.notNull())
+            .column("end_time", SQLDataType.TIMESTAMP.nullable(true))
             .column("status", SQLDataType.VARCHAR(16).notNull())
             .column("created_at", SQLDataType.TIMESTAMP.defaultValue(DSL.currentTimestamp()).notNull())
             .constraints(
@@ -326,8 +321,8 @@ public class DatabaseInitializer {
          * Create the `attendance` table if missing.
          *
          * Columns
-         * - session_id          INT UNSIGNED, not null. FK → sessions.session_id.
-         * - enrollment_id       INT UNSIGNED, not null. FK → enrollments.enrollment_id.
+         * - session_id          VARCHAR(36), not null. FK → sessions.session_id.
+         * - enrollment_id       VARCHAR(36), not null. FK → enrollments.enrollment_id.
          * - status              VARCHAR(16), not null. {"present","late","absent","excused"}.
          * - recorded_timestamp  TIMESTAMP, not null. Default CURRENT_TIMESTAMP.
          *
@@ -340,8 +335,8 @@ public class DatabaseInitializer {
          */
 
         context.createTableIfNotExists("attendance")
-        .column("session_id", SQLDataType.INTEGERUNSIGNED.notNull())
-        .column("enrollment_id", SQLDataType.INTEGERUNSIGNED.notNull())
+        .column("session_id", SQLDataType.VARCHAR(36).notNull())
+        .column("enrollment_id", SQLDataType.VARCHAR(36).notNull())
         .column("status", SQLDataType.VARCHAR(16).notNull())
         .column("recorded_timestamp", SQLDataType.TIMESTAMP.defaultValue(DSL.currentTimestamp()).notNull())
         .constraints(
