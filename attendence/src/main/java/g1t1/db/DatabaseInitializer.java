@@ -20,6 +20,9 @@ public class DatabaseInitializer {
 
     public void init() {
         try (Connection connection = connect(URL)) {
+            try (var stmt = connection.createStatement()) {
+                stmt.execute("PRAGMA foreign_keys = ON");
+            } 
             DSLContext dsl = DSL.using(connection, SQLDialect.SQLITE);
         
             dsl.transaction(cfg -> {
