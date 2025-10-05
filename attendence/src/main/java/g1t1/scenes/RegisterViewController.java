@@ -2,6 +2,7 @@ package g1t1.scenes;
 
 import g1t1.components.register.RegistrationStep;
 import g1t1.components.stepper.StepperControl;
+import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.PageController;
 import g1t1.models.scenes.PageName;
@@ -85,10 +86,10 @@ public class RegisterViewController extends PageController {
         if (!stepper.isLast()) {
             stepper.next();
         } else {
-//            System.out.println("Registered user:");
-//            System.out.println(this.registerTeacher);
-            // TODO: Auth logic
-            Router.changePage(PageName.PastRecords);
+            boolean success = AuthenticationContext.registerTeacher(this.registerTeacher);
+            if (success) {
+                Router.changePage(PageName.PastRecords);
+            }
         }
     }
 

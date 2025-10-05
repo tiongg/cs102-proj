@@ -1,5 +1,6 @@
 package g1t1.features.authentication;
 
+import g1t1.models.users.RegisterTeacher;
 import g1t1.models.users.Teacher;
 import g1t1.testing.MockDb;
 import g1t1.utils.EventEmitter;
@@ -11,16 +12,14 @@ public class AuthenticationContext {
 
     private static Teacher currentUser;
 
+    public static boolean registerTeacher(RegisterTeacher registrationInfo) {
+        Teacher teacher = MockDb.registerTeacher(registrationInfo);
+        return setCurrentTeacher(teacher);
+    }
+
     public static boolean loginTeacher(String email, String password) {
         Teacher teacher = MockDb.loginUser(email, password);
-        // Authentication failed
-        if (teacher == null) {
-            return false;
-        }
-
-        emitter.emit(new OnLoginEvent(teacher));
-        currentUser = teacher;
-        return true;
+        return setCurrentTeacher(teacher);
     }
 
     public static void logout() {
@@ -30,5 +29,16 @@ public class AuthenticationContext {
 
     public static Teacher getCurrentUser() {
         return currentUser;
+    }
+
+    private static boolean setCurrentTeacher(Teacher teacher) {
+        // Auth/Registration failed
+        if (teacher == null) {
+            return false;
+        }
+
+        emitter.emit(new OnLoginEvent(teacher));
+        currentUser = teacher;
+        return true;
     }
 }

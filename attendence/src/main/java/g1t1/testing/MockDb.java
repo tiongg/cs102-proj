@@ -3,6 +3,7 @@ package g1t1.testing;
 import g1t1.models.ids.TeacherID;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.FaceData;
+import g1t1.models.users.RegisterTeacher;
 import g1t1.models.users.Student;
 import g1t1.models.users.Teacher;
 
@@ -19,7 +20,7 @@ public class MockDb {
     private final static Map<TeacherID, List<ModuleSection>> teacherClasses = new HashMap<>();
 
     static {
-        Teacher newTeacher = new Teacher("123");
+        Teacher newTeacher = new Teacher("123", "Dr Zhang", "ZZY@goat.com", new FaceData());
         teachers.add(newTeacher);
 
         teacherClasses.put(newTeacher.getID(), new ArrayList<>(
@@ -38,6 +39,12 @@ public class MockDb {
         }
 
         return teachers.getFirst();
+    }
+
+    public static Teacher registerTeacher(RegisterTeacher registrationInfo) {
+        Teacher teacher = registrationInfo.toTeacher();
+        teachers.add(teacher);
+        return teacher;
     }
 
     public static List<ModuleSection> getUserModuleSections(TeacherID id) {
@@ -99,8 +106,7 @@ public class MockDb {
 
     private static Student createStudent(String id, String name, ModuleSection section, List<byte[]> photos) {
         Student student = new Student(id, name, section, name.toLowerCase() + "@school.edu", "12345678");
-        FaceData faceData = new FaceData();
-        faceData.setFaceImages(photos);
+        FaceData faceData = new FaceData(photos);
         student.setFaceData(faceData);
         return student;
     }

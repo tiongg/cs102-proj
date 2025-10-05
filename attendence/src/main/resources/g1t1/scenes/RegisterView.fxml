@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import g1t1.components.register.*?>
-<?import g1t1.components.stepper.*?>
-<?import java.lang.*?>
-<?import javafx.collections.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import org.kordamp.ikonli.javafx.*?>
 
+<?import g1t1.components.register.FaceDetails?>
+<?import g1t1.components.register.PasswordDetails?>
+<?import g1t1.components.register.TeacherRegisterDetails?>
+<?import g1t1.components.register.TeacherRegistrationDone?>
+<?import g1t1.components.stepper.StepperControl?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.lang.*?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
             xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.RegisterViewController">
     <Label layoutX="280.0" layoutY="23.0" text="Register" AnchorPane.leftAnchor="280.0" AnchorPane.topAnchor="24.0"
@@ -19,6 +23,7 @@
             <Font name="Inter Regular" size="24.0"/>
         </font>
     </Label>
+
     <TabPane fx:id="tabs" layoutX="330.0" layoutY="128.0" prefHeight="700.0" prefWidth="780.0" styleClass="hidden-tabs"
              tabClosingPolicy="UNAVAILABLE" tabMaxHeight="50.0" tabMaxWidth="150.0" AnchorPane.bottomAnchor="128.0"
              AnchorPane.topAnchor="128.0">

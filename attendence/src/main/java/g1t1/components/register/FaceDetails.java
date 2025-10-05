@@ -3,6 +3,7 @@ package g1t1.components.register;
 import g1t1.models.interfaces.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
+import g1t1.models.users.RegisterTeacher;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
@@ -25,28 +26,38 @@ import org.opencv.videoio.VideoCapture;
 
 class CameraRunnable implements Runnable {
     private static final int TARGET_SIZE = 256;
+    private static final int MAX_FAILS = 100;
     private final VideoCapture camera;
     private final ImageView display;
     private final Object frameLock = new Object();
     private final Mat currentFrame = new Mat();
+    private final BooleanProperty cameraFailure;
 
-    public CameraRunnable(ImageView display) {
+    public CameraRunnable(ImageView display, BooleanProperty cameraFailure) {
         this.camera = new VideoCapture(FaceConfig.getInstance().getCameraIndex());
         this.display = display;
+        this.cameraFailure = cameraFailure;
     }
 
     @Override
     public void run() {
         Mat frame = new Mat();
+        int consecutiveFailures = 0;
+        this.cameraFailure.set(false);
         while (camera.isOpened()) {
             if (Thread.currentThread().isInterrupted()) {
-                camera.release();
                 break;
             }
 
             if (!camera.read(frame) || frame.empty()) {
+                // Stop the loop if it fails too often
+                consecutiveFailures++;
+                if (consecutiveFailures >= MAX_FAILS) {
+                    break;
+                }
                 continue;
             }
+            consecutiveFailures = 0;
             Mat croppedFrame = ImageUtils.cropToFit(frame, TARGET_SIZE, TARGET_SIZE);
 
             // Update the shared frame
@@ -57,6 +68,10 @@ class CameraRunnable implements Runnable {
             Platform.runLater(() -> {
                 display.setImage(ImageUtils.matToImage(croppedFrame));
             });
+        }
+        camera.release();
+        if (consecutiveFailures >= MAX_FAILS) {
+            cameraFailure.set(true);
         }
     }
 
@@ -74,6 +89,7 @@ class CameraRunnable implements Runnable {
 
 public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
     private final BooleanProperty isValid = new SimpleBooleanProperty(true);
+    private final BooleanProperty cameraFailure = new SimpleBooleanProperty(false);
     private final ListProperty<byte[]> photosTaken = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final int REQUIRED_PICTURE_COUNT = 15;
     private ThreadWithRunnable<CameraRunnable> cameraDaemon;
@@ -83,6 +99,10 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
     private Label lblTakenPictures;
     @FXML
     private ImageView ivCameraView;
+    @FXML
+    private Label lblCameraError;
+    @FXML
+    private Label lblOnboardType;
 
     public FaceDetails() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("FaceDetails.fxml"));
@@ -100,6 +120,7 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
 
         lblTakenPictures.textProperty().bind(photosTaken.map(x -> String.format("%d / %d", x.size(), REQUIRED_PICTURE_COUNT)));
         isValid.bind(photosTaken.map(x -> x.size() >= REQUIRED_PICTURE_COUNT));
+        lblCameraError.visibleProperty().bind(cameraFailure);
     }
 
     @Override
@@ -120,8 +141,12 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
     }
 
     @Override
-    public void onMount(Object _target) {
-        CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView);
+    public void onMount(Object target) {
+        if (target instanceof RegisterTeacher) {
+            lblOnboardType.setText("Teacher");
+        }
+
+        CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView, this.cameraFailure);
         this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
         this.cameraDaemon.setDaemon(true);
         this.cameraDaemon.start();
