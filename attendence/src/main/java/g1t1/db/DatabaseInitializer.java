@@ -39,7 +39,7 @@ public class DatabaseInitializer {
         } 
     }
 
-    private Connection connect(String url) throws SQLException {
+    public Connection connect(String url) throws SQLException {
         /**
          * Obtain a JDBC connection from the given URL.
          *
@@ -65,6 +65,32 @@ public class DatabaseInitializer {
             throw new SQLException("DriverManager returned null for URL: " + url);
         }
         return connection;
+    }
+
+    public DSLContext getDslContext() {
+        /**
+         * Obtain a DSLContext for executing jOOQ queries.
+         *
+         * Purpose
+         * - Provides a DSLContext connected to the database for executing jOOQ queries.
+         *
+         * Returns
+         * - A DSLContext connected to the database.
+         * - null if connection acquisition fails.
+         *
+         * Behavior
+         * - Attempts to connect to the database using the configured URL.
+         * - Returns a DSLContext if successful, or null if connection fails.
+         * 
+         */
+
+        try {
+            Connection connection = connect(URL);
+            return DSL.using(connection, SQLDialect.SQLITE);
+        } catch (SQLException err) {
+            // log error here
+            return null;
+        }
     }
 
     private void createUsersTable(DSLContext context) {
