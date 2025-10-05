@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.HBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER_LEFT" prefHeight="36.0" spacing="8" type="HBox"
+         xmlns="http://javafx.com/javafx/17.0.12">
+    <HBox alignment="CENTER_LEFT">
+        <FontIcon iconLiteral="fas-chevron-left" textAlignment="CENTER" wrappingWidth="30"
+                  onMouseClicked="#decrementHour">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </FontIcon>
+        <Label fx:id="lblHour" styleClass="flat-input" text="08">
+            <padding>
+                <Insets left="8.0" right="8.0"/>
+            </padding>
+        </Label>
+        <FontIcon iconLiteral="fas-chevron-right" textAlignment="CENTER" wrappingWidth="30"
+                  onMouseClicked="#incrementHour">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </FontIcon>
+    </HBox>
+    <Label alignment="CENTER" text=":">
+
+    </Label>
+    <HBox alignment="CENTER_LEFT">
+        <FontIcon iconLiteral="fas-chevron-left" textAlignment="CENTER" wrappingWidth="30"
+                  onMouseClicked="#decrementMinute">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </FontIcon>
+        <Label fx:id="lblMinutes" styleClass="flat-input" text="00">
+            <padding>
+                <Insets left="8.0" right="8.0"/>
+            </padding>
+        </Label>
+        <FontIcon iconLiteral="fas-chevron-right" textAlignment="CENTER" wrappingWidth="30"
+                  onMouseClicked="#incrementMinute">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </FontIcon>
+    </HBox>
+</fx:root>
