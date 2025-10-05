@@ -51,6 +51,9 @@ local.properties
 # sbteclipse plugin
 .target
 
+# SQLite database file
+database.db
+
 # Tern plugin
 .tern-project
 
