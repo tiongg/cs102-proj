@@ -17,9 +17,9 @@ public class DatabaseInitializer {
         DatabaseInitializer db = new DatabaseInitializer();
         db.init();
     }
+
     public void init() {
-        try {
-            Connection connection = connect(URL);
+        try (Connection connection = connect(URL)) {
             DSLContext dsl = DSL.using(connection, SQLDialect.SQLITE);
         
             dsl.transaction(cfg -> {
@@ -35,9 +35,9 @@ public class DatabaseInitializer {
             });        
         } catch (SQLException err) {
             // log error here
-        }
-
+        } 
     }
+
     private Connection connect(String url) throws SQLException {
         /**
          * Obtain a JDBC connection from the given URL.
@@ -240,5 +240,5 @@ public class DatabaseInitializer {
                )
                .execute();
     }
-
+    
 }
