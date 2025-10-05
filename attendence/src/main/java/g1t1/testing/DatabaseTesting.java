@@ -1,67 +1,75 @@
 package g1t1.testing;
 
+import g1t1.db.DatabaseInitializer;
+import g1t1.db.attendance.Attendance;
+import g1t1.db.attendance.AttendanceRepository;
+import g1t1.db.attendance.AttendanceRepositoryJooq;
+import g1t1.db.enrollments.Enrollment;
+import g1t1.db.enrollments.EnrollmentRepository;
+import g1t1.db.enrollments.EnrollmentRepositoryJooq;
+import g1t1.db.module_sections.ModuleSection;
+import g1t1.db.module_sections.ModuleSectionRepository;
+import g1t1.db.module_sections.ModuleSectionRepositoryJooq;
+import g1t1.db.sessions.Session;
+import g1t1.db.sessions.SessionRepository;
+import g1t1.db.sessions.SessionRepositoryJooq;
+import g1t1.db.students.Student;
+import g1t1.db.students.StudentRepository;
+import g1t1.db.students.StudentRepositoryJooq;
+import g1t1.db.users.User;
+import g1t1.db.users.UserRepository;
+import g1t1.db.users.UserRepositoryJooq;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import org.jooq.SQLDialect;
-import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
-import org.jooq.DSLContext;
-
-import g1t1.db.DatabaseInitializer;
-import g1t1.db.users.*;
-import g1t1.db.students.*;
-import g1t1.db.user_face_images.*;
-import g1t1.db.student_face_images.*;
-import g1t1.db.module_sections.*;
-import g1t1.db.sessions.*;
-import g1t1.db.enrollments.*;
-import g1t1.db.attendance.*;
+import java.util.UUID;
 
 public class DatabaseTesting {
     public static void main(String[] args) {
-    DatabaseInitializer db = new DatabaseInitializer();
-    db.init();
+        DatabaseInitializer db = new DatabaseInitializer();
+        db.init();
 
-    try (Connection connection = db.connect()) {
-        DSLContext dsl = DSL.using(connection, SQLDialect.SQLITE);
+        try (Connection connection = db.connect()) {
+            DSLContext dsl = DSL.using(connection, SQLDialect.SQLITE);
 
-        UserRepository userRepo = new UserRepositoryJooq(dsl);
-        StudentRepository studentRepo = new StudentRepositoryJooq(dsl);
-        ModuleSectionRepository moduleSectionRepo = new ModuleSectionRepositoryJooq(dsl);
-        SessionRepository sessionRepo = new SessionRepositoryJooq(dsl);
-        EnrollmentRepository enrollmentRepo = new EnrollmentRepositoryJooq(dsl);
-        AttendanceRepository attendanceRepo = new AttendanceRepositoryJooq(dsl);
+            UserRepository userRepo = new UserRepositoryJooq(dsl);
+            StudentRepository studentRepo = new StudentRepositoryJooq(dsl);
+            ModuleSectionRepository moduleSectionRepo = new ModuleSectionRepositoryJooq(dsl);
+            SessionRepository sessionRepo = new SessionRepositoryJooq(dsl);
+            EnrollmentRepository enrollmentRepo = new EnrollmentRepositoryJooq(dsl);
+            AttendanceRepository attendanceRepo = new AttendanceRepositoryJooq(dsl);
 
-        List<String> userIds = testUserRepo(userRepo);  
-        List<String> studentIds = testStudentRepo(studentRepo);
-        List<String> moduleSectionIds = testModuleSectionRepo(moduleSectionRepo, userIds);
-        List<String> enrollmentIds = testEnrollmentRepo(enrollmentRepo, studentIds, moduleSectionIds);
-        List<String> sessionIds = testSessionRepo(sessionRepo, moduleSectionIds, userIds);
-        testAttendanceRepo(attendanceRepo, sessionIds, enrollmentIds);
+            List<String> userIds = testUserRepo(userRepo);
+            List<String> studentIds = testStudentRepo(studentRepo);
+            List<String> moduleSectionIds = testModuleSectionRepo(moduleSectionRepo, userIds);
+            List<String> enrollmentIds = testEnrollmentRepo(enrollmentRepo, studentIds, moduleSectionIds);
+            List<String> sessionIds = testSessionRepo(sessionRepo, moduleSectionIds, userIds);
+            testAttendanceRepo(attendanceRepo, sessionIds, enrollmentIds);
 
-        clearAllTables(dsl);            
+            clearAllTables(dsl);
 
-    } catch (SQLException e) {
-        System.out.println("Error connecting to the database: " + e.getMessage());
-    } catch (DataAccessException e) {
-        System.out.println("Error during database operation: " + e.getMessage());
-    } 
-}
+        } catch (SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+        } catch (DataAccessException e) {
+            System.out.println("Error during database operation: " + e.getMessage());
+        }
+    }
 
 
     private static List<String> testUserRepo(UserRepository userRepo) {
         // Create users
-        String idA = userRepo.create("Harry Ng", "harryngkokjing@gmail.com", "pA");
-        String idB = userRepo.create("Jared Chan",   "jaredchan@gmail.com",   "pB");
-        String idC = userRepo.create("Tiong Guan",  "tiongguan@gmail.com",  "pC");
-        String idD = userRepo.create("Flash Teng",  "flashteng@gmail.com",  "pD");
+        String idA = userRepo.create(UUID.randomUUID().toString(), "Harry Ng", "harryngkokjing@gmail.com", "pA");
+        String idB = userRepo.create(UUID.randomUUID().toString(), "Jared Chan", "jaredchan@gmail.com", "pB");
+        String idC = userRepo.create(UUID.randomUUID().toString(), "Tiong Guan", "tiongguan@gmail.com", "pC");
+        String idD = userRepo.create(UUID.randomUUID().toString(), "Flash Teng", "flashteng@gmail.com", "pD");
         System.out.println("Inserted IDs: " + List.of(idA, idB, idC, idD));
 
         // Read all users
@@ -96,7 +104,9 @@ public class DatabaseTesting {
         return List.of(idA, idB, idD);
     }
 
-    /** Utility for displaying user records in console */
+    /**
+     * Utility for displaying user records in console
+     */
     private static void dumpUsers(String title, List<User> users) {
         System.out.println("=== " + title + " ===");
         for (User u : users) {
@@ -140,7 +150,9 @@ public class DatabaseTesting {
         return List.of(idA, idB, idC);
     }
 
-    /** Utility for displaying student records in console */
+    /**
+     * Utility for displaying student records in console
+     */
     private static void dumpStudents(String title, List<Student> students) {
         System.out.println("=== " + title + " ===");
         for (Student s : students) {
@@ -230,8 +242,8 @@ public class DatabaseTesting {
 
     private static List<String> testSessionRepo(SessionRepository sessionRepo, List<String> moduleSectionIds, List<String> teacherUserIds) {
         // Create sessions
-        String idA = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-20"), (short)1, Timestamp.valueOf("2025-08-20 08:15:00"), null, "ongoing");
-        String idB = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-27"), (short)2, Timestamp.valueOf("2025-08-27 08:15:00"), null, "ongoing");
+        String idA = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-20"), (short) 1, Timestamp.valueOf("2025-08-20 08:15:00"), null, "ongoing");
+        String idB = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-27"), (short) 2, Timestamp.valueOf("2025-08-27 08:15:00"), null, "ongoing");
         System.out.println("Inserted Session IDs: " + List.of(idA, idB));
 
         // Fetch session by id 
@@ -243,7 +255,7 @@ public class DatabaseTesting {
         dumpSessions("Sessions for module section " + moduleSectionIds.get(0), sessionsByModuleSection);
 
         // Fetch sessions by teacher user id + week
-        List<Session> sessionsByTeacherAndWeek = sessionRepo.fetchSessionsByTeacherUserIdAndWeek(teacherUserIds.get(0), (short)1);
+        List<Session> sessionsByTeacherAndWeek = sessionRepo.fetchSessionsByTeacherUserIdAndWeek(teacherUserIds.get(0), (short) 1);
         System.out.println("Fetch by teacher user id + week count = " + sessionsByTeacherAndWeek.size());
         dumpSessions("Sessions for teacher " + teacherUserIds.get(0) + " in week 1", sessionsByTeacherAndWeek);
 
@@ -282,7 +294,7 @@ public class DatabaseTesting {
 
         // Update status
         boolean updA = attendanceRepo.update(sessionIds.get(0), enrollmentIds.get(0), "absent", Timestamp.valueOf(LocalDateTime.now()));
-        System.out.println("Update attendance record A result = " + updA);  
+        System.out.println("Update attendance record A result = " + updA);
 
         // Fetch again to verify update
         List<Attendance> updatedAttendance = attendanceRepo.fetchAttendenceBySessionId(sessionIds.get(0));
@@ -298,7 +310,9 @@ public class DatabaseTesting {
     }
 
 
-    /** Remove all rows from every table (FK-safe order). */
+    /**
+     * Remove all rows from every table (FK-safe order).
+     */
     public static void clearAllTables(DSLContext dsl) {
         dsl.transaction(cfg -> {
             DSLContext ctx = DSL.using(cfg);

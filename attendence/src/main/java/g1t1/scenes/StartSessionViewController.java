@@ -94,5 +94,6 @@ public class StartSessionViewController extends PageController {
         LocalDateTime dt = LocalDateTime.now();
         tpStartTime.getHourProperty().set(dt.getHour());
         tpStartTime.getMinuteProperty().set(dt.getMinute());
+        dpClassDate.setValue(LocalDate.now());
     }
 }

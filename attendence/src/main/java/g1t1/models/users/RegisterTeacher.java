@@ -80,4 +80,13 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
     public byte[] getThumbnailFace() {
         return thumbnailFace;
     }
+
+    public Teacher toTeacher() {
+        return new Teacher(
+                this.getTeacherID().toString(),
+                this.getFullName(),
+                this.getEmail(),
+                this.getFaceData()
+        );
+    }
 }

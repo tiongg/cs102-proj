@@ -1,7 +1,6 @@
 package g1t1;
 
-import java.net.URL;
-
+import g1t1.db.DatabaseInitializer;
 import g1t1.models.scenes.Page;
 import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
@@ -10,6 +9,8 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import nu.pattern.OpenCV;
+
+import java.net.URL;
 
 public class App extends Application {
     public static final int WIDTH = 1440;
@@ -25,6 +26,8 @@ public class App extends Application {
 
     public static void main(String[] args) {
         OpenCV.loadLocally();
+        DatabaseInitializer db = new DatabaseInitializer();
+        db.init();
         launch();
     }
 
@@ -53,8 +56,8 @@ public class App extends Application {
     }
 
     private void loadCss(Scene scene) {
-        String[] cssFiles = { "css/app.css", "css/button.css", "css/date-picker.css", "css/stepper.css",
-                "css/tabs.css", };
+        String[] cssFiles = {"css/app.css", "css/button.css", "css/date-picker.css", "css/stepper.css",
+                "css/tabs.css",};
 
         for (String cssFile : cssFiles) {
             URL url = getClass().getResource(cssFile);
