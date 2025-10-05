@@ -26,9 +26,11 @@ public class DatabaseInitializer {
                 DSLContext context = DSL.using(cfg);
 
                 createUsersTable(context);
-                createModulesTable(context);
+                createStudentsTable(context);
+                createStudentFaceImagesTable(context);
                 createModuleSectionsTable(context);
                 createEnrollmentsTable(context);
+                createSessionsTable(context);
                 createAttendancesTable(context);
 
                 // optional: create indexes for optimizing search queries
@@ -53,13 +55,11 @@ public class DatabaseInitializer {
          * - null if the connection attempt fails.
          *
          * Behavior
-         * - Catches SQLException, logs the message to stderr, and returns null.
-         * - Declares SQLException in the signature, but does not rethrow it.
-         *
-         * Caller Responsibilities
-         * - Check the returned value for null before use.
+         * - Obtains a JDBC connection via DriverManager.
+         * - Throws SQLException if acquisition fails or returns null.
          * 
          */
+        
         Connection connection = null;
         connection = DriverManager.getConnection(url);
         if (connection == null) {
@@ -76,7 +76,7 @@ public class DatabaseInitializer {
          * - user_id        INT UNSIGNED, PK, not null. Surrogate key.
          * - full_name      VARCHAR(255), not null. Human-readable display name.
          * - email          VARCHAR(255), not null. Unique per user. Case-insensitive at application layer.
-         * - password_hash  VARCHAR(255), not null. Stores a salted password hash 
+         * - password_hash  VARCHAR(255), not null. Stores a salted password hash.
          *
          * Constraints
          * - pk_users: primary key on user_id.
@@ -91,31 +91,66 @@ public class DatabaseInitializer {
             .column("password_hash", SQLDataType.VARCHAR(255).notNull())
             .constraints(
                 DSL.constraint("pk_users").primaryKey("user_id"),
-                DSL.constraint("unique_users_email").unique("email")
+                DSL.constraint("unique_email").unique("email")
             )
             .execute();
     }
 
-    private void createModulesTable(DSLContext context) {
+    private void createStudentsTable(DSLContext context) {
         /**
-         * Create the `modules` table if missing.
+         * Create the `students` table if missing.
          *
          * Columns
-         * - module_id   INT UNSIGNED, not null. Surrogate key.
-         * - title       VARCHAR(255), not null. Human-readable module title.
+         * - student_id     VARCHAR, PK, not null. Matriculation number.
+         * - full_name      VARCHAR(255), not null. Full name as per student ID card.
+         * - email          VARCHAR(255), not null. Unique per user. Case-insensitive at application layer.
          *
          * Constraints
-         * - pk_modules: primary key on module_id.
-         * - unique_module_title: unique on title.
+         * - pk_users: primary key on student_id.
+         * - unique_users_email: unique on (email) to enforce a single user account per email.
+         *
+         */
+
+        context.createTableIfNotExists("students")
+            .column("student_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("full_name", SQLDataType.VARCHAR(255).notNull())
+            .column("email", SQLDataType.VARCHAR(255).notNull())
+            .constraints(
+                DSL.constraint("pk_students").primaryKey("student_id"),
+                DSL.constraint("unique_email").unique("email")
+            )
+            .execute();
+    }
+    
+    private void createStudentFaceImagesTable(DSLContext context) {
+        /**
+         * Create the `student_face_images` table if missing.
+         *
+         * Columns
+         * - face_image_id  INT UNSIGNED, PK, not null. Surrogate key for each image.
+         * - student_id     INT UNSIGNED, not null. FK → students.student_id.
+         * - face_image     BLOB, not null. Raw face image bytes.
+         *
+         * Constraints
+         * - pk_student_face_data: primary key on face_image_id.
+         * - fk_student_id: foreign key (student_id) → students(student_id) ON DELETE CASCADE.
+         *
+         * Notes
+         * - Models a 1:N relationship from students to face images.
+         * - Store multiple images per student by inserting multiple rows with the same student_id.
          * 
          */
 
-        context.createTableIfNotExists("modules")
-            .column("module_id", SQLDataType.INTEGERUNSIGNED.notNull())
-            .column("title", SQLDataType.VARCHAR(255).notNull())
+        context.createTableIfNotExists("student_face_images")
+            .column("face_image_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("student_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("face_image", SQLDataType.BLOB.notNull())
             .constraints(
-                DSL.constraint("pk_modules").primaryKey("module_id"),
-                DSL.constraint("unique_module_title").unique("title")
+                DSL.constraint("pk_student_face_data").primaryKey("face_image_id"),
+                DSL.constraint("fk_student_id")
+                    .foreignKey("student_id")
+                    .references("students", "student_id")
+                    .onDeleteCascade()
             )
             .execute();
     }
@@ -125,81 +160,119 @@ public class DatabaseInitializer {
          * Create the `module_sections` table if missing.
          *
          * Columns
-         * - section_id      INT UNSIGNED, PK, not null. Surrogate key.
-         * - module_id       INT UNSIGNED, not null. FK to modules.module_id.
-         * - term            VARCHAR, not null. Academic term label (e.g., "AY24/25 Term 1").
-         * - section_number  VARCHAR(3), not null. Short code per module (e.g., "G1").
-         * - day_of_week     TINYINT UNSIGNED, not null. 1=Mon … 7=Sun.
-         * - start_time      VARCHAR, not null. Time string "HH:MM" 24h.
-         * - end_time        VARCHAR, not null. Time string "HH:MM" 24h.
-         * - room            VARCHAR, not null. Location identifier.
+         * - module_section_id  INT UNSIGNED, PK, not null. Surrogate key.
+         * - module_title       VARCHAR, not null. Title of the module (e.g, "CS102 Programming Fundamentals II").
+         * - section_number     VARCHAR(3), not null. Short code per module (e.g., "G1").
+         * - term               VARCHAR, not null. Academic term label (e.g., "AY24/25 Term 1").
+         * - day_of_week        TINYINT UNSIGNED, not null. 1 = Mon … 7 = Sun.
+         * - start_time         VARCHAR(8), not null. Time string "HH:MM AM/PM".
+         * - end_time           VARCHAR(8), not null. Time string "HH:MM AM/PM".
+         * - room               VARCHAR, not null. Location identifier.
          *
          * Constraints
-         * - pk_section: primary key on section_id.
-         * - unique_module_id_term_section_number: unique on (module_id, term, section_number) to prevent duplicate module sections per term.
-         * - fk_module_section_module_id: foreign key (module_id) → modules(module_id) ON DELETE CASCADE.
+         * - pk_module_section: primary key on module_section_id.
+         * - unique_module_title_section_number_term: unique on (module_title, section_number, term) to prevent duplicate module sections during the same term.
          *
          */
 
         context.createTableIfNotExists("module_sections")
-            .column("section_id", SQLDataType.INTEGERUNSIGNED.notNull())
-            .column("module_id", SQLDataType.INTEGERUNSIGNED.notNull())
-            .column("term", SQLDataType.VARCHAR.notNull())
+            .column("module_section_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("module_title", SQLDataType.VARCHAR.notNull())
             .column("section_number", SQLDataType.VARCHAR(3).notNull())
-            .column("day_of_week", SQLDataType.TINYINTUNSIGNED.notNull())  // 1 - 7
-            .column("start_time", SQLDataType.VARCHAR.notNull())           // 'HH:MM'
-            .column("end_time", SQLDataType.VARCHAR.notNull())             // 'HH:MM'
+            .column("term", SQLDataType.VARCHAR.notNull())
+            .column("day_of_week", SQLDataType.TINYINTUNSIGNED.notNull())  
+            .column("start_time", SQLDataType.VARCHAR(8).notNull()) 
+            .column("end_time", SQLDataType.VARCHAR(8).notNull())   
             .column("room", SQLDataType.VARCHAR.notNull())
             .constraints(
-                DSL.constraint("pk_section").primaryKey("section_id"),
-                DSL.constraint("unique_module_id_term_section_number")
-                    .unique("module_id", "term", "section_number"),
-                DSL.constraint("fk_module_section_module_id")
-                    .foreignKey("module_id")
-                    .references("modules", "module_id")
-                    .onDeleteCascade()
+                DSL.constraint("pk_module_sections").primaryKey("module_section_id"),
+                DSL.constraint("unique_module_title_section_number_term")
+                    .unique("module_title", "section_number", "term")
                )
                .execute();
-
     }
+
     private void createEnrollmentsTable(DSLContext context) {
         /**
          * Create the `enrollments` table if missing.
          *
          * Columns
-         * - enrollment_id  INT UNSIGNED, PK, not null. Surrogate key.
-         * - section_id     INT UNSIGNED, not null. FK to module_sections.section_id.
-         * - student_id     INT UNSIGNED, not null. FK to users.user_id.
+         * - enrollment_id      INT UNSIGNED, PK, not null. Surrogate key.
+         * - module_section_id  INT UNSIGNED, not null. FK to module_sections.module_section_id.
+         * - student_id         INT UNSIGNED, not null. FK to student.student_id.
          *
          * Constraints
          * - pk_enrollment: primary key on enrollment_id.
-         * - unique_section_id_student_id: unique on (section_id, student_id) to prevent duplicate enrollments.
-         * - fk_enrollment_section_id: foreign key (section_id) → module_sections(section_id) ON DELETE CASCADE.
-         * - fk_enrollment_student_id: foreign key (student_id) → users(user_id) ON DELETE CASCADE.
+         * - unique_section_id_student_id: unique on (module_section_id, student_id) to prevent duplicate enrollments.
+         * - fk_enrollment_module_section_id: foreign key (module_section_id) → module_sections(module_section_id) ON DELETE CASCADE.
+         * - fk_enrollment_student_id: foreign key (student_id) → students(student_id) ON DELETE CASCADE.
          *
          * Notes
          * - Composite uniqueness enforces one active seat per student per section.
-         * - Cascade deletes remove enrollments when a section or user is deleted.
+         * - Cascade deletes remove enrollments when a module section or user is deleted.
          * 
          */
 
         context.createTableIfNotExists("enrollments")
                .column("enrollment_id", SQLDataType.INTEGERUNSIGNED.notNull())
-               .column("section_id", SQLDataType.INTEGERUNSIGNED.notNull())
+               .column("module_section_id", SQLDataType.INTEGERUNSIGNED.notNull())
                .column("student_id", SQLDataType.INTEGERUNSIGNED.notNull())
                .constraints(
-                   DSL.constraint("pk_enrollment").primaryKey("enrollment_id"),
-                   DSL.constraint("unique_section_id_student_id").unique("section_id", "student_id"),
+                   DSL.constraint("pk_enrollments").primaryKey("enrollment_id"),
+                   DSL.constraint("unique_module_section_id_student_id").unique("module_section_id", "student_id"),
                    DSL.constraint("fk_enrollment_section_id")
-                       .foreignKey("section_id")
-                       .references("module_sections", "section_id")
+                       .foreignKey("module_section_id")
+                       .references("module_sections", "module_section_id")
                        .onDeleteCascade(),
                    DSL.constraint("fk_enrollment_student_id")
                        .foreignKey("student_id")
-                       .references("users", "user_id")
+                       .references("students", "student_id")
                        .onDeleteCascade()
                )
                .execute();
+    }
+
+    private void createSessionsTable(DSLContext context) {
+        /**
+         * Create the `sessions` table if missing.
+         *
+         * Columns
+         * - session_id         INT UNSIGNED, PK, auto-increment, not null. Surrogate key.
+         * - module_section_id  INT UNSIGNED, not null. FK → module_sections.module_section_id.
+         * - date               DATE, not null. Calendar date of the meeting.
+         * - week               TINYINT UNSIGNED, not null. 1–13 inclusive.
+         * - start_time         TIMESTAMP, not null. Start timestamp.
+         * - end_time           TIMESTAMP, not null. End timestamp.
+         * - status             VARCHAR(16), not null. {"ongoing","completed"}.
+         * - created_at         TIMESTAMP, not null. Default CURRENT_TIMESTAMP.
+         *
+         * Constraints
+         * - pk_sessions: primary key on session_id.
+         * - fk_sessions_module_section_id: foreign key (module_section_id) → module_sections(module_section_id) ON DELETE CASCADE.
+         * - unique_module_sections_date_week: unique on (module_section_id, date, week) to prevent duplicate sessions.
+         * - ck_sessions_status: check status ∈ {"ongoing","completed"}.
+         * 
+         */
+
+        context.createTableIfNotExists("sessions")
+            .column("session_id", SQLDataType.INTEGERUNSIGNED.identity(true).notNull())
+            .column("module_section_id", SQLDataType.INTEGERUNSIGNED.notNull())
+            .column("date", SQLDataType.DATE.notNull())
+            .column("week", SQLDataType.TINYINTUNSIGNED.notNull())
+            .column("start_time", SQLDataType.TIMESTAMP.notNull())
+            .column("end_time", SQLDataType.TIMESTAMP.notNull())
+            .column("status", SQLDataType.VARCHAR(16).notNull())
+            .column("created_at", SQLDataType.TIMESTAMP.defaultValue(DSL.currentTimestamp()).notNull())
+            .constraints(
+                DSL.constraint("pk_sessions").primaryKey("session_id"),
+                DSL.constraint("fk_sessions_module_section_id")
+                    .foreignKey("module_section_id").references("module_sections", "module_section_id")
+                    .onDeleteCascade(),
+                DSL.constraint("unique_module_section_id_date_week").unique("module_section_id", "date", "week"),
+                DSL.constraint("ck_sessions_status")
+                    .check(DSL.field("status", String.class).in("ongoing", "completed"))
+            )
+            .execute();
     }
 
     private void createAttendancesTable(DSLContext context) {
@@ -207,38 +280,35 @@ public class DatabaseInitializer {
          * Create the `attendance` table if missing.
          *
          * Columns
-         * - enrollment_id       INT UNSIGNED, not null. FK to enrollments.enrollment_id.
-         * - week                TINYINT UNSIGNED, not null. 1–13 inclusive.
-         * - date                DATE, not null. Class session calendar date.
-         * - status              VARCHAR, not null. One of: "present" | "late" | "absent" | "excused".
-         * - recorded_timestamp  TIMESTAMP, not null. Server-side record time.
+         * - session_id          INT UNSIGNED, not null. FK → sessions.session_id.
+         * - enrollment_id       INT UNSIGNED, not null. FK → enrollments.enrollment_id.
+         * - status              VARCHAR(16), not null. {"present","late","absent","excused"}.
+         * - recorded_timestamp  TIMESTAMP, not null. Default CURRENT_TIMESTAMP.
          *
          * Constraints
-         * - pk_attendance: composite primary key on (enrollment_id, week, date).
+         * - pk_attendance: primary key on (session_id, enrollment_id).
+         * - fk_attendance_session_id: foreign key (session_id) → sessions(session_id) ON DELETE CASCADE.
          * - fk_attendance_enrollment_id: foreign key (enrollment_id) → enrollments(enrollment_id) ON DELETE CASCADE.
-         * - ck_attendance_status: check constraint enforcing status ∈ {present, late, absent, excused}.
-         * 
-         * Notes
-         * - Composite PK enforces a single record per enrollment-week-date.
+         * - ck_attendance_status: check status ∈ {"present","late","absent","excused"}.
          * 
          */
 
         context.createTableIfNotExists("attendance")
-               .column("enrollment_id", SQLDataType.INTEGERUNSIGNED.notNull())
-               .column("week", SQLDataType.TINYINTUNSIGNED.notNull())  // 1 - 13
-               .column("date", SQLDataType.DATE.notNull())
-               .column("status", SQLDataType.VARCHAR.notNull())      // present|late|absent|excused
-               .column("recorded_timestamp", SQLDataType.TIMESTAMP.notNull())
-               .constraints(
-                   DSL.constraint("pk_attendance").primaryKey("enrollment_id", "week", "date"),
-                   DSL.constraint("fk_attendance_enrollment_id")
-                       .foreignKey("enrollment_id")
-                       .references("enrollments", "enrollment_id")
-                       .onDeleteCascade(),
-                    DSL.constraint("ck_attendance_status")
-                        .check(DSL.field("status", String.class).in("present", "late", "absent", "excused"))
-               )
-               .execute();
+        .column("session_id", SQLDataType.INTEGERUNSIGNED.notNull())
+        .column("enrollment_id", SQLDataType.INTEGERUNSIGNED.notNull())
+        .column("status", SQLDataType.VARCHAR(16).notNull())
+        .column("recorded_timestamp", SQLDataType.TIMESTAMP.defaultValue(DSL.currentTimestamp()).notNull())
+        .constraints(
+            DSL.constraint("pk_attendances").primaryKey("session_id", "enrollment_id"),
+            DSL.constraint("fk_attendance_session_id")
+                .foreignKey("session_id").references("sessions", "session_id")
+                .onDeleteCascade(),
+            DSL.constraint("fk_attendance_enrollment_id")
+                .foreignKey("enrollment_id").references("enrollments", "enrollment_id")
+                .onDeleteCascade(),
+            DSL.constraint("ck_attendance_status")
+                .check(DSL.field("status", String.class).in("present", "late", "absent", "excused"))
+        )
+        .execute();
     }
-    
 }
