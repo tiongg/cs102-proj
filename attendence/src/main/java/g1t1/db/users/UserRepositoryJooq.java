@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class UserRepositoryJooq implements UserRepository {
     private final DSLContext dsl;
@@ -23,7 +24,7 @@ public class UserRepositoryJooq implements UserRepository {
 
     @Override
     public String create(String fullName, String email, String passwordHash) {
-        String uuid = java.util.UUID.randomUUID().toString(); // e.g. "1e5d...-..."
+        String uuid = UUID.randomUUID().toString(); // e.g. "1e5d...-..."
         dsl.insertInto(USERS_TABLE)
             .set(USER_ID, uuid)
             .set(FULL_NAME, fullName)
@@ -46,7 +47,7 @@ public class UserRepositoryJooq implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(String userId) {
+    public Optional<User> fetchUserById(String userId) {
         return dsl.select(USER_ID, FULL_NAME, EMAIL, PASSWORD_HASH)
             .from(USERS_TABLE)
             .where(USER_ID.eq(userId))
@@ -59,7 +60,7 @@ public class UserRepositoryJooq implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> fetchUserByEmail(String email) {
         return dsl.select(USER_ID, FULL_NAME, EMAIL, PASSWORD_HASH)
             .from(USERS_TABLE)
             .where(EMAIL.eq(email))
