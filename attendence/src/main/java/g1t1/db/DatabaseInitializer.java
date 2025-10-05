@@ -202,10 +202,15 @@ public class DatabaseInitializer {
          * - start_time         VARCHAR(8), not null. Time string "HH:MM AM/PM".
          * - end_time           VARCHAR(8), not null. Time string "HH:MM AM/PM".
          * - room               VARCHAR, not null. Location identifier.
+         * - teacher_user_id    INT UNSIGNED, not null. FK → users.user_id.
          *
          * Constraints
          * - pk_module_sections: primary key on module_section_id.
          * - unique_module_title_section_number_term: unique on (module_title, section_number, term) to prevent duplicate module sections during the same term.
+         * - fk_teacher_user_id on (teacher_user_id) → users(user_id) ON DELETE RESTRICT.
+         * 
+         * Notes
+         * - ON DELETE RESTRICT prevents deleting a user if any module_sections reference them.
          *
          */
 
@@ -218,12 +223,16 @@ public class DatabaseInitializer {
             .column("start_time", SQLDataType.VARCHAR(8).notNull()) 
             .column("end_time", SQLDataType.VARCHAR(8).notNull())   
             .column("room", SQLDataType.VARCHAR.notNull())
+            .column("teacher_user_id", SQLDataType.INTEGERUNSIGNED.notNull())
             .constraints(
                 DSL.constraint("pk_module_sections").primaryKey("module_section_id"),
                 DSL.constraint("unique_module_title_section_number_term")
-                    .unique("module_title", "section_number", "term")
+                    .unique("module_title", "section_number", "term"),
+                DSL.constraint("fk_teacher_user_id")
+                    .foreignKey("teacher_user_id").references("users", "user_id")
+                    .onDeleteRestrict()
                )
-               .execute();
+            .execute();
     }
 
     private void createEnrollmentsTable(DSLContext context) {
