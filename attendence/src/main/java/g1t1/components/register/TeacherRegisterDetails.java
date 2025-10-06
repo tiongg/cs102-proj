@@ -1,7 +1,7 @@
 package g1t1.components.register;
 
 import g1t1.models.ids.TeacherID;
-import g1t1.models.interfaces.HasDetails;
+import g1t1.models.interfaces.register.HasDetails;
 import g1t1.models.scenes.Router;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;

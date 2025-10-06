@@ -1,4 +1,6 @@
-package g1t1.models.interfaces;
+package g1t1.models.interfaces.register;
+
+import g1t1.models.interfaces.HasProperty;
 
 /**
  * Has password property to update

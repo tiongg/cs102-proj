@@ -28,8 +28,7 @@
             </StackPane.margin>
         </Button>
 
-        <VBox alignment="TOP_CENTER" layoutX="124.0" layoutY="118.0" spacing="32.0" AnchorPane.leftAnchor="120.0"
-              AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="120.0" StackPane.alignment="CENTER">
+        <VBox alignment="TOP_CENTER" layoutX="124.0" layoutY="118.0" spacing="32.0" StackPane.alignment="CENTER">
             <HBox alignment="TOP_CENTER" spacing="32.0">
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Class"/>

@@ -1,9 +1,9 @@
 package g1t1.models.users;
 
 import g1t1.models.ids.TeacherID;
-import g1t1.models.interfaces.HasDetails;
-import g1t1.models.interfaces.HasFaces;
-import g1t1.models.interfaces.HasPassword;
+import g1t1.models.interfaces.register.HasDetails;
+import g1t1.models.interfaces.register.HasFaces;
+import g1t1.models.interfaces.register.HasPassword;
 
 /**
  * User/Teacher created from the registration step
