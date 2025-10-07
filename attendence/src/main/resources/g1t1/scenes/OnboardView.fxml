@@ -1,24 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import g1t1.components.Navbar?>
-
+<?import g1t1.components.onboard.StudentDetails?>
+<?import g1t1.components.onboard.StudentOnboardDone?>
+<?import g1t1.components.register.FaceDetails?>
+<?import g1t1.components.stepper.StepperControl?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            xmlns="http://javafx.com/javafx"
-            fx:controller="g1t1.scenes.OnboardViewController"
-            prefHeight="900.0" prefWidth="1440.0">
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.lang.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
+            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.OnboardViewController">
     <Navbar/>
-    <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
-                AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <Label text="Onboard" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
+    <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0"
+               AnchorPane.topAnchor="0.0">
+        <Label text="Onboard" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0" StackPane.alignment="TOP_LEFT">
             <font>
                 <Font name="Inter Semi Bold" size="26.0"/>
             </font>
+            <StackPane.margin>
+                <Insets bottom="32.0" left="32.0" right="32.0" top="40.0"/>
+            </StackPane.margin>
         </Label>
-    </AnchorPane>
+
+        <VBox spacing="72" StackPane.alignment="TOP_CENTER" prefWidth="780.0" maxWidth="780">
+            <StepperControl fx:id="stepper" prefHeight="56.0" prefWidth="780.0">
+                <labels>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Details"/>
+                        <String fx:value="Image Capture"/>
+                        <String fx:value="Complete"/>
+                    </FXCollections>
+                </labels>
+            </StepperControl>
+
+            <TabPane fx:id="tabs"
+                     prefHeight="700.0"
+                     prefWidth="780.0"
+                     styleClass="hidden-tabs" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="50.0" tabMaxWidth="150.0">
+                <StudentDetails/>
+                <FaceDetails/>
+                <StudentOnboardDone/>
+            </TabPane>
+
+            <StackPane.margin>
+                <Insets bottom="32.0" left="32.0" right="32.0" top="120.0"/>
+            </StackPane.margin>
+        </VBox>
+
+        <AnchorPane maxHeight="-Infinity" prefHeight="56" StackPane.alignment="BOTTOM_CENTER">
+            <HBox fx:id="backButton" alignment="CENTER" onMouseClicked="#prev" spacing="8.0" styleClass="flat-button"
+                  AnchorPane.leftAnchor="128.0">
+                <FontIcon iconLiteral="fas-chevron-left" iconSize="16"/>
+                <Label fx:id="backText" text="Login">
+                    <font>
+                        <Font name="Inter Regular" size="16.0"/>
+                    </font>
+                </Label>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+                <padding>
+                    <Insets bottom="8.0" left="16.0" right="16.0" top="8.0"/>
+                </padding>
+            </HBox>
+
+
+            <HBox fx:id="nextButton" alignment="CENTER" onMouseClicked="#next" spacing="8.0"
+                  AnchorPane.rightAnchor="128.0">
+                <Label fx:id="nextText" text="Next">
+                    <font>
+                        <Font name="Inter Regular" size="16.0"/>
+                    </font>
+                </Label>
+                <FontIcon iconLiteral="fas-chevron-right" iconSize="16"/>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+                <padding>
+                    <Insets bottom="8.0" left="16.0" right="16.0" top="8.0"/>
+                </padding>
+                <styleClass>
+                    <String fx:value="disabled"/>
+                    <String fx:value="flat-button"/>
+                </styleClass>
+            </HBox>
+
+            <StackPane.margin>
+                <Insets bottom="32.0" left="32.0" right="32.0" top="32.0"/>
+            </StackPane.margin>
+        </AnchorPane>
+    </StackPane>
 </AnchorPane>

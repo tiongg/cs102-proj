@@ -23,4 +23,7 @@ public interface RegistrationStep<T extends HasProperty> {
      */
     public default void onUnmount() {
     }
+
+    public default void reset() {
+    }
 }

@@ -34,7 +34,9 @@ public class AuthenticationContext {
             for (byte[] faceImage : registrationInfo.getFaceData().getFaceImages()) {
                 userFaceImageRepo.create(userId, faceImage);
             }
-            return true;
+
+            // Login the user
+            return loginTeacher(registrationInfo.getEmail(), registrationInfo.getPassword());
         } catch (SQLException e) {
             System.out.println("Error connecting to the database: " + e.getMessage());
         } catch (DataAccessException e) {

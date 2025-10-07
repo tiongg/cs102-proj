@@ -1,6 +1,6 @@
 package g1t1.components.register;
 
-import g1t1.models.interfaces.HasPassword;
+import g1t1.models.interfaces.register.HasPassword;
 import g1t1.models.scenes.Router;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
@@ -39,7 +39,8 @@ public class PasswordDetails extends Tab implements RegistrationStep<HasPassword
         lblErrorMessage.visibleProperty().bind(validProperty.not());
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         passwordInput.textProperty().set("");
         confirmPasswordInput.textProperty().set("");
     }

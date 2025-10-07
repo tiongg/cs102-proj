@@ -1,6 +1,6 @@
 package g1t1.components.register;
 
-import g1t1.models.interfaces.HasFaces;
+import g1t1.models.interfaces.register.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.RegisterTeacher;
@@ -152,7 +152,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
         this.cameraDaemon.start();
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         this.photosTaken.clear();
         thumbnailImage = null;
     }
