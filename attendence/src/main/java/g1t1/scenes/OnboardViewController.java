@@ -4,8 +4,6 @@ import g1t1.components.register.RegistrationStep;
 import g1t1.components.stepper.StepperControl;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.PageController;
-import g1t1.models.scenes.PageName;
-import g1t1.models.scenes.Router;
 import g1t1.models.users.RegisterStudent;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -36,16 +34,12 @@ public class OnboardViewController extends PageController {
     public void initialize() {
         stepper.currentIndexProperty().addListener((obv, oldIndex, newIndex) -> {
             if (stepper.isLast()) {
-                nextText.setText("Login!");
+                nextText.setText("Done!");
             } else {
                 nextText.setText("Next");
             }
 
-            if (newIndex.intValue() == 0) {
-                backText.setText("Login");
-            } else {
-                backText.setText("Back");
-            }
+            backText.setText("Back");
 
             getCurrentStep().setProperty(this.registerStudent);
             getCurrentStep().onUnmount();
@@ -56,11 +50,18 @@ public class OnboardViewController extends PageController {
         });
 
         updateButtonListeners();
-        canNext.addListener((obs, oldValue, newValue) -> {
-            if (newValue) {
+        canNext.addListener((obs, oldValue, nextAllowed) -> {
+            if (nextAllowed) {
                 nextButton.getStyleClass().remove("disabled");
             } else {
                 nextButton.getStyleClass().add("disabled");
+            }
+        });
+        stepper.currentIndexProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue.intValue() == 0) {
+                backButton.getStyleClass().add("disabled");
+            } else {
+                backButton.getStyleClass().remove("disabled");
             }
         });
     }
@@ -76,7 +77,6 @@ public class OnboardViewController extends PageController {
         canNext.bind(step.validProperty());
     }
 
-
     public void next() {
         if (!canNext.get()) {
             return;
@@ -85,20 +85,17 @@ public class OnboardViewController extends PageController {
         if (!stepper.isLast()) {
             stepper.next();
         } else {
-            // Do stuff
+            // Save to db
         }
     }
 
     public void prev() {
-        if (stepper.getCurrentIndex() != 0) {
+        if (stepper.getCurrentIndex() > 0) {
             stepper.previous();
-        } else {
-            Router.changePage(PageName.Login);
         }
     }
 
     private RegistrationStep<HasProperty> getCurrentStep() {
         return (RegistrationStep<HasProperty>) this.tabs.getSelectionModel().getSelectedItem();
     }
-
 }

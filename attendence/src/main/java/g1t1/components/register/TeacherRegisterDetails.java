@@ -3,6 +3,7 @@ package g1t1.components.register;
 import g1t1.models.ids.TeacherID;
 import g1t1.models.interfaces.register.HasDetails;
 import g1t1.models.scenes.Router;
+import g1t1.utils.BindingUtils;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -34,25 +35,15 @@ public class TeacherRegisterDetails extends Tab implements RegistrationStep<HasD
             reset();
         });
 
-        teacherIdInput.textProperty().addListener(e -> updateIsValid());
-        nameInput.textProperty().addListener(e -> updateIsValid());
-        emailInput.textProperty().addListener(e -> updateIsValid());
-
-        updateIsValid();
+        validProperty.bind(
+                BindingUtils.allFilled(teacherIdInput, nameInput, emailInput)
+        );
     }
 
     private void reset() {
         teacherIdInput.textProperty().set("");
         nameInput.textProperty().set("");
         emailInput.textProperty().set("");
-    }
-
-    private void updateIsValid() {
-        validProperty().set(
-                !teacherIdInput.textProperty().get().isEmpty() &&
-                        !nameInput.textProperty().get().isEmpty() &&
-                        !emailInput.textProperty().get().isEmpty()
-        );
     }
 
     @Override

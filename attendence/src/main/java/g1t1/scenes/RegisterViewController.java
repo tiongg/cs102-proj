@@ -57,8 +57,8 @@ public class RegisterViewController extends PageController {
         });
 
         updateButtonListeners();
-        canNext.addListener((obs, oldValue, newValue) -> {
-            if (newValue) {
+        canNext.addListener((obs, oldValue, nextAllowed) -> {
+            if (nextAllowed) {
                 nextButton.getStyleClass().remove("disabled");
             } else {
                 nextButton.getStyleClass().add("disabled");

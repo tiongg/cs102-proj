@@ -1,8 +1,10 @@
-package g1t1.components.register;
+package g1t1.components.onboard;
 
+import g1t1.components.register.RegistrationStep;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.Router;
-import g1t1.models.users.RegisterTeacher;
+import g1t1.models.sessions.ModuleSection;
+import g1t1.models.users.RegisterStudent;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
@@ -13,8 +15,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
 
-public class TeacherRegistrationDone extends Tab implements RegistrationStep<HasProperty> {
+public class StudentOnboardDone extends Tab implements RegistrationStep<HasProperty> {
     private final BooleanProperty validProperty = new SimpleBooleanProperty(true);
+
     @FXML
     private Label lblName;
     @FXML
@@ -22,10 +25,12 @@ public class TeacherRegistrationDone extends Tab implements RegistrationStep<Has
     @FXML
     private Label lblEmail;
     @FXML
+    private Label lblModuleSection;
+    @FXML
     private ImageView ivThumbnail;
 
-    public TeacherRegistrationDone() {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("TeacherRegistrationDone.fxml"));
+    public StudentOnboardDone() {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("StudentRegistrationDone.fxml"));
         loader.setController(this);
         loader.setRoot(this);
         try {
@@ -46,6 +51,7 @@ public class TeacherRegistrationDone extends Tab implements RegistrationStep<Has
         ivThumbnail.setImage(null);
     }
 
+
     @Override
     public BooleanProperty validProperty() {
         return this.validProperty;
@@ -53,10 +59,13 @@ public class TeacherRegistrationDone extends Tab implements RegistrationStep<Has
 
     @Override
     public void onMount(Object currentRegistrant) {
-        RegisterTeacher registrationDetails = (RegisterTeacher) currentRegistrant;
-        lblName.setText(registrationDetails.getFullName());
-        lblId.setText(registrationDetails.getTeacherID().toString());
+        RegisterStudent registrationDetails = (RegisterStudent) currentRegistrant;
+        lblName.setText(registrationDetails.getName());
+        lblId.setText(registrationDetails.getStudentID().toString());
         lblEmail.setText(registrationDetails.getEmail());
         ivThumbnail.setImage(ImageUtils.bytesToImage(registrationDetails.getThumbnail()));
+
+        ModuleSection moduleSection = registrationDetails.getModuleSection();
+        lblModuleSection.setText(String.format("%s - %s", moduleSection.getModule(), moduleSection.getSection()));
     }
 }

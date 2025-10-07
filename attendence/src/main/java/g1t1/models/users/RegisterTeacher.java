@@ -15,12 +15,7 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
     private String password;
 
     private FaceData faceData;
-    private byte[] thumbnailFace;
-
-    @Override
-    public void setThumbnail(byte[] thumbnail) {
-        this.thumbnailFace = thumbnail;
-    }
+    private byte[] thumbnail;
 
     @Override
     public void setId(TeacherID id) {
@@ -77,8 +72,13 @@ public class RegisterTeacher implements HasDetails<TeacherID>, HasFaces, HasPass
         this.faceData = faceData;
     }
 
-    public byte[] getThumbnailFace() {
-        return thumbnailFace;
+    public byte[] getThumbnail() {
+        return thumbnail;
+    }
+
+    @Override
+    public void setThumbnail(byte[] thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public Teacher toTeacher() {
