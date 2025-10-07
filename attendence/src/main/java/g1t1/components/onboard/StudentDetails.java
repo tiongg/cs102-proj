@@ -56,7 +56,8 @@ public class StudentDetails extends Tab implements RegistrationStep<HasStudentDe
         );
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         studentIdInput.textProperty().set("");
         nameInput.textProperty().set("");
         emailInput.textProperty().set("");

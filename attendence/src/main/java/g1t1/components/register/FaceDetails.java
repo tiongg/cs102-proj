@@ -152,7 +152,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
         this.cameraDaemon.start();
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         this.photosTaken.clear();
         thumbnailImage = null;
     }

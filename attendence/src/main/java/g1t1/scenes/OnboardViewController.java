@@ -2,6 +2,11 @@ package g1t1.scenes;
 
 import g1t1.components.register.RegistrationStep;
 import g1t1.components.stepper.StepperControl;
+import g1t1.db.DSLInstance;
+import g1t1.db.student_face_images.StudentFaceImageRepository;
+import g1t1.db.student_face_images.StudentFaceImageRepositoryJooq;
+import g1t1.db.students.StudentRepository;
+import g1t1.db.students.StudentRepositoryJooq;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.PageController;
 import g1t1.models.users.RegisterStudent;
@@ -9,8 +14,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
+import org.jooq.exception.DataAccessException;
+
+import java.sql.SQLException;
 
 public class OnboardViewController extends PageController {
     private final BooleanProperty canNext = new SimpleBooleanProperty(false);
@@ -68,7 +77,16 @@ public class OnboardViewController extends PageController {
 
     @Override
     public void onMount() {
+        reset();
+    }
+
+    private void reset() {
+        stepper.setCurrentIndex(0);
         this.registerStudent = new RegisterStudent();
+        for (Tab tab : this.tabs.getTabs()) {
+            RegistrationStep<HasProperty> step = (RegistrationStep<HasProperty>) tab;
+            step.reset();
+        }
     }
 
     private void updateButtonListeners() {
@@ -85,7 +103,10 @@ public class OnboardViewController extends PageController {
         if (!stepper.isLast()) {
             stepper.next();
         } else {
-            // Save to db
+            boolean success = saveToDb();
+            if (success) {
+                reset();
+            }
         }
     }
 
@@ -97,5 +118,29 @@ public class OnboardViewController extends PageController {
 
     private RegistrationStep<HasProperty> getCurrentStep() {
         return (RegistrationStep<HasProperty>) this.tabs.getSelectionModel().getSelectedItem();
+    }
+
+    private boolean saveToDb() {
+        try (DSLInstance dslInstance = new DSLInstance()) {
+            StudentRepository studentRepo = new StudentRepositoryJooq(dslInstance.dsl);
+            StudentFaceImageRepository studentFaceImageRepository = new StudentFaceImageRepositoryJooq(dslInstance.dsl);
+
+            String studentId = studentRepo.create(
+                    this.registerStudent.getStudentID().toString(),
+                    this.registerStudent.getName(),
+                    this.registerStudent.getEmail()
+            );
+
+            for (byte[] faceData : this.registerStudent.getFaceData().getFaceImages()) {
+                studentFaceImageRepository.create(studentId, faceData);
+            }
+
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+        } catch (DataAccessException e) {
+            System.out.println("Error during database operation: " + e.getMessage());
+        }
+        return false;
     }
 }

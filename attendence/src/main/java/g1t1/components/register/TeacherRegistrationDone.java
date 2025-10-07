@@ -39,7 +39,8 @@ public class TeacherRegistrationDone extends Tab implements RegistrationStep<Has
         });
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         lblName.setText("");
         lblId.setText("");
         lblEmail.setText("");

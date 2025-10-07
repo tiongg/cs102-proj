@@ -44,7 +44,8 @@ public class StudentOnboardDone extends Tab implements RegistrationStep<HasPrope
         });
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         lblName.setText("");
         lblId.setText("");
         lblEmail.setText("");

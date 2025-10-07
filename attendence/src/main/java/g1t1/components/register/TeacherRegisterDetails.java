@@ -40,7 +40,8 @@ public class TeacherRegisterDetails extends Tab implements RegistrationStep<HasD
         );
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         teacherIdInput.textProperty().set("");
         nameInput.textProperty().set("");
         emailInput.textProperty().set("");

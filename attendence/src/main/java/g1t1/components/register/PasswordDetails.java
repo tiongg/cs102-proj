@@ -39,7 +39,8 @@ public class PasswordDetails extends Tab implements RegistrationStep<HasPassword
         lblErrorMessage.visibleProperty().bind(validProperty.not());
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         passwordInput.textProperty().set("");
         confirmPasswordInput.textProperty().set("");
     }
