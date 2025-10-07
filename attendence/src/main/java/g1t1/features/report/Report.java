@@ -2,6 +2,10 @@ package g1t1.features.report;
 
 import g1t1.models.sessions.*;
 
+
+/**
+ * Generates a Report Object based on fields specified in ReportBuilder
+ */
 public class Report {
     private boolean includeStudentId;
     private boolean includeStatus;
