@@ -30,7 +30,8 @@ public class ReportTesting {
         // Reportbuilder
         ReportBuilder builder = new ReportBuilder().includeReport(modulesection1).withTimeStamp().withNotes();
 
-        Report report = new Report(builder); //generates the report
+        // Report
+        Report report = new Report(builder); // generates the report
 
         // Access info from report to verify
         System.out.println("Include Student Id: " + builder.isIncludeStudentId());
