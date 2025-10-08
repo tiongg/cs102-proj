@@ -19,9 +19,14 @@ public class App extends Application {
 
     private static App instance;
     private Scene currentScene;
+    private Stage currentStage;
 
     public static App getInstance() {
         return instance;
+    }
+
+    public static Stage getRootStage() {
+        return getInstance().currentStage;
     }
 
     public static void main(String[] args) {
@@ -34,6 +39,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         App.instance = this;
+        instance.currentStage = stage;
         Router.initialize();
 
         Page basePage = Router.scenes.get(initialPage);
@@ -56,11 +62,13 @@ public class App extends Application {
     }
 
     private void loadCss(Scene scene) {
-        String[] cssFiles = {"css/app.css", "css/button.css", "css/date-picker.css", "css/stepper.css",
-                "css/tabs.css",};
+        String[] cssFiles = {
+                "app.css", "button.css", "date-picker.css", "stepper.css",
+                "tabs.css", "toast.css"
+        };
 
         for (String cssFile : cssFiles) {
-            URL url = getClass().getResource(cssFile);
+            URL url = getClass().getResource(String.format("css/%s", cssFile));
             if (url != null) {
                 scene.getStylesheets().add(url.toExternalForm());
             } else {

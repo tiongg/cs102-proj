@@ -1,8 +1,11 @@
 package g1t1.scenes;
 
+import g1t1.components.Toast;
 import g1t1.components.register.RegistrationStep;
 import g1t1.components.stepper.StepperControl;
 import g1t1.db.DSLInstance;
+import g1t1.db.enrollments.EnrollmentRepository;
+import g1t1.db.enrollments.EnrollmentRepositoryJooq;
 import g1t1.db.student_face_images.StudentFaceImageRepository;
 import g1t1.db.student_face_images.StudentFaceImageRepositoryJooq;
 import g1t1.db.students.StudentRepository;
@@ -105,7 +108,10 @@ public class OnboardViewController extends PageController {
         } else {
             boolean success = saveToDb();
             if (success) {
+                Toast.show("Student added!", Toast.ToastType.SUCCESS);
                 reset();
+            } else {
+                Toast.show("Error!", Toast.ToastType.ERROR);
             }
         }
     }
@@ -124,6 +130,7 @@ public class OnboardViewController extends PageController {
         try (DSLInstance dslInstance = new DSLInstance()) {
             StudentRepository studentRepo = new StudentRepositoryJooq(dslInstance.dsl);
             StudentFaceImageRepository studentFaceImageRepository = new StudentFaceImageRepositoryJooq(dslInstance.dsl);
+            EnrollmentRepository enrollmentRepository = new EnrollmentRepositoryJooq(dslInstance.dsl);
 
             String studentId = studentRepo.create(
                     this.registerStudent.getStudentID().toString(),
@@ -134,6 +141,8 @@ public class OnboardViewController extends PageController {
             for (byte[] faceData : this.registerStudent.getFaceData().getFaceImages()) {
                 studentFaceImageRepository.create(studentId, faceData);
             }
+
+            //TODO: Enrollments
 
             return true;
         } catch (SQLException e) {

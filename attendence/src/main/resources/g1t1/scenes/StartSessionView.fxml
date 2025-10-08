@@ -25,7 +25,7 @@
             <HBox alignment="TOP_CENTER" spacing="32.0">
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Class"/>
-                    <MenuButton fx:id="classMenu" mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
+                    <MenuButton fx:id="mbModuleSections" mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
                                 styleClass="flat-input" text="Select class...">
                         <items>
                         </items>
@@ -33,7 +33,7 @@
                 </VBox>
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Week"/>
-                    <MenuButton fx:id="weekMenu" mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
+                    <MenuButton fx:id="mbWeek" mnemonicParsing="false" prefHeight="34.0" prefWidth="Infinity"
                                 styleClass="flat-input" text="Select week...">
                         <items>
                         </items>

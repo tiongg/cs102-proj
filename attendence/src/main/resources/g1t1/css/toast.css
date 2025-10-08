@@ -1,0 +1,23 @@
+.toast {
+    -fx-background-color: rgba(0,0,0,0.75);
+    -fx-padding: 8px 24px;
+    -fx-background-radius: 8px;
+}
+
+.toast-label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.toast.success {
+    -fx-background-color: rgba(46, 204, 113, 0.9);   /* green */
+}
+.toast.info {
+    -fx-background-color: rgba(52, 152, 219, 0.9);   /* blue */
+}
+.toast.warning {
+    -fx-background-color: rgba(241, 196, 15, 0.9);   /* yellow */
+}
+.toast.error {
+    -fx-background-color: rgba(231, 76, 60, 0.9);   /* red */
+}

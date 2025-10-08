@@ -1,5 +1,6 @@
 package g1t1.scenes;
 
+import g1t1.components.Toast;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
 import g1t1.models.scenes.PageName;
@@ -30,12 +31,17 @@ public class LoginViewController extends PageController {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
             Router.changePage(PageName.PastRecords);
         });
+
+        emailInput.textProperty().set("a@a.com");
+        passwordInput.textProperty().set("123");
     }
 
     @FXML
     public void login() {
         boolean success = AuthenticationContext.loginTeacher(emailInput.getText(), passwordInput.getText());
-        if (!success) {
+        if (success) {
+            Toast.show("Logged in!", Toast.ToastType.SUCCESS);
+        } else {
             lblInvalidCredentials.setVisible(true);
         }
     }

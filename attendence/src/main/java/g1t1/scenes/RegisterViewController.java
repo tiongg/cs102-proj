@@ -1,5 +1,6 @@
 package g1t1.scenes;
 
+import g1t1.components.Toast;
 import g1t1.components.register.RegistrationStep;
 import g1t1.components.stepper.StepperControl;
 import g1t1.features.authentication.AuthenticationContext;
@@ -89,6 +90,9 @@ public class RegisterViewController extends PageController {
             boolean success = AuthenticationContext.registerTeacher(this.registerTeacher);
             if (success) {
                 Router.changePage(PageName.PastRecords);
+                Toast.show("User created!", Toast.ToastType.SUCCESS);
+            } else {
+                Toast.show("Error! Teacher ID already exists!", Toast.ToastType.ERROR);
             }
         }
     }
