@@ -11,6 +11,7 @@ import g1t1.models.sessions.ModuleSection;
 import g1t1.testing.MockDb;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 public class MyClassesViewController extends PageController {
@@ -22,6 +23,12 @@ public class MyClassesViewController extends PageController {
 
     @FXML
     private Label availableClasses;
+
+    @FXML
+    private Button classesBack;
+
+    @FXML
+    private Button addClass;
 
     @FXML
     private void initialize() {
@@ -39,7 +46,10 @@ public class MyClassesViewController extends PageController {
     }
 
     private void showSessions(ModuleSection ms) {
+
         myClasses.setText("My Classes - " + ms.getModule() + " - " + ms.getSection());
+        classesBack.setVisible(true);
+        addClass.setVisible(false);
         availableClasses.setText(null);
         classesTable.setTable(List.of("Class", "Date", "Time", "Attendance", "Rate"));
         List<ClassSession> sessions = MockDb.getPastSessions(AuthenticationContext.getCurrentUser().getID()).stream()
