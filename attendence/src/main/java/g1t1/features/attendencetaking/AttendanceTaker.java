@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 public class AttendanceTaker {
     private static ClassSession currentSession;
 
-    public static void start(ModuleSection moduleSection, int week) {
+    public static void start(ModuleSection moduleSection, int week, LocalDateTime startTime) {
         FaceRecognitionService.getInstance().start(moduleSection.getStudents());
-        currentSession = new ClassSession(moduleSection, week, LocalDateTime.now(), SessionStatus.Active);
+        currentSession = new ClassSession(moduleSection, week, startTime, SessionStatus.Active);
     }
 
     public static void stop() {

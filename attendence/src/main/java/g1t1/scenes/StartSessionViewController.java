@@ -1,9 +1,5 @@
 package g1t1.scenes;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import g1t1.components.TimePicker;
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.features.authentication.AuthenticationContext;
@@ -23,6 +19,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class StartSessionViewController extends PageController {
     private final int TOTAL_WEEKS = 13;
@@ -49,9 +49,7 @@ public class StartSessionViewController extends PageController {
         LocalDate localDate = dpClassDate.getValue();
         LocalDateTime sessionStartTime = tpStartTime.addToDate(localDate);
 
-        // System.out.println(sessionStartTime.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy
-        // HH:mm")));
-        AttendanceTaker.start(classValue.get(), weekValue.get());
+        AttendanceTaker.start(classValue.get(), weekValue.get(), sessionStartTime);
         Router.changePage(PageName.DuringSession);
     }
 
@@ -87,7 +85,9 @@ public class StartSessionViewController extends PageController {
             }
         });
 
-        BooleanBinding shouldDisable = classValue.isNull().or(weekValue.lessThanOrEqualTo(0));
+        BooleanBinding shouldDisable = classValue.isNull()
+                .or(weekValue.lessThanOrEqualTo(0))
+                .or(dpClassDate.valueProperty().isNull());
         btnStartSession.disableProperty().bind(shouldDisable);
     }
 

@@ -21,13 +21,6 @@
             </StackPane.margin>
         </Label>
 
-        <Button fx:id="btnStartSession" alignment="CENTER" mnemonicParsing="false" onAction="#startSession"
-                prefWidth="240.0" text="Start session" StackPane.alignment="BOTTOM_CENTER">
-            <StackPane.margin>
-                <Insets bottom="120.0"/>
-            </StackPane.margin>
-        </Button>
-
         <VBox alignment="TOP_CENTER" layoutX="124.0" layoutY="118.0" spacing="32.0" StackPane.alignment="CENTER">
             <HBox alignment="TOP_CENTER" spacing="32.0">
                 <VBox prefHeight="43.0" prefWidth="400">
@@ -63,5 +56,12 @@
                 <Insets bottom="48.0" left="48.0" right="48.0" top="200.0"/>
             </StackPane.margin>
         </VBox>
+
+        <Button fx:id="btnStartSession" alignment="CENTER" mnemonicParsing="false" onAction="#startSession"
+                prefWidth="240.0" text="Start session" StackPane.alignment="BOTTOM_CENTER">
+            <StackPane.margin>
+                <Insets bottom="120.0"/>
+            </StackPane.margin>
+        </Button>
     </StackPane>
 </AnchorPane>
