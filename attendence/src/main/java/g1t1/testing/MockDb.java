@@ -1,24 +1,21 @@
 package g1t1.testing;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import g1t1.db.attendance.MarkingMethod;
 import g1t1.models.ids.StudentID;
 import g1t1.models.ids.TeacherID;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
+import g1t1.models.sessions.SessionAttendance;
 import g1t1.models.sessions.SessionStatus;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.Student;
 import g1t1.models.users.Teacher;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * Mock database class for testing
@@ -37,19 +34,19 @@ public class MockDb {
 
         teacherClasses.put(newTeacher.getID(), Arrays.asList(morningClass, afternoonClass));
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-
-        try {
-            pastSessions.put(newTeacher.getID(),
-                    new ArrayList<>(Arrays.asList(
-                            new ClassSession(morningClass, 1, sdf.parse("3-09-2025"), SessionStatus.Ended),
-                            new ClassSession(afternoonClass, 1, sdf.parse("3-09-2025"), SessionStatus.Ended),
-                            new ClassSession(morningClass, 1, sdf.parse("10-09-2025"), SessionStatus.Ended))));
-
-        } catch (ParseException e) {
-            System.out.println("Error parsing date");
-        }
+        // Students have to be loaded into the module section first
         loadEnrolledStudents();
+
+        ClassSession morningSession = new ClassSession(morningClass, 1, LocalDateTime.of(2025, 9, 3, 7, 50), SessionStatus.Ended);
+        pastSessions.put(newTeacher.getID(),
+                new ArrayList<>(Arrays.asList(
+                        morningSession,
+                        new ClassSession(afternoonClass, 1, LocalDateTime.of(2025, 9, 3, 15, 30), SessionStatus.Ended),
+                        new ClassSession(morningClass, 1, LocalDateTime.of(2025, 9, 10, 8, 0), SessionStatus.Ended))));
+
+        for (SessionAttendance attendance : morningSession.getStudentAttendance()) {
+            attendance.markPresent(1, MarkingMethod.MANUAL);
+        }
     }
 
     public static List<ModuleSection> getUserModuleSections(TeacherID id) {
@@ -58,7 +55,7 @@ public class MockDb {
     }
 
     public static List<ClassSession> getPastSessions(TeacherID id) {
-        return pastSessions.get(id);
+        return pastSessions.get(teacherClasses.keySet().iterator().next());
     }
 
     private static void loadEnrolledStudents() {
