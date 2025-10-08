@@ -5,13 +5,13 @@ import g1t1.db.attendance.*;
 import g1t1.db.enrollments.Enrollment;
 import g1t1.db.enrollments.EnrollmentRepository;
 import g1t1.db.enrollments.EnrollmentRepositoryJooq;
-import g1t1.db.module_sections.ModuleSection;
+import g1t1.db.module_sections.ModuleSectionRecord;
 import g1t1.db.module_sections.ModuleSectionRepository;
 import g1t1.db.module_sections.ModuleSectionRepositoryJooq;
 import g1t1.db.sessions.Session;
 import g1t1.db.sessions.SessionRepository;
 import g1t1.db.sessions.SessionRepositoryJooq;
-import g1t1.db.students.Student;
+import g1t1.db.students.StudentRecord;
 import g1t1.db.students.StudentRepository;
 import g1t1.db.students.StudentRepositoryJooq;
 import g1t1.db.users.User;
@@ -121,7 +121,7 @@ public class DatabaseTesting {
         System.out.println("Inserted Student IDs: " + List.of(idA, idB, idC, idD));
 
         // Read all students
-        List<Student> all = studentRepo.fetchAllStudents();
+        List<StudentRecord> all = studentRepo.fetchAllStudents();
         System.out.println("All students count = " + all.size());
         dumpStudents("All students", all);
 
@@ -142,7 +142,7 @@ public class DatabaseTesting {
         System.out.println("Delete student D = " + delD + ", fetch D -> " + studentRepo.fetchStudentById(idD));
 
         // Final state
-        List<Student> remaining = studentRepo.fetchAllStudents();
+        List<StudentRecord> remaining = studentRepo.fetchAllStudents();
         dumpStudents("Remaining students", remaining);
 
         return List.of(idA, idB, idC);
@@ -151,9 +151,9 @@ public class DatabaseTesting {
     /**
      * Utility for displaying student records in console
      */
-    private static void dumpStudents(String title, List<Student> students) {
+    private static void dumpStudents(String title, List<StudentRecord> students) {
         System.out.println("=== " + title + " ===");
-        for (Student s : students) {
+        for (StudentRecord s : students) {
             System.out.println(s.studentId() + " | " + s.fullName() + " | " + s.email());
         }
     }
@@ -168,7 +168,7 @@ public class DatabaseTesting {
         System.out.println("Inserted Module Section IDs: " + List.of(idA, idB, idC, idD, idE));
 
         // Read all module sections
-        List<ModuleSection> cs102ModuleSections = moduleSectionRepo.fetchModuleSectionsByModuleTitle("CS102 Programming Fundamentals II");
+        List<ModuleSectionRecord> cs102ModuleSections = moduleSectionRepo.fetchModuleSectionsByModuleTitle("CS102 Programming Fundamentals II");
         System.out.println("All CS102 module sections count = " + cs102ModuleSections.size());
         dumpModuleSections("All CS102 module sections", cs102ModuleSections);
 
@@ -176,7 +176,7 @@ public class DatabaseTesting {
         System.out.println("Fetch by module title + section number + term (SE301 G7 AY2024/2025 Term 1): " + moduleSectionRepo.fetchModuleSectionByModuleTitleAndSectionNumberAndTerm("SE301 Operating Systems & Networks", "G7", "AY2024/2025 Term 1"));
 
         // Fetch module sections by teacher user id
-        List<ModuleSection> sectionsByKokJing = moduleSectionRepo.fetchModuleSectionsByTeacherUserId(teacherUserIds.get(0));
+        List<ModuleSectionRecord> sectionsByKokJing = moduleSectionRepo.fetchModuleSectionsByTeacherUserId(teacherUserIds.get(0));
         System.out.println("Fetch by teacher user id (Kok Jing) count = " + sectionsByKokJing.size());
         dumpModuleSections("Module sections taught by Kok Jing", sectionsByKokJing);
 
@@ -193,15 +193,15 @@ public class DatabaseTesting {
         System.out.println("Delete module section E = " + delE + ", fetch E -> " + moduleSectionRepo.fetchModuleSectionByModuleTitleAndSectionNumberAndTerm("SE301 Operating Systems & Networks", "G7", "AY2024/2025 Term 1"));
 
         // Final state
-        List<ModuleSection> remaining = moduleSectionRepo.fetchModuleSectionsByModuleTitle("CS102 Programming Fundamentals II");
+        List<ModuleSectionRecord> remaining = moduleSectionRepo.fetchModuleSectionsByModuleTitle("CS102 Programming Fundamentals II");
         dumpModuleSections("Remaining CS102 module sections", remaining);
 
         return List.of(idA, idB, idC, idD);
     }
 
-    private static void dumpModuleSections(String title, List<ModuleSection> sections) {
+    private static void dumpModuleSections(String title, List<ModuleSectionRecord> sections) {
         System.out.println("=== " + title + " ===");
-        for (ModuleSection ms : sections) {
+        for (ModuleSectionRecord ms : sections) {
             System.out.println(ms.moduleSectionId() + " | " + ms.moduleTitle() + " | " + ms.sectionNumber() + " | " + ms.dayOfWeek() + " | " + ms.startTime() + " - " + ms.endTime() + " | " + ms.room() + " | " + ms.teacherUserId());
         }
     }

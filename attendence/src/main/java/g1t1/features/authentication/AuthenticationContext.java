@@ -1,12 +1,22 @@
 package g1t1.features.authentication;
 
 import g1t1.db.DSLInstance;
+import g1t1.db.DbUtils;
+import g1t1.db.enrollments.Enrollment;
+import g1t1.db.enrollments.EnrollmentRepository;
+import g1t1.db.enrollments.EnrollmentRepositoryJooq;
+import g1t1.db.module_sections.ModuleSectionRecord;
+import g1t1.db.module_sections.ModuleSectionRepository;
+import g1t1.db.module_sections.ModuleSectionRepositoryJooq;
+import g1t1.db.students.StudentRepository;
+import g1t1.db.students.StudentRepositoryJooq;
 import g1t1.db.user_face_images.UserFaceImage;
 import g1t1.db.user_face_images.UserFaceImageRepository;
 import g1t1.db.user_face_images.UserFaceImageRepositoryJooq;
 import g1t1.db.users.User;
 import g1t1.db.users.UserRepository;
 import g1t1.db.users.UserRepositoryJooq;
+import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.RegisterTeacher;
 import g1t1.models.users.Teacher;
 import g1t1.utils.EventEmitter;
@@ -49,6 +59,9 @@ public class AuthenticationContext {
         try (DSLInstance dslInstance = new DSLInstance()) {
             UserRepository userRepo = new UserRepositoryJooq(dslInstance.dsl);
             UserFaceImageRepository userFaceImageRepo = new UserFaceImageRepositoryJooq(dslInstance.dsl);
+            ModuleSectionRepository moduleSectionRepository = new ModuleSectionRepositoryJooq(dslInstance.dsl);
+            EnrollmentRepository enrollmentRepository = new EnrollmentRepositoryJooq(dslInstance.dsl);
+            StudentRepository studentRepository = new StudentRepositoryJooq(dslInstance.dsl);
 
             User dbUser = userRepo.fetchUserByEmail(email).orElse(userRepo.fetchUserById(email).orElse(null));
             if (dbUser == null) {
@@ -57,8 +70,25 @@ public class AuthenticationContext {
             if (!BCrypt.checkpw(password, dbUser.passwordHash())) {
                 return false;
             }
+
             List<UserFaceImage> dbFaces = userFaceImageRepo.fetchFaceImagesByUserId(dbUser.userId());
+            List<ModuleSectionRecord> dbSections = moduleSectionRepository.fetchModuleSectionsByTeacherUserId(dbUser.userId());
             Teacher teacher = new Teacher(dbUser, dbFaces);
+
+            for (ModuleSectionRecord dbSection : dbSections) {
+                ModuleSection section = new ModuleSection(dbSection);
+
+                // TODO: This should be a join
+                List<String> studentIds = enrollmentRepository
+                        .fetchEnrollmentsByModuleSectionId(dbSection.moduleSectionId())
+                        .stream().map(Enrollment::studentId).toList();
+                for (String studentId : studentIds) {
+                    section.addStudent(DbUtils.getStudentById(studentId, section));
+                }
+                
+                teacher.getModuleSections().add(section);
+            }
+
             return setCurrentTeacher(teacher);
         } catch (SQLException e) {
             System.out.println("Error connecting to the database: " + e.getMessage());

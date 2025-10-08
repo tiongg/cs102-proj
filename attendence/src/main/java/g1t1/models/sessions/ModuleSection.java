@@ -1,44 +1,44 @@
 package g1t1.models.sessions;
 
+import g1t1.components.table.TableChipItem;
+import g1t1.db.module_sections.ModuleSectionRecord;
+import g1t1.models.users.Student;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import g1t1.components.table.TableChipItem;
-import g1t1.models.users.Student;
 
 /**
  * Module & Section. Used to uniquely identify a class.
  */
 public class ModuleSection implements TableChipItem {
     /**
+     * Module section id. Used mainly for db stuff
+     */
+    private final String id;
+    /**
      * Module of the class. i.e CS102
      */
     private final String module;
-
     /**
      * Section of the class. i.e G1
      */
     private final String section;
-
-    /**
-     * Day of Week of class
-     */
-    private int day;
-
-    /**
-     * Start time of lesson (HH:MM)
-     */
-    private String startTime;
-
-    /**
-     * End time of lesson (HH:MM)
-     */
-    private String endTime;
-
     /**
      * Students enrolled in class
      */
     private final List<Student> students = new ArrayList<>();
+    /**
+     * Day of Week of class
+     */
+    private final int day;
+    /**
+     * Start time of lesson (HH:MM)
+     */
+    private final String startTime;
+    /**
+     * End time of lesson (HH:MM)
+     */
+    private final String endTime;
 
     public ModuleSection(String module, String section, int day, String startTime, String endTime) {
         this.module = module;
@@ -46,6 +46,16 @@ public class ModuleSection implements TableChipItem {
         this.day = day;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.id = module + " - " + section;
+    }
+
+    public ModuleSection(ModuleSectionRecord dbModuleSection) {
+        this.module = dbModuleSection.moduleTitle();
+        this.section = dbModuleSection.sectionNumber();
+        this.day = dbModuleSection.dayOfWeek();
+        this.startTime = dbModuleSection.startTime();
+        this.endTime = dbModuleSection.endTime();
+        this.id = dbModuleSection.moduleSectionId();
     }
 
     /**
@@ -86,8 +96,8 @@ public class ModuleSection implements TableChipItem {
     @Override
     public String[] getChipData() {
         // "Module", "Section", "Day", "Time", "Enrolled"
-        return new String[] { this.module, this.section, Integer.toString(this.day), formatClassDuration(),
-                Integer.toString(this.students.size()) };
+        return new String[]{this.module, this.section, Integer.toString(this.day), formatClassDuration(),
+                Integer.toString(this.students.size())};
     }
 
     @Override

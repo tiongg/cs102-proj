@@ -1,12 +1,5 @@
 package g1t1.testing;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import g1t1.models.ids.StudentID;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.FaceData;
@@ -18,14 +11,17 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Minimal JavaFX Frontend Demo
@@ -235,7 +231,7 @@ public class MinimalFrontendDemo extends Application {
 
     private Student createStudent(String id, String name, List<byte[]> photos) {
         Student student = new Student(new StudentID(id), name, new ModuleSection("CS102", "T01", 3, "08:00", "11:30"),
-                name.toLowerCase() + "@school.edu", "12345678");
+                name.toLowerCase() + "@school.edu");
         FaceData faceData = new FaceData();
         faceData.setFaceImages(photos);
         student.setFaceData(faceData);

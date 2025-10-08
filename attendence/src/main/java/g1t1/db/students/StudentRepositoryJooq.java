@@ -1,10 +1,9 @@
 package g1t1.db.students;
 
-import org.jooq.impl.DSL;
-
 import org.jooq.DSLContext;
-import org.jooq.Table;
 import org.jooq.Field;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,58 +11,59 @@ import java.util.Map;
 import java.util.Optional;
 
 public class StudentRepositoryJooq implements StudentRepository {
-    private final DSLContext dsl;
-
-    private final Table<?> STUDENTS_TABLE = DSL.table("students");
     private static final Field<String> STUDENT_ID = DSL.field("student_id", String.class);
     private static final Field<String> FULL_NAME = DSL.field("full_name", String.class);
     private static final Field<String> EMAIL = DSL.field("email", String.class);
+    private final DSLContext dsl;
+    private final Table<?> STUDENTS_TABLE = DSL.table("students");
 
-    public StudentRepositoryJooq(DSLContext dsl) { this.dsl = dsl; }
+    public StudentRepositoryJooq(DSLContext dsl) {
+        this.dsl = dsl;
+    }
 
     @Override
     public String create(String studentId, String fullName, String email) {
         dsl.insertInto(STUDENTS_TABLE)
-            .set(STUDENT_ID, studentId)
-            .set(FULL_NAME, fullName)
-            .set(EMAIL, email)
-            .execute();
+                .set(STUDENT_ID, studentId)
+                .set(FULL_NAME, fullName)
+                .set(EMAIL, email)
+                .execute();
         return studentId;
     }
 
     @Override
-    public List<Student> fetchAllStudents() {
+    public List<StudentRecord> fetchAllStudents() {
         return dsl.select(STUDENT_ID, FULL_NAME, EMAIL)
-            .from(STUDENTS_TABLE)
-            .fetch(record -> new Student(
-                record.get(STUDENT_ID),
-                record.get(FULL_NAME),
-                record.get(EMAIL)
-            ));
-    }
-
-    @Override 
-    public Optional<Student> fetchStudentById(String studentId) {
-        return dsl.select(STUDENT_ID, FULL_NAME, EMAIL)
-            .from(STUDENTS_TABLE)
-            .where(STUDENT_ID.eq(studentId))
-            .fetchOptional(record -> new Student(
-                record.get(STUDENT_ID),
-                record.get(FULL_NAME),
-                record.get(EMAIL)
-        ));
+                .from(STUDENTS_TABLE)
+                .fetch(record -> new StudentRecord(
+                        record.get(STUDENT_ID),
+                        record.get(FULL_NAME),
+                        record.get(EMAIL)
+                ));
     }
 
     @Override
-    public Optional<Student> fetchStudentByEmail(String email) {
+    public Optional<StudentRecord> fetchStudentById(String studentId) {
         return dsl.select(STUDENT_ID, FULL_NAME, EMAIL)
-            .from(STUDENTS_TABLE)
-            .where(EMAIL.eq(email))
-            .fetchOptional(record -> new Student(
-                record.get(STUDENT_ID),
-                record.get(FULL_NAME),
-                record.get(EMAIL)
-        ));
+                .from(STUDENTS_TABLE)
+                .where(STUDENT_ID.eq(studentId))
+                .fetchOptional(record -> new StudentRecord(
+                        record.get(STUDENT_ID),
+                        record.get(FULL_NAME),
+                        record.get(EMAIL)
+                ));
+    }
+
+    @Override
+    public Optional<StudentRecord> fetchStudentByEmail(String email) {
+        return dsl.select(STUDENT_ID, FULL_NAME, EMAIL)
+                .from(STUDENTS_TABLE)
+                .where(EMAIL.eq(email))
+                .fetchOptional(record -> new StudentRecord(
+                        record.get(STUDENT_ID),
+                        record.get(FULL_NAME),
+                        record.get(EMAIL)
+                ));
     }
 
     @Override
@@ -79,10 +79,10 @@ public class StudentRepositoryJooq implements StudentRepository {
                 .execute() == 1;
     }
 
-    @Override 
+    @Override
     public boolean delete(String studentId) {
         return dsl.delete(STUDENTS_TABLE)
-            .where(STUDENT_ID.eq(studentId))
-            .execute() == 1;
+                .where(STUDENT_ID.eq(studentId))
+                .execute() == 1;
     }
 }

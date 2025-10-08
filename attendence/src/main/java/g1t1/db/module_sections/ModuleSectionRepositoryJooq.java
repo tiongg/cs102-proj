@@ -1,12 +1,12 @@
 package g1t1.db.module_sections;
 
-import org.jooq.impl.DSL;
 import org.jooq.DSLContext;
-import org.jooq.Table;
 import org.jooq.Field;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,73 +32,73 @@ public class ModuleSectionRepositoryJooq implements ModuleSectionRepository {
     public String create(String moduleTitle, String sectionNumber, String term, int dayOfWeek, String startTime, String endTime, String room, String teacherUserId) {
         String uuid = UUID.randomUUID().toString();
         dsl.insertInto(MODULE_SECTIONS_TABLE)
-            .set(MODULE_SECTION_ID, uuid)
-            .set(MODULE_TITLE, moduleTitle)
-            .set(SECTION_NUMBER, sectionNumber)
-            .set(TERM, term)
-            .set(DAY_OF_WEEK, dayOfWeek)
-            .set(START_TIME, startTime)
-            .set(END_TIME, endTime)
-            .set(ROOM, room)
-            .set(TEACHER_USER_ID, teacherUserId)
-            .execute();
+                .set(MODULE_SECTION_ID, uuid)
+                .set(MODULE_TITLE, moduleTitle)
+                .set(SECTION_NUMBER, sectionNumber)
+                .set(TERM, term)
+                .set(DAY_OF_WEEK, dayOfWeek)
+                .set(START_TIME, startTime)
+                .set(END_TIME, endTime)
+                .set(ROOM, room)
+                .set(TEACHER_USER_ID, teacherUserId)
+                .execute();
         return uuid;
     }
 
     @Override
-    public List<ModuleSection> fetchModuleSectionsByModuleTitle(String moduleTitle) {
+    public List<ModuleSectionRecord> fetchModuleSectionsByModuleTitle(String moduleTitle) {
         return dsl.select(MODULE_SECTION_ID, MODULE_TITLE, SECTION_NUMBER, TERM, DAY_OF_WEEK, START_TIME, END_TIME, ROOM, TEACHER_USER_ID)
-            .from(MODULE_SECTIONS_TABLE)
-            .where(MODULE_TITLE.eq(moduleTitle))
-            .fetch(record -> new ModuleSection(
-                record.get(MODULE_SECTION_ID),
-                record.get(MODULE_TITLE),
-                record.get(SECTION_NUMBER),
-                record.get(TERM),
-                record.get(DAY_OF_WEEK),
-                record.get(START_TIME),
-                record.get(END_TIME),
-                record.get(ROOM),
-                record.get(TEACHER_USER_ID)
-            ));
+                .from(MODULE_SECTIONS_TABLE)
+                .where(MODULE_TITLE.eq(moduleTitle))
+                .fetch(record -> new ModuleSectionRecord(
+                        record.get(MODULE_SECTION_ID),
+                        record.get(MODULE_TITLE),
+                        record.get(SECTION_NUMBER),
+                        record.get(TERM),
+                        record.get(DAY_OF_WEEK),
+                        record.get(START_TIME),
+                        record.get(END_TIME),
+                        record.get(ROOM),
+                        record.get(TEACHER_USER_ID)
+                ));
     }
 
     @Override
-    public Optional<ModuleSection> fetchModuleSectionByModuleTitleAndSectionNumberAndTerm(String moduleTitle, String sectionNumber, String term) {
+    public Optional<ModuleSectionRecord> fetchModuleSectionByModuleTitleAndSectionNumberAndTerm(String moduleTitle, String sectionNumber, String term) {
         return dsl.select(MODULE_SECTION_ID, MODULE_TITLE, SECTION_NUMBER, TERM, DAY_OF_WEEK, START_TIME, END_TIME, ROOM, TEACHER_USER_ID)
-            .from(MODULE_SECTIONS_TABLE)
-            .where(MODULE_TITLE.eq(moduleTitle))
-            .and(SECTION_NUMBER.eq(sectionNumber))
-            .and(TERM.eq(term))
-            .fetchOptional(record -> new ModuleSection(
-                record.get(MODULE_SECTION_ID),
-                record.get(MODULE_TITLE),
-                record.get(SECTION_NUMBER),
-                record.get(TERM),
-                record.get(DAY_OF_WEEK),
-                record.get(START_TIME),
-                record.get(END_TIME),
-                record.get(ROOM),
-                record.get(TEACHER_USER_ID)
-            ));
+                .from(MODULE_SECTIONS_TABLE)
+                .where(MODULE_TITLE.eq(moduleTitle))
+                .and(SECTION_NUMBER.eq(sectionNumber))
+                .and(TERM.eq(term))
+                .fetchOptional(record -> new ModuleSectionRecord(
+                        record.get(MODULE_SECTION_ID),
+                        record.get(MODULE_TITLE),
+                        record.get(SECTION_NUMBER),
+                        record.get(TERM),
+                        record.get(DAY_OF_WEEK),
+                        record.get(START_TIME),
+                        record.get(END_TIME),
+                        record.get(ROOM),
+                        record.get(TEACHER_USER_ID)
+                ));
     }
 
     @Override
-    public List<ModuleSection> fetchModuleSectionsByTeacherUserId(String teacherUserId) {
+    public List<ModuleSectionRecord> fetchModuleSectionsByTeacherUserId(String teacherUserId) {
         return dsl.select(MODULE_SECTION_ID, MODULE_TITLE, SECTION_NUMBER, TERM, DAY_OF_WEEK, START_TIME, END_TIME, ROOM, TEACHER_USER_ID)
-            .from(MODULE_SECTIONS_TABLE)
-            .where(TEACHER_USER_ID.eq(teacherUserId))
-            .fetch(record -> new ModuleSection(
-                record.get(MODULE_SECTION_ID),
-                record.get(MODULE_TITLE),
-                record.get(SECTION_NUMBER),
-                record.get(TERM),
-                record.get(DAY_OF_WEEK),
-                record.get(START_TIME),
-                record.get(END_TIME),
-                record.get(ROOM),
-                record.get(TEACHER_USER_ID)
-            ));
+                .from(MODULE_SECTIONS_TABLE)
+                .where(TEACHER_USER_ID.eq(teacherUserId))
+                .fetch(record -> new ModuleSectionRecord(
+                        record.get(MODULE_SECTION_ID),
+                        record.get(MODULE_TITLE),
+                        record.get(SECTION_NUMBER),
+                        record.get(TERM),
+                        record.get(DAY_OF_WEEK),
+                        record.get(START_TIME),
+                        record.get(END_TIME),
+                        record.get(ROOM),
+                        record.get(TEACHER_USER_ID)
+                ));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class ModuleSectionRepositoryJooq implements ModuleSectionRepository {
     @Override
     public boolean delete(String moduleSectionId) {
         return dsl.delete(MODULE_SECTIONS_TABLE)
-            .where(MODULE_SECTION_ID.eq(moduleSectionId))
-            .execute() == 1;
+                .where(MODULE_SECTION_ID.eq(moduleSectionId))
+                .execute() == 1;
     }
 }

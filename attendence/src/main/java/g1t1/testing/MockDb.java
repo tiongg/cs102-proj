@@ -112,7 +112,7 @@ public class MockDb {
     }
 
     private static Student createStudent(String id, String name, ModuleSection section, List<byte[]> photos) {
-        Student student = new Student(new StudentID(id), name, section, name.toLowerCase() + "@school.edu", "12345678");
+        Student student = new Student(new StudentID(id), name, section, name.toLowerCase() + "@school.edu");
         FaceData faceData = new FaceData();
         faceData.setFaceImages(photos);
         student.setFaceData(faceData);

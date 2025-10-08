@@ -1,23 +1,33 @@
 package g1t1.models.users;
 
+import g1t1.db.student_face_images.StudentFaceImage;
+import g1t1.db.students.StudentRecord;
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.StudentID;
 import g1t1.models.sessions.ModuleSection;
 
+import java.util.List;
+
 public class Student extends BaseEntity {
-    private StudentID id;
-    private String name;
-    private ModuleSection moduleSection;
-    private String email;
-    private String phoneNumber;
+    private final StudentID id;
+    private final String name;
+    private final ModuleSection moduleSection;
+    private final String email;
     private FaceData faceData;
 
-    public Student(StudentID id, String name, ModuleSection moduleSection, String email, String phoneNumber) {
+    public Student(StudentID id, String name, ModuleSection moduleSection, String email) {
         this.id = id;
         this.name = name;
         this.moduleSection = moduleSection;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+    }
+
+    public Student(StudentRecord dbStudent, List<StudentFaceImage> dbFaceImages, ModuleSection moduleSection) {
+        this.id = new StudentID(dbStudent.studentId());
+        this.name = dbStudent.fullName();
+        this.moduleSection = moduleSection;
+        this.email = dbStudent.email();
+        this.faceData = new FaceData(dbFaceImages.stream().map(StudentFaceImage::imageData).toList());
     }
 
     public StudentID getId() {
@@ -36,10 +46,6 @@ public class Student extends BaseEntity {
         return email;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
     public FaceData getFaceData() {
         return this.faceData;
     }
@@ -51,6 +57,6 @@ public class Student extends BaseEntity {
     @Override
     public String toString() {
         return "Student [id=" + id + ", name=" + name + ", moduleSection=" + moduleSection + ", email=" + email
-                + ", phoneNumber=" + phoneNumber + "]";
+                + "]";
     }
 }
