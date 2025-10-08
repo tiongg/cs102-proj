@@ -1,9 +1,7 @@
 package g1t1.testing;
 
 import g1t1.db.DatabaseInitializer;
-import g1t1.db.attendance.Attendance;
-import g1t1.db.attendance.AttendanceRepository;
-import g1t1.db.attendance.AttendanceRepositoryJooq;
+import g1t1.db.attendance.*;
 import g1t1.db.enrollments.Enrollment;
 import g1t1.db.enrollments.EnrollmentRepository;
 import g1t1.db.enrollments.EnrollmentRepositoryJooq;
@@ -279,7 +277,7 @@ public class DatabaseTesting {
 
     private static void testAttendanceRepo(AttendanceRepository attendanceRepo, List<String> sessionIds, List<String> enrollmentIds) {
         // Create attendance records
-        boolean recA = attendanceRepo.create(sessionIds.get(0), enrollmentIds.get(0), "present");
+        boolean recA = attendanceRepo.create(sessionIds.get(0), enrollmentIds.get(0), AttendanceStatus.PRESENT, 1, MarkingMethod.MANUAL);
         System.out.println("Record attendance A result = " + recA);
 
         // Fetch by session id
@@ -293,7 +291,7 @@ public class DatabaseTesting {
         dumpAttendances("Attendance records for enrollment " + enrollmentIds.get(0), attendanceByEnrollment);
 
         // Update status
-        boolean updA = attendanceRepo.update(sessionIds.get(0), enrollmentIds.get(0), "absent", Timestamp.valueOf(LocalDateTime.now()));
+        boolean updA = attendanceRepo.update(sessionIds.get(0), enrollmentIds.get(0), AttendanceStatus.ABSENT, Timestamp.valueOf(LocalDateTime.now()));
         System.out.println("Update attendance record A result = " + updA);
 
         // Fetch again to verify update
