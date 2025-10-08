@@ -1,42 +1,32 @@
 package g1t1.models.sessions;
 
-import g1t1.models.BaseEntity;
-
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
-enum SessionStatus {
-    /**
-     * Active session. End session to save.
-     */
-    Active,
-    /**
-     * Ended session. Ready to be saved.
-     */
-    Ended
-}
+import g1t1.components.table.TableChipItem;
+import g1t1.models.BaseEntity;
+import g1t1.models.users.Student;
 
 /**
  * Class session
  */
-public class ClassSession extends BaseEntity {
+public class ClassSession extends BaseEntity implements TableChipItem {
     private ModuleSection moduleSection;
     private int week;
     private Date startTime;
+    private ArrayList<Student> presentStudents = new ArrayList<>();
     private SessionStatus sessionStatus;
 
-    public ClassSession(ModuleSection moduleSection, int week) {
+    public ClassSession(ModuleSection moduleSection, int week, Date startTime, SessionStatus status) {
         this.moduleSection = moduleSection;
-        this.sessionStatus = SessionStatus.Active;
-        this.startTime = new Date();
+        this.sessionStatus = status;
+        this.startTime = startTime;
         this.week = week;
     }
 
     public void endSession() {
         this.sessionStatus = SessionStatus.Ended;
-    }
-
-    public ModuleSection getModuleSection() {
-        return this.moduleSection;
     }
 
     public Date getStartTime() {
@@ -45,5 +35,38 @@ public class ClassSession extends BaseEntity {
 
     public int getWeek() {
         return this.week;
+    }
+
+    public ModuleSection getModuleSection() {
+        return this.moduleSection;
+    }
+
+    private String formatModuleSection() {
+        String module = moduleSection.getModule();
+        String section = moduleSection.getSection();
+        String formatString = module + " - " + section;
+        return formatString;
+    }
+
+    private String formatAttendance() {
+        String formatString = presentStudents.size() + " / " + this.moduleSection.getStudents().size();
+        return formatString;
+    }
+
+    private String formatRate() {
+        String formatString = String.format("%d%s", presentStudents.size() / this.moduleSection.getStudents().size(),
+                " %");
+        return formatString;
+    }
+
+    private String formatDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+        return sdf.format(this.startTime);
+    }
+
+    @Override
+    public String[] getChipData() {
+        return new String[] { this.formatModuleSection(), this.formatDate(), this.moduleSection.getStartTime(),
+                this.formatAttendance(), this.formatRate() };
     }
 }

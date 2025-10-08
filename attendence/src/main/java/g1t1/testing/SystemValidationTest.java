@@ -1,11 +1,5 @@
 package g1t1.testing;
 
-import g1t1.models.users.FaceData;
-import g1t1.models.users.Student;
-import g1t1.opencv.FaceRecognitionService;
-import g1t1.utils.events.opencv.AttendanceSessionEvent;
-import g1t1.utils.events.opencv.StudentDetectedEvent;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,24 +7,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import g1t1.models.ids.StudentID;
+import g1t1.models.sessions.ModuleSection;
+import g1t1.models.users.FaceData;
+import g1t1.models.users.Student;
+import g1t1.opencv.FaceRecognitionService;
+import g1t1.utils.events.opencv.AttendanceSessionEvent;
+import g1t1.utils.events.opencv.StudentDetectedEvent;
+
 /**
  * System Validation Test
  * <p>
- * PURPOSE: Validates core face recognition functionality before frontend integration.
+ * PURPOSE: Validates core face recognition functionality before frontend
+ * integration.
  * <p>
- * WHAT IT TESTS:
- * - Service lifecycle (start/stop)
- * - Event system integration
- * - Student enrollment and detection
+ * WHAT IT TESTS: - Service lifecycle (start/stop) - Event system integration -
+ * Student enrollment and detection
  * <p>
- * HOW TO RUN:
- * 1. Add student photos to test-photos/[name]/ folders
- * 2. Run: mvn compile exec:java -Dexec.mainClass="g1t1.testing.SystemValidationTest"
+ * HOW TO RUN: 1. Add student photos to test-photos/[name]/ folders 2. Run: mvn
+ * compile exec:java -Dexec.mainClass="g1t1.testing.SystemValidationTest"
  * <p>
- * EXPECTED OUTPUT:
- * - Service starts and stops successfully
- * - Events are emitted when students detected
- * - System ready for frontend integration
+ * EXPECTED OUTPUT: - Service starts and stops successfully - Events are emitted
+ * when students detected - System ready for frontend integration
  */
 public class SystemValidationTest {
     private static final String TEST_PHOTOS_BASE = "test-photos";
@@ -72,8 +70,8 @@ public class SystemValidationTest {
     }
 
     /**
-     * Test 1: Service Lifecycle
-     * Validates that frontend can start and stop the service
+     * Test 1: Service Lifecycle Validates that frontend can start and stop the
+     * service
      */
     private static void testServiceLifecycle(List<Student> students) {
         System.out.println("TEST: Service Lifecycle");
@@ -108,8 +106,8 @@ public class SystemValidationTest {
     }
 
     /**
-     * Test 2: Event System
-     * Validates that frontend can receive student detection events
+     * Test 2: Event System Validates that frontend can receive student detection
+     * events
      */
     private static void testEventSystem(List<Student> students) {
         System.out.println("TEST: Event System Integration");
@@ -118,17 +116,14 @@ public class SystemValidationTest {
         // Create event listener (this is what frontend would do)
         service.getEventEmitter().subscribe(StudentDetectedEvent.class, event -> {
             eventCount++;
-            System.out.println("   [EVENT] " + eventCount + ": " +
-                    event.getStudent().getName() +
-                    " detected (confidence: " +
-                    String.format("%.1f%%", event.getConfidence()) + ")");
+            System.out.println("   [EVENT] " + eventCount + ": " + event.getStudent().getName()
+                    + " detected (confidence: " + String.format("%.1f%%", event.getConfidence()) + ")");
         });
 
         service.getEventEmitter().subscribe(AttendanceSessionEvent.class, event -> {
             sessionEventCount++;
-            System.out.println("   [SESSION] " + sessionEventCount + ": " +
-                    event.getEventType() +
-                    " (Total detected: " + event.getSession().getTotalStudentsDetected() + ")");
+            System.out.println("   [SESSION] " + sessionEventCount + ": " + event.getEventType() + " (Total detected: "
+                    + event.getSession().getTotalStudentsDetected() + ")");
         });
 
         try {
@@ -140,7 +135,8 @@ public class SystemValidationTest {
             service.stop();
 
             if (eventCount > 0 || sessionEventCount > 0) {
-                System.out.println("   [SUCCESS] Event system working: " + eventCount + " detection events, " + sessionEventCount + " session events received");
+                System.out.println("   [SUCCESS] Event system working: " + eventCount + " detection events, "
+                        + sessionEventCount + " session events received");
                 System.out.println("   [SUCCESS] Frontend can successfully receive notifications");
             } else {
                 System.out.println("   [WARNING] No events received");
@@ -158,7 +154,8 @@ public class SystemValidationTest {
         List<Student> students = new ArrayList<>();
         File baseDir = new File(TEST_PHOTOS_BASE);
 
-        if (!baseDir.exists()) return students;
+        if (!baseDir.exists())
+            return students;
 
         File[] studentDirs = baseDir.listFiles(File::isDirectory);
         if (studentDirs != null) {
@@ -179,8 +176,7 @@ public class SystemValidationTest {
         List<byte[]> photos = new ArrayList<>();
         File folder = new File(folderPath);
 
-        File[] files = folder.listFiles((dir, name) ->
-                name.toLowerCase().matches(".*\\.(jpg|jpeg)$"));
+        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().matches(".*\\.(jpg|jpeg)$"));
 
         if (files != null) {
             Arrays.sort(files);
@@ -197,7 +193,7 @@ public class SystemValidationTest {
     }
 
     private static Student createStudent(String id, String name, List<byte[]> photos) {
-        Student student = new Student(id, name, "CS102", "T01",
+        Student student = new Student(new StudentID(id), name, new ModuleSection("CS102", "T01", 3, "08:00", "11:30"),
                 name.toLowerCase() + "@school.edu", "12345678");
         FaceData faceData = new FaceData();
         faceData.setFaceImages(photos);

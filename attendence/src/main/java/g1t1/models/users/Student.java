@@ -20,20 +20,6 @@ public class Student extends BaseEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    // #region String constructors
-    public Student(String id, String name, String module, String section, String email, String phoneNumber) {
-        this(new StudentID(id), name, new ModuleSection(module, section), email, phoneNumber);
-    }
-
-    public Student(String id, String name, ModuleSection moduleSection, String email, String phoneNumber) {
-        this(new StudentID(id), name, moduleSection, email, phoneNumber);
-    }
-
-    public Student(StudentID id, String name, String module, String section, String email, String phoneNumber) {
-        this(id, name, new ModuleSection(module, section), email, phoneNumber);
-    }
-    // #endregion
-
     public StudentID getId() {
         return id;
     }
