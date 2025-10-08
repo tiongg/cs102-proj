@@ -8,17 +8,6 @@ import g1t1.components.table.TableChipItem;
 import g1t1.models.BaseEntity;
 import g1t1.models.users.Student;
 
-enum SessionStatus {
-    /**
-     * Active session. End session to save.
-     */
-    Active,
-    /**
-     * Ended session. Ready to be saved.
-     */
-    Ended
-}
-
 /**
  * Class session
  */
@@ -26,12 +15,12 @@ public class ClassSession extends BaseEntity implements TableChipItem {
     private ModuleSection moduleSection;
     private int week;
     private Date startTime;
-    private ArrayList<Student> presentStudents;
+    private ArrayList<Student> presentStudents = new ArrayList<>();
     private SessionStatus sessionStatus;
 
-    public ClassSession(ModuleSection moduleSection, int week, Date startTime) {
+    public ClassSession(ModuleSection moduleSection, int week, Date startTime, SessionStatus status) {
         this.moduleSection = moduleSection;
-        this.sessionStatus = SessionStatus.Active;
+        this.sessionStatus = status;
         this.startTime = startTime;
         this.week = week;
     }
@@ -48,7 +37,11 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return this.week;
     }
 
-    private String getModuleSection() {
+    public ModuleSection getModuleSection() {
+        return this.moduleSection;
+    }
+
+    private String formatModuleSection() {
         String module = moduleSection.getModule();
         String section = moduleSection.getSection();
         String formatString = module + " - " + section;
@@ -73,7 +66,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
 
     @Override
     public String[] getChipData() {
-        return new String[] { this.getModuleSection(), this.formatDate(), this.moduleSection.getTime(),
+        return new String[] { this.formatModuleSection(), this.formatDate(), this.moduleSection.getStartTime(),
                 this.formatAttendance(), this.formatRate() };
     }
 }

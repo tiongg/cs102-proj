@@ -26,20 +26,26 @@ public class ModuleSection implements TableChipItem {
     private int day;
 
     /**
-     * Time of lesson (HH:MM)
+     * Start time of lesson (HH:MM)
      */
-    private String time;
+    private String startTime;
+
+    /**
+     * End time of lesson (HH:MM)
+     */
+    private String endTime;
 
     /**
      * Students enrolled in class
      */
     private final List<Student> students = new ArrayList<>();
 
-    public ModuleSection(String module, String section, int day, String time) {
+    public ModuleSection(String module, String section, int day, String startTime, String endTime) {
         this.module = module;
         this.section = section;
         this.day = day;
-        this.time = time;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     /**
@@ -64,8 +70,8 @@ public class ModuleSection implements TableChipItem {
         return this.students;
     }
 
-    public String getTime() {
-        return this.time;
+    public String getStartTime() {
+        return this.startTime;
     }
 
     @Override
@@ -73,10 +79,26 @@ public class ModuleSection implements TableChipItem {
         return "ModuleSection [module=" + module + ", section=" + section + "]";
     }
 
+    private String formatClassDuration() {
+        return String.format("%s - %s", this.startTime, this.endTime);
+    }
+
     @Override
     public String[] getChipData() {
         // "Module", "Section", "Day", "Time", "Enrolled"
-        return new String[] { this.module, this.section, Integer.toString(this.day), this.time,
+        return new String[] { this.module, this.section, Integer.toString(this.day), formatClassDuration(),
                 Integer.toString(this.students.size()) };
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof ModuleSection) {
+            ModuleSection otherSection = (ModuleSection) other;
+            if (this.getSection().equals(otherSection.getSection())
+                    && this.getModule().equals(otherSection.getModule())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

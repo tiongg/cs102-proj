@@ -3,14 +3,19 @@ package g1t1.testing;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import g1t1.models.ids.StudentID;
 import g1t1.models.ids.TeacherID;
+import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
+import g1t1.models.sessions.SessionStatus;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.Student;
 import g1t1.models.users.Teacher;
@@ -21,20 +26,39 @@ import g1t1.models.users.Teacher;
 public class MockDb {
     private final static List<Teacher> teachers = new ArrayList<>();
     private final static Map<TeacherID, List<ModuleSection>> teacherClasses = new HashMap<>();
+    private final static Map<TeacherID, List<ClassSession>> pastSessions = new HashMap<>();
 
     static {
         Teacher newTeacher = new Teacher("123", "Dr Zhang", "ZZY@goat.com", new FaceData());
         teachers.add(newTeacher);
 
-        teacherClasses.put(newTeacher.getID(),
-                new ArrayList<>(Arrays.asList(new ModuleSection("CS 102", "G1"), new ModuleSection("CS 102", "G2"))));
+        ModuleSection morningClass = new ModuleSection("CS 102", "G1", 3, "08:00", "11:30");
+        ModuleSection afternoonClass = new ModuleSection("CS 102", "G2", 3, "15:30", "18:45");
 
+        teacherClasses.put(newTeacher.getID(), Arrays.asList(morningClass, afternoonClass));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+        try {
+            pastSessions.put(newTeacher.getID(),
+                    new ArrayList<>(Arrays.asList(
+                            new ClassSession(morningClass, 1, sdf.parse("3-09-2025"), SessionStatus.Ended),
+                            new ClassSession(afternoonClass, 1, sdf.parse("3-09-2025"), SessionStatus.Ended),
+                            new ClassSession(morningClass, 1, sdf.parse("10-09-2025"), SessionStatus.Ended))));
+
+        } catch (ParseException e) {
+            System.out.println("Error parsing date");
+        }
         loadEnrolledStudents();
     }
 
     public static List<ModuleSection> getUserModuleSections(TeacherID id) {
         // First one
         return teacherClasses.get(teacherClasses.keySet().iterator().next());
+    }
+
+    public static List<ClassSession> getPastSessions(TeacherID id) {
+        return pastSessions.get(id);
     }
 
     private static void loadEnrolledStudents() {
@@ -91,8 +115,9 @@ public class MockDb {
     }
 
     private static Student createStudent(String id, String name, ModuleSection section, List<byte[]> photos) {
-        Student student = new Student(id, name, section, name.toLowerCase() + "@school.edu", "12345678");
-        FaceData faceData = new FaceData(photos);
+        Student student = new Student(new StudentID(id), name, section, name.toLowerCase() + "@school.edu", "12345678");
+        FaceData faceData = new FaceData();
+        faceData.setFaceImages(photos);
         student.setFaceData(faceData);
         return student;
     }

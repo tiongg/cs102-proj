@@ -1,8 +1,5 @@
 package g1t1.models.users;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.StudentID;
 import g1t1.models.sessions.ModuleSection;
@@ -19,15 +16,6 @@ public class Student extends BaseEntity {
         this.id = id;
         this.name = name;
         this.moduleSection = moduleSection;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-    }
-
-    
-    public Student(String id, String name, String module, String section, String email, String phoneNumber) {
-        this.id = new StudentID(id);
-        this.name = name;
-        this.moduleSection = new ModuleSection(module, section, 3, "08:00 - 11:30");
         this.email = email;
         this.phoneNumber = phoneNumber;
     }
