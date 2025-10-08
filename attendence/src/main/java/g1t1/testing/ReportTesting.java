@@ -8,16 +8,16 @@ import g1t1.models.ids.*;
 public class ReportTesting {
     public static void main(String[] args) {
         // sample module
-        ModuleSection modulesection1 = new ModuleSection("CS102", "G1");
-        ModuleSection modulesection2 = new ModuleSection("CS101", "G2");
+        ModuleSection modulesection1 = new ModuleSection("CS 102", "G1", 3, "08:00", "11:30");
+        ModuleSection modulesection2 = new ModuleSection("CS 102", "G2", 3, "15:30", "18:45");
 
         // sample students
         // Using all String constructor
-        Student stu1 = new Student("S001", "Alice", "CS102", "G1", "alice@example.com", "555-1234");
+        Student stu1 = new Student(new StudentID("S001"), "Alice", modulesection1, "alice@example.com", "555-1234");
         // Using ModuleSection object directly
-        Student stu2 = new Student("S002", "Bob", modulesection1, "bob@example.com", "555-2345");
+        Student stu2 = new Student(new StudentID("S002"), "Bob", modulesection1, "bob@example.com", "555-2345");
         // Using StudentID object + String module/section
-        Student stu3 = new Student(new StudentID("S003"), "Charlie", "CS101", "G2", "charlie@example.com", "555-3456");
+        Student stu3 = new Student(new StudentID("S003"), "Charlie", modulesection2, "charlie@example.com", "555-3456");
         // Using StudentID + ModuleSection object
         Student stu4 = new Student(new StudentID("S004"), "Diana", modulesection2, "diana@example.com", "555-4567");
 
