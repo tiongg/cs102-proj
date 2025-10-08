@@ -1,10 +1,12 @@
 package g1t1.components.table;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import javax.swing.GroupLayout.Alignment;
-
+import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.ModuleSection;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -13,16 +15,22 @@ import javafx.scene.text.TextAlignment;
 public class Table extends VBox {
     private HBox tableHeaderElement;
     private VBox tableBodyElement;
+    private Consumer<TableChipItem> onChipClick;
 
     // FXMLLoader throwing tantrum because of how it is initialised
     public Table() {
         super(10);
     }
 
+    public void setOnRowClick(Consumer<TableChipItem> handler) {
+        this.onChipClick = handler;
+    }
+
     public void setTable(List<String> tableHeaders) {
-        tableHeaderElement = new HBox(150);
+        tableHeaderElement = new HBox(100);
         tableHeaderElement.setAlignment(Pos.CENTER);
-        tableHeaderElement.setStyle("-fx-background-color: #a4a4a4ff; -fx-background-radius: 20; -fx-padding: 4");
+        tableHeaderElement.setStyle(
+                "-fx-background-color: #838383ff; -fx-background-radius: 20; -fx-padding: 8; -fx-font-weight: bold;");
 
         // clear prev values
         getChildren().clear();
@@ -39,12 +47,19 @@ public class Table extends VBox {
     }
 
     public void createBody(List<? extends TableChipItem> chips) {
+        if (tableBodyElement != null)
+            getChildren().remove(tableBodyElement);
         this.tableBodyElement = new VBox(10);
 
         for (TableChipItem chipData : chips) {
-            HBox chip = new HBox(150);
+            HBox chip = new HBox(100);
             chip.setAlignment(Pos.CENTER);
-            chip.setStyle("-fx-background-color: #a4a4a4ff; -fx-background-radius: 20; -fx-padding: 4");
+            chip.setStyle("-fx-background-color: #a4a4a4ff; -fx-background-radius: 20; -fx-padding: 4;");
+            chip.setCursor(Cursor.HAND);
+            chip.setOnMouseClicked(e -> {
+                if (onChipClick != null)
+                    onChipClick.accept(chipData);
+            });
 
             for (String data : chipData.getChipData()) {
                 Label label = new Label(data);
@@ -58,10 +73,5 @@ public class Table extends VBox {
         }
         getChildren().add(tableBodyElement);
     }
-
-    // might consist of different types in ChipsTable
-    // public void bindTo(ChipsTable<?> table){
-
-    // }
 
 }
