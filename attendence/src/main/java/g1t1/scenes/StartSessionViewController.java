@@ -30,10 +30,10 @@ public class StartSessionViewController extends PageController {
     private final SimpleObjectProperty<ModuleSection> classValue = new SimpleObjectProperty<>();
 
     @FXML
-    private MenuButton weekMenu;
+    private MenuButton mbWeek;
 
     @FXML
-    private MenuButton classMenu;
+    private MenuButton mbModuleSections;
 
     @FXML
     private DatePicker dpClassDate;
@@ -58,13 +58,13 @@ public class StartSessionViewController extends PageController {
         // Populate it with 13 weeks
         for (int i = 1; i <= TOTAL_WEEKS; i++) {
             MenuItem item = new MenuItem(String.format("Week %d", i));
-            weekMenu.getItems().add(item);
+            mbWeek.getItems().add(item);
             item.setStyle("-fx-pref-width: 385px");
 
             // Needed else index won't stick
             int week = i;
             item.setOnAction(e -> {
-                weekMenu.setText(item.getText());
+                mbWeek.setText(item.getText());
                 weekValue.set(week);
             });
         }
@@ -72,14 +72,14 @@ public class StartSessionViewController extends PageController {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
             Teacher user = e.user();
             List<ModuleSection> sections = MockDb.getUserModuleSections(user.getID());
-            classMenu.getItems().clear();
+            mbModuleSections.getItems().clear();
             for (ModuleSection section : sections) {
                 MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
-                classMenu.getItems().add(item);
+                mbModuleSections.getItems().add(item);
                 item.setStyle("-fx-pref-width: 385px");
 
                 item.setOnAction(ae -> {
-                    classMenu.setText(item.getText());
+                    mbModuleSections.setText(item.getText());
                     classValue.set(section);
                 });
             }
