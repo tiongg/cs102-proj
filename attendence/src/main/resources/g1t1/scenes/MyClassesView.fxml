@@ -7,18 +7,35 @@
 <?import javafx.scene.layout.*?>
 <?import g1t1.components.Navbar?>
 
+<?import g1t1.components.table.ClassesTable?>
+
 <?import javafx.scene.text.Font?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
-            xmlns="http://javafx.com/javafx"
-            fx:controller="g1t1.scenes.MyClassesViewController"
-            prefHeight="900.0" prefWidth="1440.0">
+    xmlns="http://javafx.com/javafx" fx:controller="g1t1.scenes.MyClassesViewController" prefHeight="900.0" prefWidth="1440.0">
     <Navbar/>
-    <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
-                AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <Label text="My Classes" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
             <font>
                 <Font name="Inter Semi Bold" size="26.0"/>
             </font>
         </Label>
+        <VBox spacing="20" alignment="CENTER" fillWidth="true" AnchorPane.topAnchor="90.0" AnchorPane.leftAnchor="40.0">
+            <HBox spacing="700" alignment="CENTER_LEFT">
+                <Label text="Available Classes">
+                    <font>
+                        <Font name="Inter" size="16.0"/>
+                    </font>
+                </Label>
+                <Button text="Add class" style=" -fx-background-color: black; -fx-background-radius: 20; -fx-background-insets: 0; -fx-text-fill: white;">
+                    <font>
+                        <Font name="Inter" size="16.0"/>
+                    </font>
+                </Button>
+            </HBox>
+            <VBox spacing="16" alignment="CENTER" fillWidth="true" AnchorPane.topAnchor="90.0" AnchorPane.leftAnchor="40.0" style="-fx-background-color: #dadadaff; -fx-background-radius: 20;">
+                <ClassesTable fx:id="classesHeader" />
+
+            </VBox>
+        </VBox>
     </AnchorPane>
 </AnchorPane>
