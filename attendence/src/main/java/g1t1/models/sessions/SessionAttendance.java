@@ -18,6 +18,18 @@ public class SessionAttendance {
         return this.status;
     }
 
+    public Student getStudent() {
+        return this.student;
+    }
+
+    public double getConfidence() {
+        return this.confidence;
+    }
+
+    public MarkingMethod getMethod() {
+        return this.method;
+    }
+
     public void markPresent(double confidence, MarkingMethod method) {
         this.status = AttendanceStatus.PRESENT;
         this.confidence = confidence;
