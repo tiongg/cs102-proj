@@ -31,6 +31,9 @@ public class LoginViewController extends PageController {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
             Router.changePage(PageName.PastRecords);
         });
+
+        emailInput.textProperty().set("a@a.com");
+        passwordInput.textProperty().set("123");
     }
 
     @FXML

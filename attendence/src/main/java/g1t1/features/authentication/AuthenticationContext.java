@@ -50,7 +50,7 @@ public class AuthenticationContext {
             UserRepository userRepo = new UserRepositoryJooq(dslInstance.dsl);
             UserFaceImageRepository userFaceImageRepo = new UserFaceImageRepositoryJooq(dslInstance.dsl);
 
-            User dbUser = userRepo.fetchUserByEmail(email).orElse(null);
+            User dbUser = userRepo.fetchUserByEmail(email).orElse(userRepo.fetchUserById(email).orElse(null));
             if (dbUser == null) {
                 return false;
             }

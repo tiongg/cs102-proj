@@ -1,6 +1,7 @@
 package g1t1.scenes;
 
 import g1t1.components.TimePicker;
+import g1t1.components.Toast;
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
@@ -51,6 +52,7 @@ public class StartSessionViewController extends PageController {
 
         AttendanceTaker.start(classValue.get(), weekValue.get(), sessionStartTime);
         Router.changePage(PageName.DuringSession);
+        Toast.show("Session started!", Toast.ToastType.SUCCESS);
     }
 
     @FXML
