@@ -32,9 +32,9 @@
                     </font>
                 </Button>
             </HBox>
-            <HBox spacing="8" alignment="CENTER_LEFT">
+            <!-- <HBox spacing="8" alignment="CENTER_LEFT">
                 <Button fx:id="backBtn" text="Back" onAction="#onBack" visible="false" style="-fx-background-color: transparent; -fx-text-fill: black; -fx-underline: true;"/>
-            </HBox>
+            </HBox> -->
             <Table fx:id="classesTable" fillWidth="true" AnchorPane.topAnchor="90.0" AnchorPane.leftAnchor="40.0"/>
 
         </VBox>

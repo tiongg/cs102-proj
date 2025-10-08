@@ -55,11 +55,6 @@ public class Table extends VBox {
             HBox chip = new HBox(100);
             chip.setAlignment(Pos.CENTER);
             chip.setStyle("-fx-background-color: #a4a4a4ff; -fx-background-radius: 20; -fx-padding: 4;");
-            chip.setCursor(Cursor.HAND);
-            chip.setOnMouseClicked(e -> {
-                if (onChipClick != null)
-                    onChipClick.accept(chipData);
-            });
 
             for (String data : chipData.getChipData()) {
                 Label label = new Label(data);
@@ -69,9 +64,17 @@ public class Table extends VBox {
                 label.setTextAlignment(TextAlignment.CENTER);
                 chip.getChildren().add(label);
             }
+            chip.setCursor(Cursor.HAND);
+            chip.setOnMouseClicked(e -> {
+                if (onChipClick != null)
+                    onChipClick.accept(chipData);
+            });
             tableBodyElement.getChildren().add(chip);
         }
         getChildren().add(tableBodyElement);
     }
 
+    public void setOnChipClick(Consumer<TableChipItem> handler) {
+        this.onChipClick = handler;
+    }
 }
