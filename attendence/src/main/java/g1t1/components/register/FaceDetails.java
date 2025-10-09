@@ -1,10 +1,20 @@
 package g1t1.components.register;
 
+import java.util.List;
+
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.Rect;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
+
 import g1t1.models.interfaces.register.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.RegisterTeacher;
 import g1t1.opencv.config.FaceConfig;
+import g1t1.opencv.models.DetectedFace;
+import g1t1.opencv.services.FaceDetector;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
 import g1t1.utils.events.routing.OnNavigateEvent;
@@ -19,10 +29,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.videoio.VideoCapture;
 
 class CameraRunnable implements Runnable {
     private static final int TARGET_SIZE = 256;
@@ -32,11 +38,13 @@ class CameraRunnable implements Runnable {
     private final Object frameLock = new Object();
     private final Mat currentFrame = new Mat();
     private final BooleanProperty cameraFailure;
+    private final FaceDetector faceDetector;
 
     public CameraRunnable(ImageView display, BooleanProperty cameraFailure) {
         this.camera = new VideoCapture(FaceConfig.getInstance().getCameraIndex());
         this.display = display;
         this.cameraFailure = cameraFailure;
+        this.faceDetector = new FaceDetector();
     }
 
     @Override
@@ -80,10 +88,60 @@ class CameraRunnable implements Runnable {
             if (!currentFrame.empty()) {
                 MatOfByte buffer = new MatOfByte();
                 Imgcodecs.imencode(".png", currentFrame, buffer);
+                // File file = new File("test-photos/test.png");
+                // try (FileOutputStream writer = new FileOutputStream(file)) {
+                // writer.write(buffer.toArray());
+                // } catch (IOException e) {
+                // }
                 return buffer.toArray();
             }
         }
-        return new byte[]{};
+        return new byte[] {};
+    }
+
+    public byte[] getFaceInFrame() {
+        synchronized (frameLock) {
+            if (currentFrame.empty()) {
+                return new byte[] {};
+            }
+
+            List<DetectedFace> detectedFaces = faceDetector.detectFaces(currentFrame);
+            if (detectedFaces.isEmpty()) {
+                return new byte[] {};
+            }
+
+            DetectedFace detectedFace = detectedFaces.getFirst();
+            Rect boundingBox = detectedFace.getBoundingBox();
+
+            if (boundingBox == null) {
+                return new byte[] {};
+            }
+
+            // Ensure bounding box is within frame boundaries
+            int x = Math.max(0, boundingBox.x - 20);
+            int y = Math.max(0, boundingBox.y - 20);
+            int width = Math.min(boundingBox.width + 40, currentFrame.cols() - x);
+            int height = Math.min(boundingBox.height + 40, currentFrame.rows() - y);
+
+            if (width <= 0 || height <= 0) {
+                return new byte[] {};
+            }
+
+            // Extract face region
+            Rect safeBounds = new Rect(x, y, width, height);
+            Mat faceRegion = new Mat(currentFrame, safeBounds);
+
+            // Encode to byte array
+            MatOfByte buffer = new MatOfByte();
+            Imgcodecs.imencode(".png", faceRegion, buffer);
+            byte[] result = buffer.toArray();
+
+            // Cleanup
+            faceRegion.release();
+            buffer.release();
+
+            return result;
+        }
     }
 }
 
@@ -118,7 +176,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
             reset();
         });
 
-        lblTakenPictures.textProperty().bind(photosTaken.map(x -> String.format("%d / %d", x.size(), REQUIRED_PICTURE_COUNT)));
+        lblTakenPictures.textProperty()
+                .bind(photosTaken.map(x -> String.format("%d / %d", x.size(), REQUIRED_PICTURE_COUNT)));
         isValid.bind(photosTaken.map(x -> x.size() >= REQUIRED_PICTURE_COUNT));
         lblCameraError.visibleProperty().bind(cameraFailure);
     }
@@ -159,12 +218,16 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
     }
 
     public void takePicture() {
-        byte[] frame = this.cameraDaemon.getRunnable().getCurrentFrame();
         // First image taken is thumbnail
         if (thumbnailImage == null) {
-            // Clone incase processing pipeline modifies original buffer
+            byte[] frame = this.cameraDaemon.getRunnable().getCurrentFrame();
             thumbnailImage = frame.clone();
         }
-        this.photosTaken.add(frame);
+        byte[] faceInFrame = this.cameraDaemon.getRunnable().getFaceInFrame();
+        if (faceInFrame.length <= 0) {
+            System.out.println("Error taking photo! No face");
+            return;
+        }
+        this.photosTaken.add(faceInFrame);
     }
 }
