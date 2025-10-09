@@ -202,7 +202,7 @@ public class FaceRecognitionService {
                             double confidence = result.getConfidence();
 
                             if (confidence >= 5) {
-                                boundingBox.setRecognised(recognisedObject.getName(), livenessInfo, confidence);
+                                boundingBox.setRecognised(recognisedObject, livenessInfo, confidence);
 
                                 handleRecognitionResult(recognisedObject, confidence);
                             }
