@@ -9,8 +9,8 @@ import g1t1.models.users.Student;
 public class ReportTesting {
     public static void main(String[] args) {
         // sample module
-        ModuleSection modulesection1 = new ModuleSection("CS 102", "G1", 3, "08:00", "11:30");
-        ModuleSection modulesection2 = new ModuleSection("CS 102", "G2", 3, "15:30", "18:45");
+        ModuleSection modulesection1 = new ModuleSection("CS 102", "G1", "AY25-26T1", "SCIS1 2-4", 3, "08:00", "11:30");
+        ModuleSection modulesection2 = new ModuleSection("CS 102", "G2", "AY25-26T1", "SCIS1 2-4", 3, "15:30", "18:45");
 
         // sample students
         // Using all String constructor

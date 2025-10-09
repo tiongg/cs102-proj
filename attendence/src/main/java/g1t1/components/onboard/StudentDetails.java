@@ -7,7 +7,6 @@ import g1t1.models.interfaces.onboard.HasStudentDetails;
 import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Teacher;
-import g1t1.testing.MockDb;
 import g1t1.utils.BindingUtils;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.routing.OnNavigateEvent;
@@ -20,8 +19,6 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
-
-import java.util.List;
 
 public class StudentDetails extends Tab implements RegistrationStep<HasStudentDetails> {
     private final BooleanProperty validProperty = new SimpleBooleanProperty(false);
@@ -67,9 +64,8 @@ public class StudentDetails extends Tab implements RegistrationStep<HasStudentDe
     public void initialize() {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
             Teacher user = e.user();
-            List<ModuleSection> sections = MockDb.getUserModuleSections(user.getID());
             mbModuleSelection.getItems().clear();
-            for (ModuleSection section : sections) {
+            for (ModuleSection section : user.getModuleSections()) {
                 MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
                 mbModuleSelection.getItems().add(item);
                 item.setStyle("-fx-pref-width: 385px");

@@ -12,6 +12,8 @@ public interface ModuleSectionRepository {
 
     List<ModuleSectionRecord> fetchModuleSectionsByTeacherUserId(String teacherUserId);
 
+    List<ModuleSectionRecord> fetchModuleSectionsByTeacherIdAndTerm(String teacherUserId, String term);
+
     boolean update(String moduleSectionId, String moduleTitleNullable, String sectionNumberNullable, String termNullable, String startTimeNullable, String endTimeNullable, String roomNullable, String teacherUserIdNullable);
 
     boolean delete(String moduleSectionId);

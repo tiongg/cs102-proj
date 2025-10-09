@@ -9,7 +9,6 @@ import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Teacher;
-import g1t1.testing.MockDb;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
@@ -23,12 +22,11 @@ import javafx.scene.control.MenuItem;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class StartSessionViewController extends PageController {
     private final int TOTAL_WEEKS = 13;
     private final IntegerProperty weekValue = new SimpleIntegerProperty(0);
-    private final SimpleObjectProperty<ModuleSection> classValue = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<ModuleSection> moduleSectionValue = new SimpleObjectProperty<>();
 
     @FXML
     private MenuButton mbWeek;
@@ -50,7 +48,7 @@ public class StartSessionViewController extends PageController {
         LocalDate localDate = dpClassDate.getValue();
         LocalDateTime sessionStartTime = tpStartTime.addToDate(localDate);
 
-        AttendanceTaker.start(classValue.get(), weekValue.get(), sessionStartTime);
+        AttendanceTaker.start(moduleSectionValue.get(), weekValue.get(), sessionStartTime);
         Router.changePage(PageName.DuringSession);
         Toast.show("Session started!", Toast.ToastType.SUCCESS);
     }
@@ -73,21 +71,20 @@ public class StartSessionViewController extends PageController {
 
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
             Teacher user = e.user();
-            List<ModuleSection> sections = MockDb.getUserModuleSections(user.getID());
             mbModuleSections.getItems().clear();
-            for (ModuleSection section : sections) {
+            for (ModuleSection section : user.getModuleSections()) {
                 MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
                 mbModuleSections.getItems().add(item);
                 item.setStyle("-fx-pref-width: 385px");
 
                 item.setOnAction(ae -> {
                     mbModuleSections.setText(item.getText());
-                    classValue.set(section);
+                    moduleSectionValue.set(section);
                 });
             }
         });
 
-        BooleanBinding shouldDisable = classValue.isNull()
+        BooleanBinding shouldDisable = moduleSectionValue.isNull()
                 .or(weekValue.lessThanOrEqualTo(0))
                 .or(dpClassDate.valueProperty().isNull());
         btnStartSession.disableProperty().bind(shouldDisable);

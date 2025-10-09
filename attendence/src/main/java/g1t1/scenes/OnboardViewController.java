@@ -4,6 +4,7 @@ import g1t1.components.Toast;
 import g1t1.components.register.RegistrationStep;
 import g1t1.components.stepper.StepperControl;
 import g1t1.db.DSLInstance;
+import g1t1.db.DbUtils;
 import g1t1.db.enrollments.EnrollmentRepository;
 import g1t1.db.enrollments.EnrollmentRepositoryJooq;
 import g1t1.db.student_face_images.StudentFaceImageRepository;
@@ -13,6 +14,7 @@ import g1t1.db.students.StudentRepositoryJooq;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.PageController;
 import g1t1.models.users.RegisterStudent;
+import g1t1.models.users.Student;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -142,7 +144,12 @@ public class OnboardViewController extends PageController {
                 studentFaceImageRepository.create(studentId, faceData);
             }
 
-            //TODO: Enrollments
+            String moduleId = this.registerStudent.getModuleSection().getId();
+            enrollmentRepository.create(moduleId, studentId);
+
+            // Update module section in memory
+            Student student = DbUtils.getStudentById(studentId, this.registerStudent.getModuleSection());
+            this.registerStudent.getModuleSection().addStudent(student);
 
             return true;
         } catch (SQLException e) {

@@ -1,5 +1,7 @@
 package g1t1.db;
 
+import g1t1.db.module_sections.ModuleSectionRepository;
+import g1t1.db.module_sections.ModuleSectionRepositoryJooq;
 import g1t1.db.student_face_images.StudentFaceImage;
 import g1t1.db.student_face_images.StudentFaceImageRepository;
 import g1t1.db.student_face_images.StudentFaceImageRepositoryJooq;
@@ -25,6 +27,22 @@ public class DbUtils {
             }
             List<StudentFaceImage> dbImages = faceImageRepository.fetchFaceImagesByStudentId(id);
             return new Student(dbStudent, dbImages, moduleSection);
+        }
+    }
+
+    public static String saveModuleSection(ModuleSection moduleSection, String userId) throws SQLException, DataAccessException {
+        try (DSLInstance dslInstance = new DSLInstance()) {
+            ModuleSectionRepository moduleSectionRepository = new ModuleSectionRepositoryJooq(dslInstance.dsl);
+            return moduleSectionRepository.create(
+                    moduleSection.getModule(),
+                    moduleSection.getSection(),
+                    moduleSection.getTerm(),
+                    moduleSection.getDay(),
+                    moduleSection.getStartTime(),
+                    moduleSection.getEndTime(),
+                    moduleSection.getRoom(),
+                    userId
+            );
         }
     }
 }

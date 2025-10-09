@@ -102,6 +102,25 @@ public class ModuleSectionRepositoryJooq implements ModuleSectionRepository {
     }
 
     @Override
+    public List<ModuleSectionRecord> fetchModuleSectionsByTeacherIdAndTerm(String teacherUserId, String term) {
+        return dsl.select(MODULE_SECTION_ID, MODULE_TITLE, SECTION_NUMBER, TERM, DAY_OF_WEEK, START_TIME, END_TIME, ROOM, TEACHER_USER_ID)
+                .from(MODULE_SECTIONS_TABLE)
+                .where(TEACHER_USER_ID.eq(teacherUserId))
+                .and(TERM.eq(term))
+                .fetch(record -> new ModuleSectionRecord(
+                        record.get(MODULE_SECTION_ID),
+                        record.get(MODULE_TITLE),
+                        record.get(SECTION_NUMBER),
+                        record.get(TERM),
+                        record.get(DAY_OF_WEEK),
+                        record.get(START_TIME),
+                        record.get(END_TIME),
+                        record.get(ROOM),
+                        record.get(TEACHER_USER_ID)
+                ));
+    }
+
+    @Override
     public boolean update(String moduleSectionId, String moduleTitleNullable, String sectionNumberNullable, String termNullable, String startTimeNullable, String endTimeNullable, String roomNullable, String teacherUserIdNullable) {
         var changes = new HashMap<Field<?>, Object>();
         if (moduleTitleNullable != null) changes.put(MODULE_TITLE, moduleTitleNullable);

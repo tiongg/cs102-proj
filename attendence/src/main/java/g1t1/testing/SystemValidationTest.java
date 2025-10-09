@@ -193,7 +193,7 @@ public class SystemValidationTest {
     }
 
     private static Student createStudent(String id, String name, List<byte[]> photos) {
-        Student student = new Student(new StudentID(id), name, new ModuleSection("CS102", "T01", 3, "08:00", "11:30"),
+        Student student = new Student(new StudentID(id), name, new ModuleSection("CS102", "T01", "AY25-26T1", "SCIS1 2-4", 3, "08:00", "11:30"),
                 name.toLowerCase() + "@school.edu");
         FaceData faceData = new FaceData();
         faceData.setFaceImages(photos);
