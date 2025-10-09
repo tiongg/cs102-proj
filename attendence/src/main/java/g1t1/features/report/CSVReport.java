@@ -47,18 +47,18 @@ public class CSVReport implements ReportGenerator {
     }
 
     // helper function to build student rows
-    private String[] buildRow(Student student, Report report) {
+    private String[] buildRow(SessionAttendance sessionAttendance, Report report) {
         List<String> row = new ArrayList<>();
         if (report.isIncludeStudentId())
-            row.add(student.getId().toString());
+            row.add(sessionAttendance.getStudent().getId().toString());
         if (report.isIncludeName())
-            row.add(student.getName());
+            row.add(sessionAttendance.getStudent().getName());
         if (report.isIncludeStatus())
-            row.add("Temporary status");
+            row.add(sessionAttendance.getStatus().toString());
         if (report.isIncludeConfidence())
-            row.add("Temporary confidence");
+            row.add(Double.toString(sessionAttendance.getConfidence()));
         if (report.isIncludeMethod())
-            row.add("Temporary method");
+            row.add(sessionAttendance.getMethod().toString());
         if (report.isIncludeNotes())
             row.add("Temporary note");
         return row.toArray(new String[0]);
@@ -73,13 +73,14 @@ public class CSVReport implements ReportGenerator {
     public void generate(Report report) {
         ClassSession session = report.getClassSession();
         ModuleSection section = session.getModuleSection();
+
         if (section == null) {
             throw new IllegalArgumentException("section cannot be null");
         }
 
-        List<Student> students = section.getStudents();
-        if (students == null) {
-            throw new IllegalArgumentException("students cannot be null");
+        List<SessionAttendance> sessAttendances = session.getStudentAttendance();
+        if (sessAttendances == null) {
+            throw new IllegalArgumentException("SessionAttendance cannot be null");
         }
 
         try (CSVWriter writer = new CSVWriter(new FileWriter(filepath))) {
@@ -109,9 +110,9 @@ public class CSVReport implements ReportGenerator {
             // writing Header
             writer.writeNext(buildHeader(report));
 
-            // writing Student information
-            for (Student student : students) {
-                writer.writeNext(buildRow(student, report));
+            // writing Student information based on SessionAttendance
+            for (SessionAttendance sessionAttendance : sessAttendances) {
+                writer.writeNext(buildRow(sessionAttendance, report));
             }
             System.out.println("File successfully written to " + filepath);
         } catch (Exception e) {

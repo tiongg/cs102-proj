@@ -28,6 +28,8 @@ public class Report {
         this.includeMethod = builder.isIncludeMethod();
         this.includeNotes = builder.isIncludeNotes();
         this.classSession = builder.getClassSession();
+
+        //to remove the nullcheck later
         if(AuthenticationContext.getCurrentUser()!=null){
             this.currentTeacher = AuthenticationContext.getCurrentUser();
         }
