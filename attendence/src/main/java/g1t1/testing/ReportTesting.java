@@ -1,25 +1,26 @@
 package g1t1.testing;
 
-import g1t1.features.report.*;
-import g1t1.models.users.*;
-import g1t1.models.sessions.*;
-import g1t1.models.ids.*;
+import g1t1.features.report.Report;
+import g1t1.features.report.ReportBuilder;
+import g1t1.models.ids.StudentID;
+import g1t1.models.sessions.ModuleSection;
+import g1t1.models.users.Student;
 
 public class ReportTesting {
     public static void main(String[] args) {
         // sample module
-        ModuleSection modulesection1 = new ModuleSection("CS 102", "G1", 3, "08:00", "11:30");
-        ModuleSection modulesection2 = new ModuleSection("CS 102", "G2", 3, "15:30", "18:45");
+        ModuleSection modulesection1 = new ModuleSection("CS 102", "G1", "AY25-26T1", "SCIS1 2-4", 3, "08:00", "11:30");
+        ModuleSection modulesection2 = new ModuleSection("CS 102", "G2", "AY25-26T1", "SCIS1 2-4", 3, "15:30", "18:45");
 
         // sample students
         // Using all String constructor
-        Student stu1 = new Student(new StudentID("S001"), "Alice", modulesection1, "alice@example.com", "555-1234");
+        Student stu1 = new Student(new StudentID("S001"), "Alice", modulesection1, "alice@example.com");
         // Using ModuleSection object directly
-        Student stu2 = new Student(new StudentID("S002"), "Bob", modulesection1, "bob@example.com", "555-2345");
+        Student stu2 = new Student(new StudentID("S002"), "Bob", modulesection1, "bob@example.com");
         // Using StudentID object + String module/section
-        Student stu3 = new Student(new StudentID("S003"), "Charlie", modulesection2, "charlie@example.com", "555-3456");
+        Student stu3 = new Student(new StudentID("S003"), "Charlie", modulesection2, "charlie@example.com");
         // Using StudentID + ModuleSection object
-        Student stu4 = new Student(new StudentID("S004"), "Diana", modulesection2, "diana@example.com", "555-4567");
+        Student stu4 = new Student(new StudentID("S004"), "Diana", modulesection2, "diana@example.com");
 
         // adding students
         modulesection1.addStudent(stu1);

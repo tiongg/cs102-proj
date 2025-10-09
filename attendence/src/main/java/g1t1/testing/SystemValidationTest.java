@@ -1,12 +1,5 @@
 package g1t1.testing;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import g1t1.models.ids.StudentID;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.FaceData;
@@ -14,6 +7,13 @@ import g1t1.models.users.Student;
 import g1t1.opencv.FaceRecognitionService;
 import g1t1.utils.events.opencv.AttendanceSessionEvent;
 import g1t1.utils.events.opencv.StudentDetectedEvent;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * System Validation Test
@@ -193,8 +193,8 @@ public class SystemValidationTest {
     }
 
     private static Student createStudent(String id, String name, List<byte[]> photos) {
-        Student student = new Student(new StudentID(id), name, new ModuleSection("CS102", "T01", 3, "08:00", "11:30"),
-                name.toLowerCase() + "@school.edu", "12345678");
+        Student student = new Student(new StudentID(id), name, new ModuleSection("CS102", "T01", "AY25-26T1", "SCIS1 2-4", 3, "08:00", "11:30"),
+                name.toLowerCase() + "@school.edu");
         FaceData faceData = new FaceData();
         faceData.setFaceImages(photos);
         student.setFaceData(faceData);

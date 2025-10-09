@@ -4,7 +4,9 @@ import g1t1.db.user_face_images.UserFaceImage;
 import g1t1.db.users.User;
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.TeacherID;
+import g1t1.models.sessions.ModuleSection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Teacher extends BaseEntity {
@@ -12,6 +14,8 @@ public class Teacher extends BaseEntity {
     private final String name;
     private final String email;
     private final FaceData faceData;
+
+    private final List<ModuleSection> moduleSections = new ArrayList<>();
 
     public Teacher(String id, String name, String email, FaceData faceData) {
         this.ID = new TeacherID(id);
@@ -38,6 +42,14 @@ public class Teacher extends BaseEntity {
 
     public String getEmail() {
         return email;
+    }
+
+    public FaceData getFaceData() {
+        return this.faceData;
+    }
+
+    public List<ModuleSection> getModuleSections() {
+        return this.moduleSections;
     }
 
     @Override

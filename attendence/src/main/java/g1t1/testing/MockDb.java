@@ -29,8 +29,8 @@ public class MockDb {
         Teacher newTeacher = new Teacher("123", "Dr Zhang", "ZZY@goat.com", new FaceData());
         teachers.add(newTeacher);
 
-        ModuleSection morningClass = new ModuleSection("CS 102", "G1", 3, "08:00", "11:30");
-        ModuleSection afternoonClass = new ModuleSection("CS 102", "G2", 3, "15:30", "18:45");
+        ModuleSection morningClass = new ModuleSection("CS 102", "G3", "AY25-26T1", "SCIS1 2-4", 3, "08:00", "11:30");
+        ModuleSection afternoonClass = new ModuleSection("CS 102", "G4", "AY25-26T1", "SCIS1 2-4", 3, "15:30", "18:45");
 
         teacherClasses.put(newTeacher.getID(), Arrays.asList(morningClass, afternoonClass));
 
@@ -112,7 +112,7 @@ public class MockDb {
     }
 
     private static Student createStudent(String id, String name, ModuleSection section, List<byte[]> photos) {
-        Student student = new Student(new StudentID(id), name, section, name.toLowerCase() + "@school.edu", "12345678");
+        Student student = new Student(new StudentID(id), name, section, name.toLowerCase() + "@school.edu");
         FaceData faceData = new FaceData();
         faceData.setFaceImages(photos);
         student.setFaceData(faceData);
