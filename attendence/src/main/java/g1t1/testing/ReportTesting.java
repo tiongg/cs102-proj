@@ -21,8 +21,7 @@ public class ReportTesting {
 
 
         // Reportbuilder
-        ReportBuilder builder = new ReportBuilder().includeReport(session1).withTimeStamp().withNotes().withConfidence()
-                .withMethod();
+        ReportBuilder builder = new ReportBuilder().includeReport(session1).withTimeStamp().withConfidence().withMethod();
 
         // Report
         Report report = new Report(builder); // generates the report

@@ -14,7 +14,6 @@ public class Report {
     private boolean includeTimeStamp;
     private boolean includeConfidence;
     private boolean includeMethod;
-    private boolean includeNotes;
 
     private Teacher currentTeacher;
     private ClassSession classSession;
@@ -26,7 +25,6 @@ public class Report {
         this.includeTimeStamp = builder.isIncludeTimeStamp();
         this.includeConfidence = builder.isIncludeConfidence();
         this.includeMethod = builder.isIncludeMethod();
-        this.includeNotes = builder.isIncludeNotes();
         this.classSession = builder.getClassSession();
 
         //to remove the nullcheck later
@@ -57,10 +55,6 @@ public class Report {
 
     public boolean isIncludeMethod() {
         return includeMethod;
-    }
-
-    public boolean isIncludeNotes() {
-        return includeNotes;
     }
 
     public ClassSession getClassSession() {

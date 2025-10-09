@@ -40,8 +40,6 @@ public class CSVReport implements ReportGenerator {
             header.add("Confidence");
         if (report.isIncludeMethod())
             header.add("Method");
-        if (report.isIncludeNotes())
-            header.add("Notes");
 
         return header.toArray(new String[0]); // 0 added as dummy
     }
@@ -59,8 +57,6 @@ public class CSVReport implements ReportGenerator {
             row.add(Double.toString(sessionAttendance.getConfidence()));
         if (report.isIncludeMethod())
             row.add(sessionAttendance.getMethod().toString());
-        if (report.isIncludeNotes())
-            row.add("Temporary note");
         return row.toArray(new String[0]);
     }
 

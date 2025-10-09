@@ -12,7 +12,6 @@ public class ReportBuilder {
     private boolean includeTimeStamp = false;
     private boolean includeConfidence = false;
     private boolean includeMethod = false;
-    private boolean includeNotes = false;
     private ClassSession classSession;
 
     /*
@@ -58,11 +57,6 @@ public class ReportBuilder {
         return this;
     }
 
-    public ReportBuilder withNotes() {
-        this.includeNotes = true;
-        return this;
-    }
-
     // getters
     public boolean isIncludeStudentId() {
         return includeStudentId;
@@ -86,10 +80,6 @@ public class ReportBuilder {
 
     public boolean isIncludeMethod() {
         return includeMethod;
-    }
-
-    public boolean isIncludeNotes() {
-        return includeNotes;
     }
 
     public ClassSession getClassSession() {
