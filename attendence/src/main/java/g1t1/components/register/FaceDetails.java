@@ -8,6 +8,8 @@ import org.opencv.core.Rect;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.VideoCapture;
 
+import g1t1.components.Toast;
+import g1t1.components.Toast.ToastType;
 import g1t1.models.interfaces.register.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
@@ -225,7 +227,7 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
         }
         byte[] faceInFrame = this.cameraDaemon.getRunnable().getFaceInFrame();
         if (faceInFrame.length <= 0) {
-            System.out.println("Error taking photo! No face");
+            Toast.show("Error taking photo, face not detected!", ToastType.ERROR);
             return;
         }
         this.photosTaken.add(faceInFrame);
