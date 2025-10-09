@@ -1,3 +1,7 @@
-"Student ID","Name","Status","Timestamp","Notes"
-"S001","Alice","Temporary status","Temporary timestamp","Temporary note"
-"S002","Bob","Temporary status","Temporary timestamp","Temporary note"
+"Module Section: CS102-G1"
+"Teacher: Cannot fetch teacher"
+"Timestamp: 08-10-2025 22:29:55"
+
+"Student ID","Name","Status","Confidence","Method","Notes"
+"S001","Alice","Temporary status","Temporary confidence","Temporary method","Temporary note"
+"S002","Bob","Temporary status","Temporary confidence","Temporary method","Temporary note"

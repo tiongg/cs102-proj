@@ -32,15 +32,13 @@ public class ReportTesting {
         modulesection2.addStudent(stu4);
 
         // Reportbuilder
-        ReportBuilder builder = new ReportBuilder().includeReport(modulesection1).withTimeStamp().withNotes();
+        ReportBuilder builder = new ReportBuilder().includeReport(modulesection1).withTimeStamp().withNotes().withConfidence().withMethod();
 
         // Report
         Report report = new Report(builder); // generates the report
 
         // Access info from report to verify
-        System.out.println("Include Student Id: " + builder.isIncludeStudentId());
-        System.out.println("Include TimeStamp: " + builder.isIncludeTimeStamp());
-        System.out.println("Include Notes: " + builder.isIncludeNotes());
+
 
         ModuleSection reportSection = builder.getModuleSection();
         System.out.println("Report Module: " + reportSection.getModule());
