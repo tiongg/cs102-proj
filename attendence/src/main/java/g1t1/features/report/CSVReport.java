@@ -41,11 +41,27 @@ public class CSVReport implements ReportGenerator {
         if (report.isIncludeNotes())
             header.add("Notes");
 
-        return header.toArray(new String[0]); //0 added as dummy
+        return header.toArray(new String[0]); // 0 added as dummy
     }
 
-    private String[] buildRow(Report report){
-        return null;
+    // building row
+    private String[] buildRow(Student student, Report report) {
+        List<String> row = new ArrayList<>();
+        if (report.isIncludeStudentId())
+            row.add(student.getId().toString());
+        if (report.isIncludeName())
+            row.add(student.getName());
+        if (report.isIncludeStatus())
+            row.add("Temporary status");
+        if (report.isIncludeConfidence())
+            row.add("Temporary confidence");
+        if (report.isIncludeMethod())
+            row.add("Temporary method");
+        if (report.isIncludeTimeStamp())
+            row.add("Temporary timestamp");
+        if (report.isIncludeNotes())
+            row.add("Temporary note");
+        return row.toArray(new String[0]);
     }
 
     @Override
@@ -62,6 +78,11 @@ public class CSVReport implements ReportGenerator {
 
         try (CSVWriter writer = new CSVWriter(new FileWriter(filepath))) {
             // writer.writeNext(); takes in String[]
+            writer.writeNext(buildHeader(report));
+            for(Student student:students){
+                writer.writeNext(buildRow(student, report));
+            }
+            System.out.println("File successfully written to "+filepath);
         } catch (IOException e) {
             // TODO: handle exception
             e.printStackTrace();
