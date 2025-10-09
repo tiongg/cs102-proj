@@ -8,7 +8,7 @@ import g1t1.models.users.Student;
 
 public class ReportTesting {
     public static void main(String[] args) {
-        //filepath for testing
+        // filepath for testing
         String filePath = "./src/main/java/g1t1/testing/outputs/";
 
         // sample module
@@ -31,27 +31,22 @@ public class ReportTesting {
         modulesection2.addStudent(stu3);
         modulesection2.addStudent(stu4);
 
+        // sample session
+        ClassSession session1 = new ClassSession(modulesection1, 1);
+
         // Reportbuilder
-        ReportBuilder builder = new ReportBuilder().includeReport(modulesection1).withTimeStamp().withNotes().withConfidence().withMethod();
+        ReportBuilder builder = new ReportBuilder().includeReport(session1).withTimeStamp().withNotes().withConfidence()
+                .withMethod();
 
         // Report
         Report report = new Report(builder); // generates the report
 
-        // Access info from report to verify
-
-
-        ModuleSection reportSection = builder.getModuleSection();
-        System.out.println("Report Module: " + reportSection.getModule());
-        System.out.println("Report Section: " + reportSection.getSection());
-        System.out.println("Number of students: " + reportSection.getStudents().size());
-
         // List all student IDs
-        for (Student s : reportSection.getStudents()) {
+        for (Student s : report.getClassSession().getModuleSection().getStudents()) {
             System.out.println("Student ID: " + s.getId());
         }
 
-
-        CSVReport csvreport = new CSVReport(filePath+"csvfile.csv");
+        CSVReport csvreport = new CSVReport(filePath + "csvfile.csv");
         csvreport.generate(report);
     }
 }

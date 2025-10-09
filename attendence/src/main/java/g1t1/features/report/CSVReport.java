@@ -11,6 +11,9 @@ import com.opencsv.CSVWriter;
 import g1t1.models.sessions.*;
 import g1t1.models.users.*;
 
+/**
+ * Generates CSV Report which exports to specific file
+ */
 public class CSVReport implements ReportGenerator {
     private String filepath;
 
@@ -68,7 +71,8 @@ public class CSVReport implements ReportGenerator {
 
     @Override
     public void generate(Report report) {
-        ModuleSection section = report.getModuleSection();
+        ClassSession session = report.getClassSession();
+        ModuleSection section = session.getModuleSection();
         if (section == null) {
             throw new IllegalArgumentException("section cannot be null");
         }

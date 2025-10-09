@@ -13,7 +13,7 @@ public class ReportBuilder {
     private boolean includeConfidence = false;
     private boolean includeMethod = false;
     private boolean includeNotes = false;
-    private ModuleSection moduleSection;
+    private ClassSession classSession;
 
     /*
      * Notes: ClassSession Contains: 
@@ -38,8 +38,8 @@ public class ReportBuilder {
      */
 
     // to add data of modulesection that you want data from
-    public ReportBuilder includeReport(ModuleSection moduleSection) {
-        this.moduleSection = moduleSection;
+    public ReportBuilder includeReport(ClassSession classSession) {
+        this.classSession = classSession;
         return this;
     }
 
@@ -92,8 +92,8 @@ public class ReportBuilder {
         return includeNotes;
     }
 
-    public ModuleSection getModuleSection() {
-        return moduleSection;
+    public ClassSession getClassSession() {
+        return classSession;
     }
 
 }

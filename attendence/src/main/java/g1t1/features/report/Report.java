@@ -17,7 +17,7 @@ public class Report {
     private boolean includeNotes;
 
     private Teacher currentTeacher;
-    private ModuleSection moduleSection;
+    private ClassSession classSession;
 
     public Report(ReportBuilder builder) {
         this.includeStudentId = builder.isIncludeStudentId();
@@ -27,7 +27,7 @@ public class Report {
         this.includeConfidence = builder.isIncludeConfidence();
         this.includeMethod = builder.isIncludeMethod();
         this.includeNotes = builder.isIncludeNotes();
-        this.moduleSection = builder.getModuleSection();
+        this.classSession = builder.getClassSession();
         if(AuthenticationContext.getCurrentUser()!=null){
             this.currentTeacher = AuthenticationContext.getCurrentUser();
         }
@@ -61,8 +61,8 @@ public class Report {
         return includeNotes;
     }
 
-    public ModuleSection getModuleSection() {
-        return moduleSection;
+    public ClassSession getClassSession() {
+        return classSession;
     }
 
     public Teacher getTeacher(){
