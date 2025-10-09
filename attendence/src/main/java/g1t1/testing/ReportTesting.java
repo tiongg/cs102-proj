@@ -8,6 +8,9 @@ import g1t1.models.users.Student;
 
 public class ReportTesting {
     public static void main(String[] args) {
+        //filepath for testing
+        String filePath = "./src/main/java/g1t1/testing/outputs/";
+
         // sample module
         ModuleSection modulesection1 = new ModuleSection("CS 102", "G1", "AY25-26T1", "SCIS1 2-4", 3, "08:00", "11:30");
         ModuleSection modulesection2 = new ModuleSection("CS 102", "G2", "AY25-26T1", "SCIS1 2-4", 3, "15:30", "18:45");
@@ -49,5 +52,8 @@ public class ReportTesting {
             System.out.println("Student ID: " + s.getId());
         }
 
+
+        CSVReport csvreport = new CSVReport(filePath+"csvfile.csv");
+        csvreport.generate(report);
     }
 }
