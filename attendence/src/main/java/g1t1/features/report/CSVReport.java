@@ -28,10 +28,12 @@ public class CSVReport implements ReportGenerator {
     }
 
     // helper functon to build modulesection
-    private String[] buildModuleSection(ModuleSection section) {
-        return new String[] { "Module Section: " + section.getModule() + "-" + section.getSection() };
+    private String[] buildClassSection(ClassSession session) {
+        ModuleSection section = session.getModuleSection();
+        return new String[] {
+                "Module Section: " + section.getModule() + "-" + section.getSection() + "W" + session.getWeek()}; 
     }
-    
+
     // helper function to build header
     private String[] buildHeader(Report report) {
         List<String> header = new ArrayList<>();
@@ -65,8 +67,6 @@ public class CSVReport implements ReportGenerator {
         return row.toArray(new String[0]);
     }
 
-    
-
     @Override
     public void generate(Report report) {
         ClassSession session = report.getClassSession();
@@ -84,7 +84,7 @@ public class CSVReport implements ReportGenerator {
         try (CSVWriter writer = new CSVWriter(new FileWriter(filepath))) {
 
             // writing Module Section
-            writer.writeNext(buildModuleSection(section));
+            writer.writeNext(buildClassSection(session));
 
             // writing Teacher
             if (report.getTeacher() != null) {
@@ -99,7 +99,7 @@ public class CSVReport implements ReportGenerator {
                 LocalDateTime currDateTime = LocalDateTime.now();
                 DateTimeFormatter formattedDateObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                 String formattedDate = currDateTime.format(formattedDateObj);
-                String[] row = { "Timestamp: " + formattedDate };
+                String[] row = { "Report Generated on: " + formattedDate };
                 writer.writeNext(row);
             }
             // break
