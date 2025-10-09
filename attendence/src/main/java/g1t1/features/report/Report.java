@@ -28,4 +28,36 @@ public class Report {
         this.moduleSection = builder.getModuleSection();
     }
 
+    public boolean isIncludeStudentId() {
+        return includeStudentId;
+    }
+
+    public boolean isIncludeStatus() {
+        return includeStatus;
+    }
+
+    public boolean isIncludeName() {
+        return includeName;
+    }
+
+    public boolean isIncludeTimeStamp() {
+        return includeTimeStamp;
+    }
+
+    public boolean isIncludeConfidence() {
+        return includeConfidence;
+    }
+
+    public boolean isIncludeMethod() {
+        return includeMethod;
+    }
+
+    public boolean isIncludeNotes() {
+        return includeNotes;
+    }
+
+    public ModuleSection getModuleSection() {
+        return moduleSection;
+    }
+
 }
