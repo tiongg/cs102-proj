@@ -11,7 +11,7 @@
                AnchorPane.rightAnchor="350.0" AnchorPane.topAnchor="0.0"/>
     <VBox alignment="TOP_CENTER" prefWidth="350" spacing="24" style="-fx-background-color: #d7d7d7;" styleClass=""
           AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <VBox spacing="8">
+        <VBox spacing="8" VBox.vgrow="ALWAYS">
             <Label alignment="CENTER" prefHeight="64.0" prefWidth="350.0" text="Currently Marking"
                    textAlignment="CENTER">
                 <font>
@@ -33,15 +33,19 @@
             </HBox>
 
             <HBox alignment="TOP_CENTER" spacing="4">
-                <Label text="Remaining" alignment="CENTER_RIGHT" prefWidth="200.0"/>
+                <Label alignment="CENTER_RIGHT" prefWidth="200.0" text="Remaining"/>
                 <Label text=":"/>
                 <Label fx:id="lblRemainingTime" prefWidth="200.0" text="5 mins"/>
             </HBox>
 
             <HBox alignment="TOP_CENTER" spacing="4">
-                <Label text="Present:" alignment="CENTER_RIGHT" prefWidth="200.0"/>
+                <Label alignment="CENTER_RIGHT" prefWidth="200.0" text="Present:"/>
                 <Label text=":"/>
                 <Label fx:id="lblPresent" prefWidth="200.0" text="15 / 20"/>
+            </HBox>
+
+            <HBox alignment="BOTTOM_CENTER" spacing="4" VBox.vgrow="ALWAYS">
+                <Button fx:id="btnAdminPanel" text="Admin panel" styleClass="flat-input"/>
             </HBox>
         </VBox>
         <padding>

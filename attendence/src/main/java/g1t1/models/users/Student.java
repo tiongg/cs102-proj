@@ -5,10 +5,11 @@ import g1t1.db.students.StudentRecord;
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.StudentID;
 import g1t1.models.sessions.ModuleSection;
+import g1t1.opencv.models.Recognisable;
 
 import java.util.List;
 
-public class Student extends BaseEntity {
+public class Student extends BaseEntity implements Recognisable {
     private final StudentID id;
     private final String name;
     private final ModuleSection moduleSection;
@@ -36,6 +37,11 @@ public class Student extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getRecognitionId() {
+        return this.getId().toString();
     }
 
     public ModuleSection getModuleSection() {
