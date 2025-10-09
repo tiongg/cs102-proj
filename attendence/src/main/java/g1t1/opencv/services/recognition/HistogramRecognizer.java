@@ -1,13 +1,19 @@
 package g1t1.opencv.services.recognition;
 
 import g1t1.features.logger.AppLogger;
-import g1t1.models.users.Student;
 import g1t1.opencv.config.FaceConfig;
-import org.opencv.core.*;
-import org.opencv.imgcodecs.*;
-import org.opencv.imgproc.*;
+import g1t1.opencv.models.Recognisable;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfFloat;
+import org.opencv.core.MatOfInt;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,12 +30,12 @@ public class HistogramRecognizer extends Recognizer {
      * Pre-compute histograms for all enrolled students.
      * Call this once when service starts instead of processing every frame.
      */
-    public void precomputeEnrollmentData(List<Student> enrolledStudents) {
+    public void precomputeEnrollmentData(List<? extends Recognisable> recognisableList) {
         long startTime = System.currentTimeMillis();
         studentHistograms.clear();
         bestKnownSimilarities.clear();
 
-        for (Student student : enrolledStudents) {
+        for (Recognisable student : recognisableList) {
             if (student.getFaceData() == null || student.getFaceData().getFaceImages() == null) {
                 continue;
             }
@@ -47,29 +53,29 @@ public class HistogramRecognizer extends Recognizer {
             }
 
             if (!histograms.isEmpty()) {
-                studentHistograms.put(student.getId().toString(), histograms);
+                studentHistograms.put(student.getRecognitionId(), histograms);
             }
         }
 
         long duration = System.currentTimeMillis() - startTime;
         if (FaceConfig.getInstance().isLoggingEnabled()) {
-            AppLogger.log("Pre-computed enrollment histograms for " + enrolledStudents.size() +
-                         " students in " + duration + "ms");
+            AppLogger.log("Pre-computed enrollment histograms for " + recognisableList.size() +
+                    " students in " + duration + "ms");
         }
     }
 
     @Override
-    public double compareWithStudent(Mat processedFace, Student student) {
-        String studentId = student.getId().toString();
-        List<Mat> precomputedHistograms = studentHistograms.get(studentId);
+    public double compareWithRecognisable(Mat processedFace, Recognisable recognisable) {
+        String recognitionId = recognisable.getRecognitionId();
+        List<Mat> precomputedHistograms = studentHistograms.get(recognitionId);
 
         if (precomputedHistograms == null || precomputedHistograms.isEmpty()) {
             // Fallback to original method if no pre-computed data
-            return fallbackCompareWithStudent(processedFace, student);
+            return fallbackCompareWithRecognisable(processedFace, recognisable);
         }
 
         // Quick cache check - if we've seen this student recently with high confidence
-        Double recentSimilarity = bestKnownSimilarities.get(studentId);
+        Double recentSimilarity = bestKnownSimilarities.get(recognitionId);
         if (recentSimilarity != null && recentSimilarity > 80.0) {
             // Fast-track high-confidence students (performance optimization)
             Mat faceHistogram = calculateHistogram(processedFace);
@@ -96,7 +102,7 @@ public class HistogramRecognizer extends Recognizer {
 
         // Cache the result for fast-tracking
         double confidencePercentage = bestSimilarity * 100.0;
-        bestKnownSimilarities.put(studentId, confidencePercentage);
+        bestKnownSimilarities.put(recognitionId, confidencePercentage);
 
         return confidencePercentage;
     }
@@ -104,15 +110,15 @@ public class HistogramRecognizer extends Recognizer {
     /**
      * Fallback method for when pre-computed data is not available
      */
-    private double fallbackCompareWithStudent(Mat processedFace, Student student) {
-        if (student.getFaceData() == null || student.getFaceData().getFaceImages() == null) {
+    private double fallbackCompareWithRecognisable(Mat processedFace, Recognisable recognisable) {
+        if (recognisable.getFaceData() == null || recognisable.getFaceData().getFaceImages() == null) {
             return 0.0;
         }
 
         Mat faceHistogram = calculateHistogram(processedFace);
         double bestSimilarity = 0.0;
 
-        List<byte[]> faceImages = student.getFaceData().getFaceImages();
+        List<byte[]> faceImages = recognisable.getFaceData().getFaceImages();
         for (byte[] imageData : faceImages) {
             Mat enrolledFace = loadAndPreprocessEnrolledFace(imageData);
             if (!enrolledFace.empty()) {
@@ -148,12 +154,12 @@ public class HistogramRecognizer extends Recognizer {
         List<Mat> images = Arrays.asList(image);
 
         Imgproc.calcHist(
-            images,
-            new MatOfInt(0),
-            new Mat(),
-            histogram,
-            new MatOfInt(256),
-            new MatOfFloat(0f, 256f)
+                images,
+                new MatOfInt(0),
+                new Mat(),
+                histogram,
+                new MatOfInt(256),
+                new MatOfFloat(0f, 256f)
         );
 
         return histogram;

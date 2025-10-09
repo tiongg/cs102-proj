@@ -26,8 +26,9 @@ public class AttendanceSession {
      * Update student detection with new confidence level.
      * Keeps track of maximum confidence seen for each student.
      */
-    public void updateStudentDetection(Student student, double confidence) {
+    public void updateRecognisedDetection(Recognisable recognisedObject, double confidence) {
         if (!isActive) return;
+        if (!(recognisedObject instanceof Student student)) return;
 
         String studentId = student.getId().toString();
 

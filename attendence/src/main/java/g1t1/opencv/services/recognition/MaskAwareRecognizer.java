@@ -1,13 +1,16 @@
 package g1t1.opencv.services.recognition;
 
 import g1t1.features.logger.AppLogger;
-import g1t1.models.users.Student;
 import g1t1.opencv.config.FaceConfig;
+import g1t1.opencv.models.Recognisable;
 import org.opencv.core.*;
-import org.opencv.imgcodecs.*;
-import org.opencv.imgproc.*;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -17,24 +20,24 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MaskAwareRecognizer extends Recognizer {
 
     // Cache for pre-computed upper face histograms per student
-    private final Map<String, List<Mat>> studentUpperHistograms = new ConcurrentHashMap<>();
+    private final Map<String, List<Mat>> recognisedUpperHistograms = new ConcurrentHashMap<>();
     private final Map<String, Double> bestKnownSimilarities = new ConcurrentHashMap<>();
 
     /**
      * Pre-compute upper face histograms for all enrolled students.
      */
-    public void precomputeEnrollmentData(List<Student> enrolledStudents) {
+    public void precomputeEnrollmentData(List<? extends Recognisable> recognisableList) {
         long startTime = System.currentTimeMillis();
-        studentUpperHistograms.clear();
+        recognisedUpperHistograms.clear();
         bestKnownSimilarities.clear();
 
-        for (Student student : enrolledStudents) {
-            if (student.getFaceData() == null || student.getFaceData().getFaceImages() == null) {
+        for (Recognisable recognisable : recognisableList) {
+            if (recognisable.getFaceData() == null || recognisable.getFaceData().getFaceImages() == null) {
                 continue;
             }
 
             List<Mat> histograms = new ArrayList<>();
-            List<byte[]> faceImages = student.getFaceData().getFaceImages();
+            List<byte[]> faceImages = recognisable.getFaceData().getFaceImages();
 
             for (byte[] imageData : faceImages) {
                 Mat enrolledFace = loadAndPreprocessEnrolledFace(imageData);
@@ -48,25 +51,25 @@ public class MaskAwareRecognizer extends Recognizer {
             }
 
             if (!histograms.isEmpty()) {
-                studentUpperHistograms.put(student.getId().toString(), histograms);
+                recognisedUpperHistograms.put(recognisable.getRecognitionId(), histograms);
             }
         }
 
         long duration = System.currentTimeMillis() - startTime;
         if (FaceConfig.getInstance().isLoggingEnabled()) {
-            AppLogger.log("Pre-computed mask-aware enrollment histograms for " + enrolledStudents.size() +
-                         " students in " + duration + "ms");
+            AppLogger.log("Pre-computed mask-aware enrollment histograms for " + recognisableList.size() +
+                    " recognisable objects in " + duration + "ms");
         }
     }
 
     @Override
-    public double compareWithStudent(Mat processedFace, Student student) {
-        String studentId = student.getId().toString();
-        List<Mat> precomputedHistograms = studentUpperHistograms.get(studentId);
+    public double compareWithRecognisable(Mat processedFace, Recognisable recognisable) {
+        String recognitionId = recognisable.getRecognitionId();
+        List<Mat> precomputedHistograms = recognisedUpperHistograms.get(recognitionId);
 
         if (precomputedHistograms == null || precomputedHistograms.isEmpty()) {
             // Fallback to original method if no pre-computed data
-            return fallbackCompareWithStudent(processedFace, student);
+            return fallbackCompareWithRecognisable(processedFace, recognisable);
         }
 
         Mat upperFaceRegion = extractUpperFaceRegion(processedFace);
@@ -84,7 +87,7 @@ public class MaskAwareRecognizer extends Recognizer {
         upperFaceRegion.release();
 
         double confidencePercentage = bestSimilarity * 100.0;
-        bestKnownSimilarities.put(studentId, confidencePercentage);
+        bestKnownSimilarities.put(recognitionId, confidencePercentage);
 
         return confidencePercentage;
     }
@@ -92,13 +95,13 @@ public class MaskAwareRecognizer extends Recognizer {
     /**
      * Fallback method for when pre-computed data is not available
      */
-    private double fallbackCompareWithStudent(Mat processedFace, Student student) {
+    private double fallbackCompareWithRecognisable(Mat processedFace, Recognisable recognisable) {
         Mat upperFaceRegion = extractUpperFaceRegion(processedFace);
         Mat faceHistogram = calculateHistogram(upperFaceRegion);
         double bestSimilarity = 0.0;
 
-        if (student.getFaceData() != null && student.getFaceData().getFaceImages() != null) {
-            for (byte[] imageData : student.getFaceData().getFaceImages()) {
+        if (recognisable.getFaceData() != null && recognisable.getFaceData().getFaceImages() != null) {
+            for (byte[] imageData : recognisable.getFaceData().getFaceImages()) {
                 Mat enrolledFace = loadAndPreprocessEnrolledFace(imageData);
                 Mat enrolledUpperRegion = extractUpperFaceRegion(enrolledFace);
                 Mat enrolledHistogram = calculateHistogram(enrolledUpperRegion);
@@ -123,12 +126,12 @@ public class MaskAwareRecognizer extends Recognizer {
      * Cleanup pre-computed data when service stops
      */
     public void cleanup() {
-        for (List<Mat> histograms : studentUpperHistograms.values()) {
+        for (List<Mat> histograms : recognisedUpperHistograms.values()) {
             for (Mat histogram : histograms) {
                 histogram.release();
             }
         }
-        studentUpperHistograms.clear();
+        recognisedUpperHistograms.clear();
         bestKnownSimilarities.clear();
     }
 
@@ -143,12 +146,12 @@ public class MaskAwareRecognizer extends Recognizer {
         List<Mat> images = Arrays.asList(image);
 
         Imgproc.calcHist(
-            images,
-            new MatOfInt(0),
-            new Mat(),
-            histogram,
-            new MatOfInt(256),
-            new MatOfFloat(0, 256)
+                images,
+                new MatOfInt(0),
+                new Mat(),
+                histogram,
+                new MatOfInt(256),
+                new MatOfFloat(0, 256)
         );
 
         return histogram;

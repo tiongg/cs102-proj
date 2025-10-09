@@ -22,7 +22,7 @@ public class DetectionBoundingBox {
         this.thickness = thickness;
     }
 
-    public void setStudent(String name, String liveness, double confidence) {
+    public void setRecognised(String name, String liveness, double confidence) {
         this.name = name;
         this.livenessInfo = liveness;
         this.confidence = confidence;

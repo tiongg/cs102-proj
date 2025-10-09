@@ -108,7 +108,8 @@ public class DuringSessionViewController extends PageController {
         this.lblSection.setText(section.getSection());
 
         this.lblWeek.setText(String.format("Week %d", session.getWeek()));
-//        this.lblTimeStart.setText(section.getStartTime());
+        this.lblTimeStart.setText(section.getStartTime());
+        //TODO: Settings
 
         this.lblPresent.setText(String.format("%d / %d", 0, section.getStudents().size()));
     }

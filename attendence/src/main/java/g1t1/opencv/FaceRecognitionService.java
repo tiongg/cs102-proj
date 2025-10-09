@@ -31,16 +31,17 @@ public class FaceRecognitionService {
     private static FaceRecognitionService instance;
     private final int FRAME_SKIP_INTERVAL = 2;
     private final long RECOGNITION_CACHE_DURATION = 2000;
+
     private EventEmitter<Object> eventEmitter;
     private boolean isRunning;
-    private List<Student> enrolledStudents;
+    private List<? extends Recognisable> recognisableObjects;
     private FaceDetector faceDetector;
     private HistogramRecognizer histogramRecognizer;
     private MaskAwareRecognizer maskAwareRecognizer;
     private MaskDetector maskDetector;
     private LivenessChecker livenessChecker;
     private AttendanceSession currentSession;
-    private Set<String> loggedStudents;
+    private Set<String> loggedUsers;
     private Map<String, Boolean> maskCache;
     private Map<String, Long> lastMaskCheckTime;
     private int frameSkipCounter = 0;
@@ -49,7 +50,7 @@ public class FaceRecognitionService {
     private Map<String, Long> recognitionCacheTime = new ConcurrentHashMap<>();
 
     private FaceRecognitionService() {
-        this.eventEmitter = new EventEmitter();
+        this.eventEmitter = new EventEmitter<>();
         this.isRunning = false;
         this.faceDetector = new FaceDetector();
         this.histogramRecognizer = new HistogramRecognizer();
@@ -72,24 +73,24 @@ public class FaceRecognitionService {
      * Start face recognition with enrolled students. Frontend calls this to begin
      * attendance session.
      */
-    public void start(List<Student> students) {
+    public void start(List<? extends Recognisable> recognisableObjects) {
         if (isRunning) {
             return;
         }
 
-        this.enrolledStudents = students;
+        this.recognisableObjects = recognisableObjects;
         this.isRunning = true;
         this.currentSession = new AttendanceSession();
-        this.loggedStudents = new HashSet<>();
+        this.loggedUsers = new HashSet<>();
         this.maskCache = new HashMap<>();
         this.lastMaskCheckTime = new HashMap<>();
 
         if (FaceConfig.getInstance().isLoggingEnabled()) {
-            AppLogger.log("Face recognition started with " + students.size() + " enrolled students");
+            AppLogger.log("Face recognition started with " + recognisableObjects.size() + " recognisable objects");
         }
 
-        histogramRecognizer.precomputeEnrollmentData(students);
-        maskAwareRecognizer.precomputeEnrollmentData(students);
+        histogramRecognizer.precomputeEnrollmentData(recognisableObjects);
+        maskAwareRecognizer.precomputeEnrollmentData(recognisableObjects);
 
         // Emit session started event
         eventEmitter.emit(new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_STARTED));
@@ -105,7 +106,7 @@ public class FaceRecognitionService {
         }
 
         this.isRunning = false;
-        this.enrolledStudents = null;
+        this.recognisableObjects = null;
 
         // End current session
         if (currentSession != null) {
@@ -144,7 +145,7 @@ public class FaceRecognitionService {
      * Get number of enrolled students (for debugging/monitoring).
      */
     public int getEnrolledStudentCount() {
-        return enrolledStudents != null ? enrolledStudents.size() : 0;
+        return recognisableObjects != null ? recognisableObjects.size() : 0;
     }
 
     /**
@@ -193,17 +194,17 @@ public class FaceRecognitionService {
                     }
 
                     if (isLive) {
-                        RecognitionResult result = getCachedOrNewRecognition(faceRegion, enrolledStudents,
+                        RecognitionResult result = getCachedOrNewRecognition(faceRegion, recognisableObjects,
                                 String.valueOf(detectedFace.getFaceId()));
 
                         if (result != null) {
-                            Student recognizedStudent = result.getMatchedStudent();
+                            Recognisable recognisedObject = result.getMatchedObject();
                             double confidence = result.getConfidence();
 
                             if (confidence >= 5) {
-                                boundingBox.setStudent(recognizedStudent.getName(), livenessInfo, confidence);
+                                boundingBox.setRecognised(recognisedObject.getName(), livenessInfo, confidence);
 
-                                handleRecognitionResult(recognizedStudent, confidence);
+                                handleRecognitionResult(recognisedObject, confidence);
                             }
                         }
                     } else {
@@ -218,29 +219,28 @@ public class FaceRecognitionService {
         }
     }
 
-    private void handleRecognitionResult(Student student, double confidence) {
-        String studentId = student.getId().toString();
+    private void handleRecognitionResult(Recognisable recognisedObject, double confidence) {
+        String recognitionId = recognisedObject.getRecognitionId();
 
-        boolean isNewStudent = !currentSession.isStudentDetected(studentId);
-        double previousMaxConfidence = currentSession.getMaxConfidenceForStudent(studentId);
+        boolean isNewRecognition = !currentSession.isStudentDetected(recognitionId);
+        double previousMaxConfidence = currentSession.getMaxConfidenceForStudent(recognitionId);
 
-        currentSession.updateStudentDetection(student, confidence);
+        currentSession.updateRecognisedDetection(recognisedObject, confidence);
 
-        if (confidence >= FaceConfig.getInstance().getRecognitionThreshold() && !loggedStudents.contains(studentId)) {
-            loggedStudents.add(studentId);
+        if (confidence >= FaceConfig.getInstance().getRecognitionThreshold() && !loggedUsers.contains(recognitionId)) {
+            loggedUsers.add(recognitionId);
             if (FaceConfig.getInstance().isLoggingEnabled()) {
-                AppLogger.log("Student detected: " + student.getName() + " (ID: " + studentId + ", Section: "
-                        + student.getModuleSection() + ")");
+                AppLogger.log("Person detected: " + recognisedObject.getName() + " (ID: " + recognitionId + ")");
             }
         }
 
-        if (isNewStudent || (confidence - previousMaxConfidence >= 1.0)) {
+        if ((isNewRecognition || (confidence - previousMaxConfidence >= 1.0)) && (recognisedObject instanceof Student student)) {
             eventEmitter.emit(new StudentDetectedEvent(student, confidence));
             eventEmitter.emit(new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.STUDENT_UPDATED));
         }
     }
 
-    private Recognizer selectRecognizer(Mat faceRegion, String studentId) {
+    private Recognizer selectRecognizer(Mat faceRegion, String recognitionId) {
         if (!FaceConfig.getInstance().isMaskDetectionEnabled()) {
             return histogramRecognizer;
         }
@@ -248,10 +248,10 @@ public class FaceRecognitionService {
         long currentTime = System.currentTimeMillis();
         boolean needsCheck = false;
 
-        if (!maskCache.containsKey(studentId)) {
+        if (!maskCache.containsKey(recognitionId)) {
             needsCheck = true;
         } else {
-            Long lastCheck = lastMaskCheckTime.get(studentId);
+            Long lastCheck = lastMaskCheckTime.get(recognitionId);
             if (lastCheck == null || (currentTime - lastCheck) > 3000) { // 3 seconds
                 needsCheck = true;
             }
@@ -260,10 +260,10 @@ public class FaceRecognitionService {
         boolean hasMask;
         if (needsCheck) {
             hasMask = maskDetector.detectMask(faceRegion);
-            maskCache.put(studentId, hasMask);
-            lastMaskCheckTime.put(studentId, currentTime);
+            maskCache.put(recognitionId, hasMask);
+            lastMaskCheckTime.put(recognitionId, currentTime);
         } else {
-            hasMask = maskCache.get(studentId);
+            hasMask = maskCache.get(recognitionId);
         }
 
         return hasMask ? maskAwareRecognizer : histogramRecognizer;
@@ -289,7 +289,7 @@ public class FaceRecognitionService {
     /**
      * Get cached recognition result if still valid, otherwise perform recognition.
      */
-    private RecognitionResult getCachedOrNewRecognition(Mat faceRegion, List<Student> students, String faceId) {
+    private RecognitionResult getCachedOrNewRecognition(Mat faceRegion, List<? extends Recognisable> recognisableObjects, String faceId) {
         long currentTime = System.currentTimeMillis();
 
         // Check if we have a valid cached result
@@ -303,7 +303,7 @@ public class FaceRecognitionService {
         // Perform new recognition
         String faceIdForRecognizer = "face_" + faceId;
         Recognizer selectedRecognizer = selectRecognizer(faceRegion, faceIdForRecognizer);
-        RecognitionResult result = selectedRecognizer.getBestMatch(faceRegion, students);
+        RecognitionResult result = selectedRecognizer.getBestMatch(faceRegion, recognisableObjects);
 
         // Cache the result
         if (result != null) {

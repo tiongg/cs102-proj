@@ -5,11 +5,12 @@ import g1t1.db.users.User;
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.TeacherID;
 import g1t1.models.sessions.ModuleSection;
+import g1t1.opencv.models.Recognisable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Teacher extends BaseEntity {
+public class Teacher extends BaseEntity implements Recognisable {
     private final TeacherID ID;
     private final String name;
     private final String email;
@@ -38,6 +39,11 @@ public class Teacher extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getRecognitionId() {
+        return this.getID().toString();
     }
 
     public String getEmail() {

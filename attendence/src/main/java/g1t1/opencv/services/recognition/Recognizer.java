@@ -1,12 +1,15 @@
 package g1t1.opencv.services.recognition;
 
-import g1t1.models.users.Student;
-import g1t1.opencv.config.*;
-import g1t1.opencv.models.*;
-import g1t1.opencv.services.preprocessing.*;
-import org.opencv.core.*;
+import g1t1.opencv.config.FaceConfig;
+import g1t1.opencv.models.Recognisable;
+import g1t1.opencv.models.RecognitionResult;
+import g1t1.opencv.services.preprocessing.GrayscaleProcessor;
+import g1t1.opencv.services.preprocessing.HistogramEqualizationProcessor;
+import g1t1.opencv.services.preprocessing.NormalizerProcessor;
+import g1t1.opencv.services.preprocessing.ResizeProcessor;
+import org.opencv.core.Mat;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Abstract base class for face recognition algorithms using Template Method pattern.
@@ -29,24 +32,24 @@ public abstract class Recognizer {
     /**
      * Template method for face recognition workflow.
      */
-    public final RecognitionResult recognize(Mat detectedFace, List<Student> enrolledStudents) {
-        if (detectedFace == null || detectedFace.empty() || enrolledStudents == null) {
+    public final RecognitionResult recognize(Mat detectedFace, List<Recognisable> recognisableList) {
+        if (detectedFace == null || detectedFace.empty() || recognisableList == null) {
             return null;
         }
 
         Mat processedFace = preprocessFace(detectedFace);
-        Student bestMatch = null;
+        Recognisable bestMatch = null;
         double bestConfidence = 0.0;
 
-        for (Student student : enrolledStudents) {
-            if (student.getFaceData() == null || student.getFaceData().getFaceImages() == null) {
+        for (Recognisable recognisable : recognisableList) {
+            if (recognisable.getFaceData() == null || recognisable.getFaceData().getFaceImages() == null) {
                 continue;
             }
 
-            double confidence = compareWithStudent(processedFace, student);
+            double confidence = compareWithRecognisable(processedFace, recognisable);
             if (confidence > bestConfidence && confidence >= config.getRecognitionThreshold()) {
                 bestConfidence = confidence;
-                bestMatch = student;
+                bestMatch = recognisable;
             }
         }
 
@@ -76,21 +79,21 @@ public abstract class Recognizer {
     /**
      * Get best match without threshold filtering (for visual feedback).
      */
-    public final RecognitionResult getBestMatch(Mat detectedFace, List<Student> enrolledStudents) {
-        if (detectedFace == null || detectedFace.empty() || enrolledStudents == null) {
+    public final RecognitionResult getBestMatch(Mat detectedFace, List<? extends Recognisable> recognisableList) {
+        if (detectedFace == null || detectedFace.empty() || recognisableList == null) {
             return null;
         }
 
         Mat processedFace = preprocessFace(detectedFace);
-        Student bestMatch = null;
+        Recognisable bestMatch = null;
         double bestConfidence = 0.0;
 
-        for (Student student : enrolledStudents) {
+        for (Recognisable student : recognisableList) {
             if (student.getFaceData() == null || student.getFaceData().getFaceImages() == null) {
                 continue;
             }
 
-            double confidence = compareWithStudent(processedFace, student);
+            double confidence = compareWithRecognisable(processedFace, student);
             if (confidence > bestConfidence) {
                 bestConfidence = confidence;
                 bestMatch = student;
@@ -109,5 +112,5 @@ public abstract class Recognizer {
      * Algorithm-specific comparison between processed face and student's enrolled data.
      * Subclasses implement their specific recognition algorithm here.
      */
-    public abstract double compareWithStudent(Mat processedFace, Student student);
+    public abstract double compareWithRecognisable(Mat processedFace, Recognisable recognisable);
 }
