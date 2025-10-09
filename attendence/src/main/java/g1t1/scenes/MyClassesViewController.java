@@ -1,8 +1,12 @@
 package g1t1.scenes;
 
+
 // for table 
 import java.util.List;
 
+
+import g1t1.components.TimePicker;
+import g1t1.components.Toast;
 import g1t1.components.table.Table;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
@@ -12,7 +16,10 @@ import g1t1.testing.MockDb;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
 
 public class MyClassesViewController extends PageController {
 
@@ -30,6 +37,23 @@ public class MyClassesViewController extends PageController {
 
     @FXML
     private Button addClassBtn;
+
+    @FXML
+    private StackPane addClassOverlay;
+    @FXML
+    private TextField tfModule;
+    @FXML
+    private TextField tfSection;
+    @FXML
+    private TextField tfTerm;
+    @FXML
+    private ChoiceBox<String> cbDay;
+    @FXML
+    private TimePicker tfStart;
+    @FXML
+    private TimePicker tfEnd;
+    @FXML
+    private TextField tfRoom;
 
     private List<ModuleSection> cacheModuleSections;
 
@@ -84,6 +108,88 @@ public class MyClassesViewController extends PageController {
     private void classesBack() {
         // System.out.println("going back");
         moduleViews();
+    }
+
+    @FXML
+    private void openAddClass() {
+        if (cbDay.getItems().isEmpty()) {
+            cbDay.getItems().addAll("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+        }
+        tfModule.clear();
+        tfSection.clear();
+        tfTerm.setText(ModuleSection.getCurrentAYTerm());
+        tfTerm.setEditable(false);
+        tfStart.resetTime();
+        tfEnd.resetTime();
+        cbDay.getSelectionModel().clearSelection();
+        tfRoom.clear();
+        addClassOverlay.setVisible(true);
+    }
+
+    @FXML
+    private void closeAddClass() {
+        addClassOverlay.setVisible(false);
+    }
+
+    @FXML
+    private void createClass() {
+        // Format of start and end, String (HH:MM)
+
+        String module = tfModule.getText();
+        String section = tfSection.getText();
+        String term = tfTerm.getText();
+        String dayName = cbDay.getValue();
+        String start = String.format("%02d:%02d", tfStart.getHourProperty().get(), tfStart.getMinuteProperty().get());
+        String end = String.format("%02d:%02d", tfEnd.getHourProperty().get(), tfEnd.getMinuteProperty().get());
+        String room = tfRoom.getText();
+
+        if (module == null || module.isBlank() || section == null || section.isBlank() || dayName == null
+                || dayName.isBlank() || start == null || start.isBlank() || end == null || end.isBlank()) {
+
+            Toast.show("Please fill in all the fields", Toast.ToastType.ERROR);
+            return;
+        }
+
+        int dayNum = 0;
+        switch (dayName) {
+        case "Monday":
+            dayNum = 0;
+            break;
+        case "Tuesday":
+            dayNum = 1;
+            break;
+        case "Wednesday":
+            dayNum = 2;
+            break;
+        case "Thursday":
+            dayNum = 3;
+            break;
+        case "Friday":
+            dayNum = 4;
+            break;
+        case "Saturday":
+            dayNum = 5;
+            break;
+        case "Sunday":
+            dayNum = 6;
+            break;
+        }
+
+        // ModuleSection newModule = new ModuleSection(module, section, term, room,
+        // dayNum, start, end);
+
+        // tiong said to just print to terminal :)
+        System.out.println(module);
+        System.out.println(section);
+        System.out.println(dayNum);
+        System.out.println(start);
+        System.out.println(end);
+        System.out.println(room);
+        // cacheModuleSections.add(newModule);
+
+        Toast.show("Class Created!", Toast.ToastType.SUCCESS);
+        moduleViews();
+        addClassOverlay.setVisible(false);
     }
 
 }

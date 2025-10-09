@@ -102,8 +102,9 @@ public class TimePicker extends HBox {
     }
 
     public void resetTime() {
-        this.hourProperty.set(0);
-        this.minuteProperty.set(0);
-        
+        var localTime = java.time.LocalTime.now();
+        this.hourProperty.set(localTime.getHour());
+        this.minuteProperty.set(localTime.getMinute());
+
     }
 }
