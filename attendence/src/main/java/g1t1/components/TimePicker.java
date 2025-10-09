@@ -100,4 +100,10 @@ public class TimePicker extends HBox {
     public LocalDateTime addToDate(LocalDate originalDt) {
         return originalDt.atTime(this.getHourProperty().get(), this.getMinuteProperty().get());
     }
+
+    public void resetTime() {
+        this.hourProperty.set(0);
+        this.minuteProperty.set(0);
+        
+    }
 }
