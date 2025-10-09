@@ -27,6 +27,11 @@ public class CSVReport implements ReportGenerator {
         this.filepath = filepath; // where you want the file to be exp
     }
 
+    // helper functon to build modulesection
+    private String[] buildModuleSection(ModuleSection section) {
+        return new String[] { "Module Section: " + section.getModule() + "-" + section.getSection() };
+    }
+    
     // helper function to build header
     private String[] buildHeader(Report report) {
         List<String> header = new ArrayList<>();
@@ -60,10 +65,7 @@ public class CSVReport implements ReportGenerator {
         return row.toArray(new String[0]);
     }
 
-    // helper functon to build modulesection
-    private String[] buildModuleSection(ModuleSection section) {
-        return new String[] { "Module Section: " + section.getModule() + "-" + section.getSection() };
-    }
+    
 
     @Override
     public void generate(Report report) {
