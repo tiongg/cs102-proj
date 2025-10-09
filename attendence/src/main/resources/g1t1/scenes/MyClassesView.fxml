@@ -20,7 +20,7 @@
                     <Font name="Inter Semi Bold" size="26.0"/>
                 </font>
             </Label>
-            <Button fx:id="classesBack" text="Back" visible="false" style=" -fx-background-color: black; -fx-background-radius: 20; -fx-background-insets: 0; -fx-text-fill: white;">
+            <Button fx:id="classesBackBtn" text="Back" onAction="#classesBack" visible="false" style=" -fx-background-color: black; -fx-background-radius: 20; -fx-background-insets: 0; -fx-text-fill: white; -fx-cursor: hand;">
                 <font>
                     <Font name="Inter" size="16.0"/>
                 </font>
@@ -33,7 +33,7 @@
                         <Font name="Inter" size="16.0"/>
                     </font>
                 </Label>
-                <Button fx:id="addClass" text="Add class" style=" -fx-background-color: black; -fx-background-radius: 20; -fx-background-insets: 0; -fx-text-fill: white;">
+                <Button fx:id="addClassBtn" text="Add class" style=" -fx-background-color: black; -fx-background-radius: 20; -fx-background-insets: 0; -fx-text-fill: white; -fx-cursor: hand;">
                     <font>
                         <Font name="Inter" size="16.0"/>
                     </font>

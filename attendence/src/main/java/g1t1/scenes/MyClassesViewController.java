@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 public class MyClassesViewController extends PageController {
+
     @FXML
     private Table classesTable;
 
@@ -25,10 +26,12 @@ public class MyClassesViewController extends PageController {
     private Label availableClasses;
 
     @FXML
-    private Button classesBack;
+    private Button classesBackBtn;
 
     @FXML
-    private Button addClass;
+    private Button addClassBtn;
+
+    private List<ModuleSection> cacheModuleSections;
 
     @FXML
     private void initialize() {
@@ -36,6 +39,7 @@ public class MyClassesViewController extends PageController {
             classesTable.setTable(List.of("Module", "Section", "Day", "Time", "Enrolled"));
 
             classesTable.createBody(MockDb.getUserModuleSections(e.user().getID()));
+            cacheModuleSections = MockDb.getUserModuleSections(e.user().getID());
 
             classesTable.setOnChipClick(item -> {
                 if (item instanceof ModuleSection ms) {
@@ -48,8 +52,8 @@ public class MyClassesViewController extends PageController {
     private void showSessions(ModuleSection ms) {
 
         myClasses.setText("My Classes - " + ms.getModule() + " - " + ms.getSection());
-        classesBack.setVisible(true);
-        addClass.setVisible(false);
+        classesBackBtn.setVisible(true);
+        addClassBtn.setVisible(false);
         availableClasses.setText(null);
         classesTable.setTable(List.of("Class", "Date", "Time", "Attendance", "Rate"));
         List<ClassSession> sessions = MockDb.getPastSessions(AuthenticationContext.getCurrentUser().getID()).stream()
@@ -57,4 +61,29 @@ public class MyClassesViewController extends PageController {
 
         classesTable.createBody(sessions);
     }
+
+    private void moduleViews() {
+
+        myClasses.setText("My Classes");
+        availableClasses.setText("Available Classes");
+        classesBackBtn.setVisible(false);
+        addClassBtn.setVisible(true);
+        classesTable.setTable(List.of("Module", "Section", "Day", "Time", "Enrolled"));
+
+        classesTable.createBody(cacheModuleSections);
+
+        classesTable.setOnChipClick(item -> {
+            if (item instanceof ModuleSection ms) {
+                showSessions(ms);
+            }
+        });
+
+    }
+
+    @FXML
+    private void classesBack() {
+        // System.out.println("going back");
+        moduleViews();
+    }
+
 }
