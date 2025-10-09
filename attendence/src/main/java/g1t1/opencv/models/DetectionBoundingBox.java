@@ -15,6 +15,7 @@ public class DetectionBoundingBox {
     private String livenessInfo;
     private double confidence;
     private boolean isPicture = false;
+    private boolean isTeacher = false;
 
     public DetectionBoundingBox(Point p1, Point p2, int thickness) {
         this.p1 = p1;
@@ -28,6 +29,7 @@ public class DetectionBoundingBox {
         this.livenessInfo = liveness;
         this.confidence = confidence;
         if (recognizedObject instanceof Teacher) {
+            this.isTeacher = true;
             this.color = new Scalar(238, 130, 238);
         } else {
             this.color = new Scalar(0, 255, 0);
@@ -55,5 +57,9 @@ public class DetectionBoundingBox {
             Imgproc.putText(frame, nameLabel, new Point(p1.x, p1.y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
                     this.color, 2);
         }
+    }
+
+    public boolean getIsTeacher() {
+        return isTeacher;
     }
 }

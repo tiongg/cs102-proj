@@ -12,6 +12,7 @@ import g1t1.models.users.Teacher;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
 public class StartSessionViewController extends PageController {
     private final int TOTAL_WEEKS = 13;
     private final IntegerProperty weekValue = new SimpleIntegerProperty(0);
-    private final SimpleObjectProperty<ModuleSection> moduleSectionValue = new SimpleObjectProperty<>();
+    private final ObjectProperty<ModuleSection> moduleSectionValue = new SimpleObjectProperty<>();
 
     @FXML
     private MenuButton mbWeek;

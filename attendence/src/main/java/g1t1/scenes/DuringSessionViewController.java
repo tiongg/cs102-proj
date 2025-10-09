@@ -10,8 +10,11 @@ import g1t1.opencv.models.DetectionBoundingBox;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
@@ -23,13 +26,15 @@ import java.util.List;
 class CameraRunnable implements Runnable {
     private final VideoCapture camera;
     private final ImageView display;
+    private final BooleanProperty isTeacherInView;
     private final FaceRecognitionService service;
     private final List<DetectionBoundingBox> boxes = new ArrayList<>();
     private final int msPerProcess; // milliseconds between processing steps
     private long previousTick; // previous timestamp frame was processed
 
-    public CameraRunnable(ImageView display) {
+    public CameraRunnable(ImageView display, BooleanProperty isTeacherInView) {
         this.camera = new VideoCapture(FaceConfig.getInstance().getCameraIndex());
+        this.isTeacherInView = isTeacherInView;
         this.display = display;
         this.service = FaceRecognitionService.getInstance();
         this.msPerProcess = 1 / FaceConfig.getInstance().getTargetFps() * 1000;
@@ -54,9 +59,14 @@ class CameraRunnable implements Runnable {
                 this.service.processFrame(frame, this.boxes);
             }
 
+            boolean teacherFound = false;
             for (DetectionBoundingBox boundingBox : this.boxes) {
                 boundingBox.drawOnFrame(frame);
+                if (boundingBox.getIsTeacher()) {
+                    teacherFound = true;
+                }
             }
+            this.isTeacherInView.set(teacherFound);
 
             Platform.runLater(() -> {
                 display.setImage(ImageUtils.matToImage(frame));
@@ -66,9 +76,14 @@ class CameraRunnable implements Runnable {
 }
 
 public class DuringSessionViewController extends PageController {
+    private final BooleanProperty isTeacherInViewProperty = new SimpleBooleanProperty(false);
     private ThreadWithRunnable<CameraRunnable> cameraDaemon;
+
     @FXML
     private Label lblModule, lblSection, lblWeek, lblTimeStart, lblRemainingTime, lblPresent;
+
+    @FXML
+    private Button btnAdminPanel;
 
     @FXML
     private ImageView ivCameraView;
@@ -78,6 +93,7 @@ public class DuringSessionViewController extends PageController {
         ivCameraView.fitWidthProperty()
                 .bind(ivCameraView.getParent().layoutBoundsProperty().map(bounds -> bounds.getWidth() - 350));
         ivCameraView.fitHeightProperty().bind(ivCameraView.getParent().layoutBoundsProperty().map(Bounds::getHeight));
+        btnAdminPanel.disableProperty().bind(this.isTeacherInViewProperty.not());
     }
 
     @Override
@@ -89,7 +105,7 @@ public class DuringSessionViewController extends PageController {
         }
         assignLabels(session);
 
-        CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView);
+        CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView, this.isTeacherInViewProperty);
         this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
         this.cameraDaemon.setDaemon(true);
         this.cameraDaemon.start();
