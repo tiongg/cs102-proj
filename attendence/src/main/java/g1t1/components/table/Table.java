@@ -1,16 +1,14 @@
 package g1t1.components.table;
 
-import java.util.List;
-import java.util.function.Consumer;
-
-import g1t1.models.sessions.ClassSession;
-import g1t1.models.sessions.ModuleSection;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Table extends VBox {
     private HBox tableHeaderElement;
@@ -26,7 +24,7 @@ public class Table extends VBox {
         this.onChipClick = handler;
     }
 
-    public void setTable(List<String> tableHeaders) {
+    public void setTableHeaders(String... tableHeaders) {
         tableHeaderElement = new HBox(100);
         tableHeaderElement.setAlignment(Pos.CENTER);
         tableHeaderElement.setStyle(
@@ -47,8 +45,9 @@ public class Table extends VBox {
     }
 
     public void createBody(List<? extends TableChipItem> chips) {
-        if (tableBodyElement != null)
+        if (tableBodyElement != null) {
             getChildren().remove(tableBodyElement);
+        }
         this.tableBodyElement = new VBox(10);
 
         for (TableChipItem chipData : chips) {

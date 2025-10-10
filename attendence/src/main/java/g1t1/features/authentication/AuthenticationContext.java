@@ -20,6 +20,7 @@ import g1t1.models.users.Teacher;
 import g1t1.utils.EventEmitter;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnLogoutEvent;
+import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import org.jooq.exception.DataAccessException;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -42,13 +43,6 @@ public class AuthenticationContext {
             for (byte[] faceImage : registrationInfo.getFaceData().getFaceImages()) {
                 userFaceImageRepo.create(userId, faceImage);
             }
-
-            // Create some dummy module sections
-            ModuleSection morningClass = new ModuleSection("CS 102", "G1", ModuleSection.getCurrentAYTerm(), "SCIS1 2-4", 3, "08:00", "11:30");
-            ModuleSection afternoonClass = new ModuleSection("CS 102", "G2", ModuleSection.getCurrentAYTerm(), "SCIS1 2-4", 3, "15:30", "18:45");
-
-            DbUtils.saveModuleSection(morningClass, userId);
-            DbUtils.saveModuleSection(afternoonClass, userId);
 
             // Login the user
             return loginTeacher(registrationInfo.getEmail(), registrationInfo.getPassword());
@@ -114,14 +108,18 @@ public class AuthenticationContext {
         return currentUser;
     }
 
+    public static void triggerUserUpdate() {
+        emitter.emit(new OnUserUpdateEvent(currentUser));
+    }
+
     private static boolean setCurrentTeacher(Teacher teacher) {
         // Auth/Registration failed
         if (teacher == null) {
             return false;
         }
 
-        emitter.emit(new OnLoginEvent(teacher));
         currentUser = teacher;
+        emitter.emit(new OnLoginEvent(teacher));
         return true;
     }
 }
