@@ -5,11 +5,15 @@ package g1t1.scenes;
 import g1t1.components.TimePicker;
 import g1t1.components.Toast;
 import g1t1.components.table.Table;
+import g1t1.db.DSLInstance;
+import g1t1.db.module_sections.ModuleSectionRepository;
+import g1t1.db.module_sections.ModuleSectionRepositoryJooq;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.testing.MockDb;
+import g1t1.utils.DateUtils;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.property.IntegerProperty;
@@ -17,7 +21,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
+import org.jooq.exception.DataAccessException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class MyClassesViewController extends PageController {
@@ -65,9 +71,8 @@ public class MyClassesViewController extends PageController {
             switchToModuleView();
         });
 
-        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-        for (int i = 0; i < days.length; i++) {
-            MenuItem item = new MenuItem(String.format("%s", days[i]));
+        for (int i = 0; i < DateUtils.daysOfWeek.length; i++) {
+            MenuItem item = new MenuItem(String.format("%s", DateUtils.daysOfWeek[i]));
             mbDay.getItems().add(item);
             item.setStyle("-fx-pref-width: 385px");
             // Needed else index won't stick
@@ -84,7 +89,7 @@ public class MyClassesViewController extends PageController {
         classesBackBtn.setVisible(true);
         addClassBtn.setVisible(false);
         availableClasses.setText(null);
-        classesTable.setTableHeaders(List.of("Class", "Date", "Time", "Attendance", "Rate"));
+        classesTable.setTableHeaders("Class", "Date", "Time", "Attendance", "Rate");
         List<ClassSession> sessions = MockDb.getPastSessions(AuthenticationContext.getCurrentUser().getID()).stream()
                 .filter(session -> session.getModuleSection().equals(ms)).toList();
 
@@ -97,7 +102,7 @@ public class MyClassesViewController extends PageController {
         classesBackBtn.setVisible(false);
         addClassOverlay.setVisible(false);
         addClassBtn.setVisible(true);
-        classesTable.setTableHeaders(List.of("Module", "Section", "Day", "Time", "Enrolled"));
+        classesTable.setTableHeaders("Module", "Section", "Day", "Time", "Enrolled");
         classesTable.createBody(AuthenticationContext.getCurrentUser().getModuleSections());
 
         classesTable.setOnChipClick(item -> {
@@ -146,16 +151,23 @@ public class MyClassesViewController extends PageController {
             return;
         }
 
+        try (DSLInstance dslInstance = new DSLInstance()) {
+            ModuleSectionRepository moduleSectionRepository = new ModuleSectionRepositoryJooq(dslInstance.dsl);
+            moduleSectionRepository.create(
+                    module,
+                    section,
+                    term,
+                    dayOfWeek,
+                    start, end,
+                    room, AuthenticationContext.getCurrentUser().getID().toString()
+            );
+        } catch (SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+        } catch (DataAccessException e) {
+            System.out.println("Error during database operation: " + e.getMessage());
+        }
 
         ModuleSection newModule = new ModuleSection(module, section, term, room, dayOfWeek, start, end);
-
-//        System.out.println(module);
-//        System.out.println(section);
-//        System.out.println(term);
-//        System.out.println(dayOfWeek);
-//        System.out.println(start);
-//        System.out.println(end);
-//        System.out.println(room);
 
         AuthenticationContext.getCurrentUser().getModuleSections().add(newModule);
         AuthenticationContext.triggerUserUpdate();
