@@ -42,7 +42,7 @@
 
     <StackPane fx:id="addClassOverlay" visible="false" pickOnBounds="true" style="-fx-background-color: rgba(0,0,0,0.35);">
 
-        <VBox spacing="12" alignment="CENTER_LEFT" style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;" maxWidth="600" maxHeight="400">
+        <VBox spacing="12" alignment="CENTER_LEFT" style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;" maxWidth="700" maxHeight="400">
             <Label text="Create new class">
                 <font>
                     <Font name="Inter Semi Bold" size="20"/>
@@ -51,10 +51,10 @@
 
             <GridPane hgap="12" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints percentWidth="30"/>
-                    <ColumnConstraints percentWidth="20"/>
-                    <ColumnConstraints percentWidth="30"/>
-                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="15"/>
+                    <ColumnConstraints percentWidth="35"/>
+                    <ColumnConstraints percentWidth="15"/>
+                    <ColumnConstraints percentWidth="35"/>
                 </columnConstraints>
 
                 <Label text="Module Title:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -69,21 +69,23 @@
                 <Label text="Day of Week:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
                 <ChoiceBox fx:id="cbDay" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
 
-
                 <Label text="Start Time:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                 <TimePicker fx:id="tfStart" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
 
                 <Label text="End Time:" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
                 <TimePicker fx:id="tfEnd" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
-
+                <!-- <VBox prefHeight="43.0" prefWidth="400">
+                    <Label text="Start Time"/>
+                    <TimePicker fx:id="tpStartTime" prefHeight="40.0" prefWidth="Infinity" style="-fx-font-size: 16px"/>
+                </VBox> -->
                 <Label text="Room:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                 <TextField fx:id="tfRoom" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
             </GridPane>
 
             <HBox spacing="10" alignment="CENTER_RIGHT">
-              
+
                 <Button text="Cancel" onAction="#closeAddClass" style="-fx-background-color: transparent; -fx-text-fill: black;"/>
                 <Button text="Create" onAction="#createClass" style="-fx-background-color: black; -fx-text-fill: white; -fx-background-radius: 20;"/>
             </HBox>

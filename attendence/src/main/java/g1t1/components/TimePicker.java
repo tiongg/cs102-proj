@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class TimePicker extends HBox {
     private final IntegerProperty hourProperty = new SimpleIntegerProperty(0);
@@ -102,9 +103,12 @@ public class TimePicker extends HBox {
     }
 
     public void resetTime() {
-        var localTime = java.time.LocalTime.now();
+        LocalTime localTime = LocalTime.now();
         this.hourProperty.set(localTime.getHour());
         this.minuteProperty.set(localTime.getMinute());
+    }
 
+    public String getFormattedTime() {
+        return String.format("%02d:%02d", this.hourProperty.get(), this.minuteProperty.get());
     }
 }

@@ -1,9 +1,7 @@
 package g1t1.scenes;
 
-
 // for table 
 import java.util.List;
-
 
 import g1t1.components.TimePicker;
 import g1t1.components.Toast;
@@ -139,41 +137,26 @@ public class MyClassesViewController extends PageController {
         String section = tfSection.getText();
         String term = tfTerm.getText();
         String dayName = cbDay.getValue();
-        String start = String.format("%02d:%02d", tfStart.getHourProperty().get(), tfStart.getMinuteProperty().get());
-        String end = String.format("%02d:%02d", tfEnd.getHourProperty().get(), tfEnd.getMinuteProperty().get());
+        String start = tfStart.getFormattedTime();
+        String end = tfEnd.getFormattedTime();
         String room = tfRoom.getText();
 
-        if (module == null || module.isBlank() || section == null || section.isBlank() || dayName == null
-                || dayName.isBlank() || start == null || start.isBlank() || end == null || end.isBlank()) {
+        if (module.isBlank() || section.isBlank() || dayName == null) {
 
             Toast.show("Please fill in all the fields", Toast.ToastType.ERROR);
             return;
         }
 
-        int dayNum = 0;
-        switch (dayName) {
-        case "Monday":
-            dayNum = 0;
-            break;
-        case "Tuesday":
-            dayNum = 1;
-            break;
-        case "Wednesday":
-            dayNum = 2;
-            break;
-        case "Thursday":
-            dayNum = 3;
-            break;
-        case "Friday":
-            dayNum = 4;
-            break;
-        case "Saturday":
-            dayNum = 5;
-            break;
-        case "Sunday":
-            dayNum = 6;
-            break;
-        }
+        int dayNum = switch (dayName) {
+        case "Monday" -> 0;
+        case "Tuesday" -> 1;
+        case "Wednesday" -> 2;
+        case "Thursday" -> 3;
+        case "Friday" -> 4;
+        case "Saturday" -> 5;
+        case "Sunday" -> 6;
+        default -> -1;
+        };
 
         // ModuleSection newModule = new ModuleSection(module, section, term, room,
         // dayNum, start, end);
@@ -181,6 +164,7 @@ public class MyClassesViewController extends PageController {
         // tiong said to just print to terminal :)
         System.out.println(module);
         System.out.println(section);
+        System.out.println(term);
         System.out.println(dayNum);
         System.out.println(start);
         System.out.println(end);
