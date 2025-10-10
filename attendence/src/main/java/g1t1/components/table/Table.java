@@ -24,7 +24,7 @@ public class Table extends VBox {
         this.onChipClick = handler;
     }
 
-    public void setTableHeaders(List<String> tableHeaders) {
+    public void setTableHeaders(String... tableHeaders) {
         tableHeaderElement = new HBox(100);
         tableHeaderElement.setAlignment(Pos.CENTER);
         tableHeaderElement.setStyle(

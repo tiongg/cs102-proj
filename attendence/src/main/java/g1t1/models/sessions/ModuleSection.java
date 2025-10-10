@@ -3,6 +3,7 @@ package g1t1.models.sessions;
 import g1t1.components.table.TableChipItem;
 import g1t1.db.module_sections.ModuleSectionRecord;
 import g1t1.models.users.Student;
+import g1t1.utils.DateUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class ModuleSection implements TableChipItem {
     @Override
     public String[] getChipData() {
         // "Module", "Section", "Day", "Time", "Enrolled"
-        return new String[]{this.module, this.section, Integer.toString(this.day), formatClassDuration(),
+        return new String[]{this.module, this.section, DateUtils.dayOfWeekToWord(this.getDay()), formatClassDuration(),
                 Integer.toString(this.students.size())};
     }
 

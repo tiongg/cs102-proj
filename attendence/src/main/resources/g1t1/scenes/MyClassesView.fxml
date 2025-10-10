@@ -12,7 +12,7 @@
 
     <AnchorPane>
         <Navbar/>
-        <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
+        <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="Infinity" AnchorPane.bottomAnchor="0.0"
                     AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
             <HBox spacing="450" alignment="CENTER_LEFT" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
@@ -26,7 +26,7 @@
                         style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"/>
             </HBox>
 
-            <VBox spacing="20" alignment="CENTER" fillWidth="true" AnchorPane.topAnchor="90.0"
+            <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="90.0"
                   AnchorPane.leftAnchor="40.0">
                 <HBox spacing="700" alignment="CENTER_LEFT">
                     <Label fx:id="availableClasses" text="Available Classes">
@@ -38,14 +38,13 @@
                             style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"/>
                 </HBox>
 
-                <Table fx:id="classesTable" fillWidth="true"/>
+                <Table fx:id="classesTable"/>
             </VBox>
         </AnchorPane>
     </AnchorPane>
 
     <StackPane fx:id="addClassOverlay" visible="false" pickOnBounds="true"
                style="-fx-background-color: rgba(0,0,0,0.35);">
-
         <VBox spacing="12" alignment="CENTER_LEFT"
               style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;" maxWidth="700"
               maxHeight="400">
@@ -87,7 +86,6 @@
             </GridPane>
 
             <HBox spacing="10" alignment="CENTER_RIGHT">
-
                 <Button text="Cancel" onAction="#closeAddClass"
                         style="-fx-background-color: transparent; -fx-text-fill: black;"/>
                 <Button text="Create" onAction="#createClass"
