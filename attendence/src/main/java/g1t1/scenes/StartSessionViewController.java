@@ -10,6 +10,7 @@ import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Teacher;
 import g1t1.utils.events.authentication.OnLoginEvent;
+import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -70,6 +71,20 @@ public class StartSessionViewController extends PageController {
         }
 
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
+            Teacher user = e.user();
+            mbModuleSections.getItems().clear();
+            for (ModuleSection section : user.getModuleSections()) {
+                MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
+                mbModuleSections.getItems().add(item);
+                item.setStyle("-fx-pref-width: 385px");
+
+                item.setOnAction(ae -> {
+                    mbModuleSections.setText(item.getText());
+                    moduleSectionValue.set(section);
+                });
+            }
+        });
+        AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
             Teacher user = e.user();
             mbModuleSections.getItems().clear();
             for (ModuleSection section : user.getModuleSections()) {

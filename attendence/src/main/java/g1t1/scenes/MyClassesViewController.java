@@ -1,7 +1,6 @@
 package g1t1.scenes;
 
 // for table 
-import java.util.List;
 
 import g1t1.components.TimePicker;
 import g1t1.components.Toast;
@@ -12,14 +11,17 @@ import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.testing.MockDb;
 import g1t1.utils.events.authentication.OnLoginEvent;
+import g1t1.utils.events.authentication.OnUserUpdateEvent;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 
+import java.util.List;
+
 public class MyClassesViewController extends PageController {
+    private final IntegerProperty newClassWeekValue = new SimpleIntegerProperty(-1);
 
     @FXML
     private Table classesTable;
@@ -45,7 +47,7 @@ public class MyClassesViewController extends PageController {
     @FXML
     private TextField tfTerm;
     @FXML
-    private ChoiceBox<String> cbDay;
+    private MenuButton mbDay;
     @FXML
     private TimePicker tfStart;
     @FXML
@@ -53,73 +55,73 @@ public class MyClassesViewController extends PageController {
     @FXML
     private TextField tfRoom;
 
-    private List<ModuleSection> cacheModuleSections;
 
     @FXML
     private void initialize() {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
-            classesTable.setTable(List.of("Module", "Section", "Day", "Time", "Enrolled"));
-
-            classesTable.createBody(MockDb.getUserModuleSections(e.user().getID()));
-            cacheModuleSections = MockDb.getUserModuleSections(e.user().getID());
-
-            classesTable.setOnChipClick(item -> {
-                if (item instanceof ModuleSection ms) {
-                    showSessions(ms);
-                }
-            });
+            switchToModuleView();
         });
+        AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
+            switchToModuleView();
+        });
+
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        for (int i = 0; i < days.length; i++) {
+            MenuItem item = new MenuItem(String.format("%s", days[i]));
+            mbDay.getItems().add(item);
+            item.setStyle("-fx-pref-width: 385px");
+            // Needed else index won't stick
+            int dayOfWeek = i;
+            item.setOnAction(e -> {
+                mbDay.setText(item.getText());
+                newClassWeekValue.set(dayOfWeek);
+            });
+        }
     }
 
     private void showSessions(ModuleSection ms) {
-
         myClasses.setText("My Classes - " + ms.getModule() + " - " + ms.getSection());
         classesBackBtn.setVisible(true);
         addClassBtn.setVisible(false);
         availableClasses.setText(null);
-        classesTable.setTable(List.of("Class", "Date", "Time", "Attendance", "Rate"));
+        classesTable.setTableHeaders(List.of("Class", "Date", "Time", "Attendance", "Rate"));
         List<ClassSession> sessions = MockDb.getPastSessions(AuthenticationContext.getCurrentUser().getID()).stream()
                 .filter(session -> session.getModuleSection().equals(ms)).toList();
 
         classesTable.createBody(sessions);
     }
 
-    private void moduleViews() {
-
+    private void switchToModuleView() {
         myClasses.setText("My Classes");
         availableClasses.setText("Available Classes");
         classesBackBtn.setVisible(false);
+        addClassOverlay.setVisible(false);
         addClassBtn.setVisible(true);
-        classesTable.setTable(List.of("Module", "Section", "Day", "Time", "Enrolled"));
-
-        classesTable.createBody(cacheModuleSections);
+        classesTable.setTableHeaders(List.of("Module", "Section", "Day", "Time", "Enrolled"));
+        classesTable.createBody(AuthenticationContext.getCurrentUser().getModuleSections());
 
         classesTable.setOnChipClick(item -> {
             if (item instanceof ModuleSection ms) {
                 showSessions(ms);
             }
         });
-
     }
 
     @FXML
     private void classesBack() {
-        // System.out.println("going back");
-        moduleViews();
+        switchToModuleView();
     }
 
     @FXML
     private void openAddClass() {
-        if (cbDay.getItems().isEmpty()) {
-            cbDay.getItems().addAll("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
-        }
         tfModule.clear();
         tfSection.clear();
         tfTerm.setText(ModuleSection.getCurrentAYTerm());
         tfTerm.setEditable(false);
         tfStart.resetTime();
         tfEnd.resetTime();
-        cbDay.getSelectionModel().clearSelection();
+        newClassWeekValue.set(-1);
+        mbDay.setText("Select a day...");
         tfRoom.clear();
         addClassOverlay.setVisible(true);
     }
@@ -131,49 +133,34 @@ public class MyClassesViewController extends PageController {
 
     @FXML
     private void createClass() {
-        // Format of start and end, String (HH:MM)
-
         String module = tfModule.getText();
         String section = tfSection.getText();
         String term = tfTerm.getText();
-        String dayName = cbDay.getValue();
+        int dayOfWeek = newClassWeekValue.intValue();
         String start = tfStart.getFormattedTime();
         String end = tfEnd.getFormattedTime();
         String room = tfRoom.getText();
 
-        if (module.isBlank() || section.isBlank() || dayName == null) {
-
+        if (module.isBlank() || section.isBlank() || dayOfWeek == -1) {
             Toast.show("Please fill in all the fields", Toast.ToastType.ERROR);
             return;
         }
 
-        int dayNum = switch (dayName) {
-        case "Monday" -> 0;
-        case "Tuesday" -> 1;
-        case "Wednesday" -> 2;
-        case "Thursday" -> 3;
-        case "Friday" -> 4;
-        case "Saturday" -> 5;
-        case "Sunday" -> 6;
-        default -> -1;
-        };
 
-        // ModuleSection newModule = new ModuleSection(module, section, term, room,
-        // dayNum, start, end);
+        ModuleSection newModule = new ModuleSection(module, section, term, room, dayOfWeek, start, end);
 
-        // tiong said to just print to terminal :)
-        System.out.println(module);
-        System.out.println(section);
-        System.out.println(term);
-        System.out.println(dayNum);
-        System.out.println(start);
-        System.out.println(end);
-        System.out.println(room);
-        // cacheModuleSections.add(newModule);
+//        System.out.println(module);
+//        System.out.println(section);
+//        System.out.println(term);
+//        System.out.println(dayOfWeek);
+//        System.out.println(start);
+//        System.out.println(end);
+//        System.out.println(room);
+
+        AuthenticationContext.getCurrentUser().getModuleSections().add(newModule);
+        AuthenticationContext.triggerUserUpdate();
 
         Toast.show("Class Created!", Toast.ToastType.SUCCESS);
-        moduleViews();
-        addClassOverlay.setVisible(false);
     }
 
 }

@@ -157,12 +157,8 @@ public class ModuleSection implements TableChipItem {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof ModuleSection) {
-            ModuleSection otherSection = (ModuleSection) other;
-            if (this.getSection().equals(otherSection.getSection())
-                    && this.getModule().equals(otherSection.getModule())) {
-                return true;
-            }
+        if (other instanceof ModuleSection otherSection) {
+            return this.id.equals(otherSection.getId());
         }
         return false;
     }
