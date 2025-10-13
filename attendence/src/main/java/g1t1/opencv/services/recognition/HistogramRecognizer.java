@@ -4,13 +4,15 @@ import g1t1.features.logger.AppLogger;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.Recognisable;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
-import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.HOGDescriptor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,236 +21,304 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Optimized face recognition using pre-computed histograms.
- * Dramatically improves performance by caching enrollment data.
+ * Face recognition using histogram, LBP, and HOG features.
+ * Combines three complementary feature types for high identification accuracy
+ * with strong discrimination between different individuals.
+ *
+ * Preprocessing pipeline (from Recognizer base class):
+ * Grayscale → Bilateral Filter → Normalize → CLAHE → Resize
  */
 public class HistogramRecognizer extends Recognizer {
 
-    // Cache for pre-computed histograms per student
-    private final Map<String, List<Mat>> studentHistograms = new ConcurrentHashMap<>();
-    private final Map<String, Double> bestKnownSimilarities = new ConcurrentHashMap<>();
+    private final Map<String, List<FaceFeatures>> studentFeatures = new ConcurrentHashMap<>();
+    private final HOGDescriptor hogDescriptor;
 
     /**
-     * Pre-compute histograms for all enrolled students.
-     * Call this once when service starts instead of processing every frame.
+     * Container for face feature data.
+     */
+    private static class FaceFeatures {
+        final Mat histogram;
+        final Mat lbp;
+        final Mat hog;
+
+        FaceFeatures(Mat histogram, Mat lbp, Mat hog) {
+            this.histogram = histogram;
+            this.lbp = lbp;
+            this.hog = hog;
+        }
+
+        void release() {
+            histogram.release();
+            lbp.release();
+            hog.release();
+        }
+    }
+
+    public HistogramRecognizer() {
+        super();
+        this.hogDescriptor = new HOGDescriptor(
+            new Size(64, 128),
+            new Size(16, 16),
+            new Size(8, 8),
+            new Size(8, 8),
+            9
+        );
+    }
+
+    /**
+     * Pre-computes features for all enrolled students.
+     * Uses full preprocessing pipeline from base Recognizer class.
+     *
+     * @param recognisableList List of enrolled students
      */
     public void precomputeEnrollmentData(List<? extends Recognisable> recognisableList) {
         long startTime = System.currentTimeMillis();
-        studentHistograms.clear();
-        bestKnownSimilarities.clear();
+        studentFeatures.clear();
 
         for (Recognisable student : recognisableList) {
             if (student.getFaceData() == null || student.getFaceData().getFaceImages() == null) {
                 continue;
             }
 
-            List<Mat> histograms = new ArrayList<>();
-            List<byte[]> faceImages = student.getFaceData().getFaceImages();
-
-            for (byte[] imageData : faceImages) {
-                Mat enrolledFace = loadAndPreprocessEnrolledFace(imageData);
-                if (!enrolledFace.empty()) {
-                    Mat histogram = calculateHistogram(enrolledFace);
-                    histograms.add(histogram);
-                    enrolledFace.release();
+            List<FaceFeatures> features = new ArrayList<>();
+            for (byte[] imageData : student.getFaceData().getFaceImages()) {
+                Mat image = Imgcodecs.imdecode(new MatOfByte(imageData), Imgcodecs.IMREAD_COLOR);
+                if (!image.empty()) {
+                    Mat processedFace = preprocessFace(image);
+                    features.add(extractFeatures(processedFace));
+                    processedFace.release();
+                    image.release();
                 }
             }
 
-            if (!histograms.isEmpty()) {
-                studentHistograms.put(student.getRecognitionId(), histograms);
+            if (!features.isEmpty()) {
+                studentFeatures.put(student.getRecognitionId(), features);
             }
         }
 
         long duration = System.currentTimeMillis() - startTime;
         if (FaceConfig.getInstance().isLoggingEnabled()) {
-            AppLogger.log("Pre-computed enrollment histograms for " + recognisableList.size() +
+            AppLogger.log("Pre-computed features for " + recognisableList.size() +
                     " students in " + duration + "ms");
         }
     }
 
+    /**
+     * Compares preprocessed face against enrolled student.
+     * Face is already preprocessed by Recognizer base class.
+     *
+     * @param processedFace Preprocessed face image
+     * @param recognisable Student to compare against
+     * @return Confidence percentage [0-100]
+     */
     @Override
     public double compareWithRecognisable(Mat processedFace, Recognisable recognisable) {
         String recognitionId = recognisable.getRecognitionId();
-        List<Mat> precomputedHistograms = studentHistograms.get(recognitionId);
+        List<FaceFeatures> precomputedFeatures = studentFeatures.get(recognitionId);
 
-        if (precomputedHistograms == null || precomputedHistograms.isEmpty()) {
-            // Fallback to original method if no pre-computed data
-            return fallbackCompareWithRecognisable(processedFace, recognisable);
+        if (precomputedFeatures == null || precomputedFeatures.isEmpty()) {
+            return fallbackCompare(processedFace, recognisable);
         }
 
-        // Quick cache check - if we've seen this student recently with high confidence
-        Double recentSimilarity = bestKnownSimilarities.get(recognitionId);
-        if (recentSimilarity != null && recentSimilarity > 80.0) {
-            // Fast-track high-confidence students (performance optimization)
-            Mat faceHistogram = calculateHistogram(processedFace);
-            double correl = Imgproc.compareHist(faceHistogram, precomputedHistograms.get(0), Imgproc.HISTCMP_CORREL);
-            double bhattacharyya = Imgproc.compareHist(faceHistogram, precomputedHistograms.get(0), Imgproc.HISTCMP_BHATTACHARYYA);
-            double bhattacharyyaSim = Math.exp(-bhattacharyya);
-            double quickCheck = (correl * 0.7) + (bhattacharyyaSim * 0.3);
-            faceHistogram.release();
-
-            if (quickCheck * 100.0 > 75.0) {
-                return quickCheck * 100.0;
-            }
-        }
-
-        // Full comparison against pre-computed histograms using multiple comparison methods
-        Mat faceHistogram = calculateHistogram(processedFace);
+        FaceFeatures detectedFeatures = extractFeatures(processedFace);
         double bestSimilarity = 0.0;
 
-        for (Mat precomputedHistogram : precomputedHistograms) {
-            // Use correlation method (best for histogram comparison)
-            double correl = Imgproc.compareHist(faceHistogram, precomputedHistogram, Imgproc.HISTCMP_CORREL);
-
-            // Use Bhattacharyya distance (lower is better, convert to similarity)
-            double bhattacharyya = Imgproc.compareHist(faceHistogram, precomputedHistogram, Imgproc.HISTCMP_BHATTACHARYYA);
-            double bhattacharyyaSim = Math.exp(-bhattacharyya); // Convert distance to similarity
-
-            // Optimized weighted combination emphasizing correlation
-            // Only use correlation and Bhattacharyya (both normalized 0-1)
-            double combinedSimilarity = (correl * 0.7) + (bhattacharyyaSim * 0.3);
-
-            if (combinedSimilarity > bestSimilarity) {
-                bestSimilarity = combinedSimilarity;
+        for (FaceFeatures enrolledFeatures : precomputedFeatures) {
+            double similarity = compareFeatures(detectedFeatures, enrolledFeatures);
+            if (similarity > bestSimilarity) {
+                bestSimilarity = similarity;
             }
         }
 
-        faceHistogram.release();
-
-        // Cache the result for fast-tracking
-        double confidencePercentage = bestSimilarity * 100.0;
-        bestKnownSimilarities.put(recognitionId, confidencePercentage);
-
-        return confidencePercentage;
+        detectedFeatures.release();
+        return bestSimilarity * 100.0;
     }
 
     /**
-     * Fallback method for when pre-computed data is not available
+     * Fallback comparison when pre-computed data unavailable.
      */
-    private double fallbackCompareWithRecognisable(Mat processedFace, Recognisable recognisable) {
+    private double fallbackCompare(Mat processedFace, Recognisable recognisable) {
         if (recognisable.getFaceData() == null || recognisable.getFaceData().getFaceImages() == null) {
             return 0.0;
         }
 
-        Mat faceHistogram = calculateHistogram(processedFace);
+        FaceFeatures detectedFeatures = extractFeatures(processedFace);
         double bestSimilarity = 0.0;
 
-        List<byte[]> faceImages = recognisable.getFaceData().getFaceImages();
-        for (byte[] imageData : faceImages) {
-            Mat enrolledFace = loadAndPreprocessEnrolledFace(imageData);
-            if (!enrolledFace.empty()) {
-                Mat enrolledHistogram = calculateHistogram(enrolledFace);
+        for (byte[] imageData : recognisable.getFaceData().getFaceImages()) {
+            Mat image = Imgcodecs.imdecode(new MatOfByte(imageData), Imgcodecs.IMREAD_COLOR);
+            if (!image.empty()) {
+                Mat enrolledProcessed = preprocessFace(image);
+                FaceFeatures enrolledFeatures = extractFeatures(enrolledProcessed);
+                double similarity = compareFeatures(detectedFeatures, enrolledFeatures);
 
-                // Use multiple comparison methods
-                double correl = Imgproc.compareHist(faceHistogram, enrolledHistogram, Imgproc.HISTCMP_CORREL);
-                double bhattacharyya = Imgproc.compareHist(faceHistogram, enrolledHistogram, Imgproc.HISTCMP_BHATTACHARYYA);
-                double bhattacharyyaSim = Math.exp(-bhattacharyya);
-
-                double combinedSimilarity = (correl * 0.7) + (bhattacharyyaSim * 0.3);
-
-                if (combinedSimilarity > bestSimilarity) {
-                    bestSimilarity = combinedSimilarity;
+                if (similarity > bestSimilarity) {
+                    bestSimilarity = similarity;
                 }
 
-                enrolledHistogram.release();
+                enrolledFeatures.release();
+                enrolledProcessed.release();
+                image.release();
             }
-            enrolledFace.release();
         }
 
-        faceHistogram.release();
+        detectedFeatures.release();
         return bestSimilarity * 100.0;
     }
 
-    private Mat loadAndPreprocessEnrolledFace(byte[] imageData) {
-        Mat image = Imgcodecs.imdecode(new MatOfByte(imageData), Imgcodecs.IMREAD_COLOR);
-        if (image.empty()) {
-            return new Mat();
-        }
-
-        Mat processed = preprocessFace(image);
-        image.release();
-        return processed;
-    }
-
-    private Mat calculateHistogram(Mat image) {
-        // Create a multi-scale, multi-region histogram for better discrimination
-        int height = image.rows();
-        int width = image.cols();
-        int halfHeight = height / 2;
-        int halfWidth = width / 2;
-        int thirdHeight = height / 3;
-        int thirdWidth = width / 3;
-
-        java.util.List<Mat> histograms = new java.util.ArrayList<>();
-
-        // Full face histogram (global appearance)
-        histograms.add(calculateSingleHistogram(image));
-
-        // 4 quadrants (spatial structure)
-        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, 0, halfWidth, halfHeight))));
-        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(halfWidth, 0, width - halfWidth, halfHeight))));
-        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, halfHeight, halfWidth, height - halfHeight))));
-        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(halfWidth, halfHeight, width - halfWidth, height - halfHeight))));
-
-        // 3x3 grid for finer details (eyes, nose, mouth regions)
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                int x = j * thirdWidth;
-                int y = i * thirdHeight;
-                int w = (j == 2) ? (width - x) : thirdWidth;
-                int h = (i == 2) ? (height - y) : thirdHeight;
-                histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(x, y, w, h))));
-            }
-        }
-
-        // Horizontal bands (emphasize eyes and mouth rows)
-        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, 0, width, thirdHeight)))); // Upper third (eyes)
-        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, thirdHeight, width, thirdHeight)))); // Middle third (nose)
-        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, 2 * thirdHeight, width, height - 2 * thirdHeight)))); // Lower third (mouth)
-
-        // Combine all histograms into one feature vector
-        Mat combined = new Mat();
-        org.opencv.core.Core.vconcat(histograms, combined);
-
-        // Cleanup
-        for (Mat hist : histograms) {
-            hist.release();
-        }
-
-        return combined;
-    }
-
-    private Mat calculateSingleHistogram(Mat image) {
-        Mat histogram = new Mat();
-        List<Mat> images = Arrays.asList(image);
-
-        // Use more bins for better discrimination (64 bins instead of 256)
-        // Reduces noise while preserving important details
-        Imgproc.calcHist(
-                images,
-                new MatOfInt(0),
-                new Mat(),
-                histogram,
-                new MatOfInt(64),
-                new MatOfFloat(0f, 256f)
+    /**
+     * Extracts all three feature types from preprocessed face.
+     */
+    private FaceFeatures extractFeatures(Mat face) {
+        return new FaceFeatures(
+            calculateHistogram(face),
+            calculateLBP(face),
+            calculateHOG(face)
         );
+    }
 
-        // Normalize using L2 norm for better comparison stability
-        org.opencv.core.Core.normalize(histogram, histogram, 1, 0, org.opencv.core.Core.NORM_L2);
-
+    /**
+     * Calculates intensity histogram (128 bins).
+     */
+    private Mat calculateHistogram(Mat image) {
+        Mat histogram = new Mat();
+        Imgproc.calcHist(
+            Arrays.asList(image),
+            new MatOfInt(0),
+            new Mat(),
+            histogram,
+            new MatOfInt(128),
+            new MatOfFloat(0f, 256f)
+        );
+        Core.normalize(histogram, histogram, 1, 0, Core.NORM_L2);
         return histogram;
     }
 
     /**
-     * Cleanup pre-computed data when service stops
+     * Calculates Local Binary Pattern histogram for texture features.
      */
-    public void cleanup() {
-        for (List<Mat> histograms : studentHistograms.values()) {
-            for (Mat histogram : histograms) {
-                histogram.release();
+    private Mat calculateLBP(Mat image) {
+        int height = image.rows();
+        int width = image.cols();
+        if (height < 3 || width < 3) {
+            return new Mat();
+        }
+
+        Mat lbpImage = new Mat(height - 2, width - 2, CvType.CV_8UC1);
+
+        for (int i = 1; i < height - 1; i++) {
+            for (int j = 1; j < width - 1; j++) {
+                double center = image.get(i, j)[0];
+                int lbpValue = 0;
+
+                lbpValue |= (image.get(i - 1, j - 1)[0] >= center ? 1 : 0) << 7;
+                lbpValue |= (image.get(i - 1, j)[0] >= center ? 1 : 0) << 6;
+                lbpValue |= (image.get(i - 1, j + 1)[0] >= center ? 1 : 0) << 5;
+                lbpValue |= (image.get(i, j + 1)[0] >= center ? 1 : 0) << 4;
+                lbpValue |= (image.get(i + 1, j + 1)[0] >= center ? 1 : 0) << 3;
+                lbpValue |= (image.get(i + 1, j)[0] >= center ? 1 : 0) << 2;
+                lbpValue |= (image.get(i + 1, j - 1)[0] >= center ? 1 : 0) << 1;
+                lbpValue |= (image.get(i, j - 1)[0] >= center ? 1 : 0);
+
+                lbpImage.put(i - 1, j - 1, lbpValue);
             }
         }
-        studentHistograms.clear();
-        bestKnownSimilarities.clear();
+
+        Mat lbpHistogram = new Mat();
+        Imgproc.calcHist(
+            Arrays.asList(lbpImage),
+            new MatOfInt(0),
+            new Mat(),
+            lbpHistogram,
+            new MatOfInt(256),
+            new MatOfFloat(0f, 256f)
+        );
+        Core.normalize(lbpHistogram, lbpHistogram, 1, 0, Core.NORM_L2);
+
+        lbpImage.release();
+        return lbpHistogram;
+    }
+
+    /**
+     * Calculates HOG (Histogram of Oriented Gradients) for edge structure features.
+     */
+    private Mat calculateHOG(Mat image) {
+        Mat resized = new Mat();
+        Imgproc.resize(image, resized, new Size(64, 128));
+
+        MatOfFloat descriptors = new MatOfFloat();
+        hogDescriptor.compute(resized, descriptors);
+
+        Mat hogMat = descriptors.clone();
+        Core.normalize(hogMat, hogMat, 1, 0, Core.NORM_L2);
+
+        resized.release();
+        descriptors.release();
+
+        return hogMat;
+    }
+
+    /**
+     * Compares features using geometric mean with minimum score penalty.
+     * Ensures ALL features must agree for high confidence score.
+     *
+     * @return Similarity score [0, 1]
+     */
+    private double compareFeatures(FaceFeatures f1, FaceFeatures f2) {
+        double histScore = compareHistograms(f1.histogram, f2.histogram);
+        double lbpScore = compareLBP(f1.lbp, f2.lbp);
+        double hogScore = compareHOG(f1.hog, f2.hog);
+
+        double minScore = Math.min(Math.min(histScore, lbpScore), hogScore);
+        double geometricMean = Math.pow(histScore * lbpScore * hogScore, 1.0 / 3.0);
+
+        return geometricMean * (0.5 + 0.5 * minScore);
+    }
+
+    /**
+     * Compares histograms using chi-square distance.
+     */
+    private double compareHistograms(Mat hist1, Mat hist2) {
+        double chiSquare = Imgproc.compareHist(hist1, hist2, Imgproc.HISTCMP_CHISQR);
+        double similarity = Math.exp(-chiSquare / 5.0);
+        return Math.pow(similarity, 1.5);
+    }
+
+    /**
+     * Compares LBP histograms using chi-square distance.
+     */
+    private double compareLBP(Mat lbp1, Mat lbp2) {
+        double chiSquare = Imgproc.compareHist(lbp1, lbp2, Imgproc.HISTCMP_CHISQR);
+        double similarity = Math.exp(-chiSquare / 3.0);
+        return Math.pow(similarity, 2.0);
+    }
+
+    /**
+     * Compares HOG descriptors using Euclidean distance.
+     */
+    private double compareHOG(Mat hog1, Mat hog2) {
+        if (hog1.empty() || hog2.empty() || hog1.rows() != hog2.rows()) {
+            return 0.0;
+        }
+
+        Mat diff = new Mat();
+        Core.subtract(hog1, hog2, diff);
+        double distance = Core.norm(diff, Core.NORM_L2);
+        diff.release();
+
+        double similarity = Math.exp(-distance / 20.0);
+        return Math.pow(similarity, 2.5);
+    }
+
+    /**
+     * Releases all pre-computed data.
+     */
+    public void cleanup() {
+        for (List<FaceFeatures> features : studentFeatures.values()) {
+            for (FaceFeatures feature : features) {
+                feature.release();
+            }
+        }
+        studentFeatures.clear();
     }
 }

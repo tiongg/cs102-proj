@@ -3,8 +3,9 @@ package g1t1.opencv.services.recognition;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.Recognisable;
 import g1t1.opencv.models.RecognitionResult;
+import g1t1.opencv.services.preprocessing.BilateralFilterProcessor;
+import g1t1.opencv.services.preprocessing.CLAHEProcessor;
 import g1t1.opencv.services.preprocessing.GrayscaleProcessor;
-import g1t1.opencv.services.preprocessing.HistogramEqualizationProcessor;
 import g1t1.opencv.services.preprocessing.NormalizerProcessor;
 import g1t1.opencv.services.preprocessing.ResizeProcessor;
 import org.opencv.core.Mat;
@@ -17,15 +18,17 @@ import java.util.List;
 public abstract class Recognizer {
     protected final FaceConfig config;
     protected final GrayscaleProcessor grayscale;
+    protected final BilateralFilterProcessor bilateralFilter;
     protected final NormalizerProcessor normalizer;
-    protected final HistogramEqualizationProcessor histogramEqualizer;
+    protected final CLAHEProcessor clahe;
     protected final ResizeProcessor resizer;
 
     public Recognizer() {
         this.config = FaceConfig.getInstance();
         this.grayscale = new GrayscaleProcessor();
+        this.bilateralFilter = new BilateralFilterProcessor();
         this.normalizer = new NormalizerProcessor();
-        this.histogramEqualizer = new HistogramEqualizationProcessor();
+        this.clahe = new CLAHEProcessor();
         this.resizer = new ResizeProcessor();
     }
 
@@ -63,22 +66,27 @@ public abstract class Recognizer {
 
     /**
      * Preprocess detected face using enhanced pipeline.
+     * Pipeline: Grayscale -> Bilateral Filter -> Normalize -> CLAHE -> Resize
      */
     protected final Mat preprocessFace(Mat face) {
         Mat step1 = grayscale.process(face);
 
-        // Apply slight Gaussian blur to reduce noise and improve histogram stability
-        Mat step1b = new Mat();
-        org.opencv.imgproc.Imgproc.GaussianBlur(step1, step1b, new org.opencv.core.Size(3, 3), 0.5);
+        // Apply bilateral filter for edge-preserving noise reduction
+        Mat step2 = bilateralFilter.process(step1);
 
-        Mat step2 = normalizer.process(step1b);
-        Mat step3 = histogramEqualizer.process(step2);
-        Mat result = resizer.process(step3);
+        // Normalize intensity values
+        Mat step3 = normalizer.process(step2);
+
+        // Apply CLAHE for adaptive contrast enhancement
+        Mat step4 = clahe.process(step3);
+
+        // Resize to standard dimensions
+        Mat result = resizer.process(step4);
 
         step1.release();
-        step1b.release();
         step2.release();
         step3.release();
+        step4.release();
         return result;
     }
 
