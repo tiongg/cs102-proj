@@ -66,11 +66,17 @@ public abstract class Recognizer {
      */
     protected final Mat preprocessFace(Mat face) {
         Mat step1 = grayscale.process(face);
-        Mat step2 = normalizer.process(step1);
+
+        // Apply slight Gaussian blur to reduce noise and improve histogram stability
+        Mat step1b = new Mat();
+        org.opencv.imgproc.Imgproc.GaussianBlur(step1, step1b, new org.opencv.core.Size(3, 3), 0.5);
+
+        Mat step2 = normalizer.process(step1b);
         Mat step3 = histogramEqualizer.process(step2);
         Mat result = resizer.process(step3);
 
         step1.release();
+        step1b.release();
         step2.release();
         step3.release();
         return result;

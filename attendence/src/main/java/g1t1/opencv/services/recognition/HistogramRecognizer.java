@@ -3,10 +3,12 @@ package g1t1.opencv.services.recognition;
 import g1t1.features.logger.AppLogger;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.Recognisable;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
+import org.opencv.core.Rect;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -79,22 +81,35 @@ public class HistogramRecognizer extends Recognizer {
         if (recentSimilarity != null && recentSimilarity > 80.0) {
             // Fast-track high-confidence students (performance optimization)
             Mat faceHistogram = calculateHistogram(processedFace);
-            double quickCheck = Imgproc.compareHist(faceHistogram, precomputedHistograms.get(0), Imgproc.HISTCMP_CORREL);
+            double correl = Imgproc.compareHist(faceHistogram, precomputedHistograms.get(0), Imgproc.HISTCMP_CORREL);
+            double bhattacharyya = Imgproc.compareHist(faceHistogram, precomputedHistograms.get(0), Imgproc.HISTCMP_BHATTACHARYYA);
+            double bhattacharyyaSim = Math.exp(-bhattacharyya);
+            double quickCheck = (correl * 0.7) + (bhattacharyyaSim * 0.3);
             faceHistogram.release();
 
-            if (quickCheck * 100.0 > 70.0) {
+            if (quickCheck * 100.0 > 75.0) {
                 return quickCheck * 100.0;
             }
         }
 
-        // Full comparison against pre-computed histograms
+        // Full comparison against pre-computed histograms using multiple comparison methods
         Mat faceHistogram = calculateHistogram(processedFace);
         double bestSimilarity = 0.0;
 
         for (Mat precomputedHistogram : precomputedHistograms) {
-            double similarity = Imgproc.compareHist(faceHistogram, precomputedHistogram, Imgproc.HISTCMP_CORREL);
-            if (similarity > bestSimilarity) {
-                bestSimilarity = similarity;
+            // Use correlation method (best for histogram comparison)
+            double correl = Imgproc.compareHist(faceHistogram, precomputedHistogram, Imgproc.HISTCMP_CORREL);
+
+            // Use Bhattacharyya distance (lower is better, convert to similarity)
+            double bhattacharyya = Imgproc.compareHist(faceHistogram, precomputedHistogram, Imgproc.HISTCMP_BHATTACHARYYA);
+            double bhattacharyyaSim = Math.exp(-bhattacharyya); // Convert distance to similarity
+
+            // Optimized weighted combination emphasizing correlation
+            // Only use correlation and Bhattacharyya (both normalized 0-1)
+            double combinedSimilarity = (correl * 0.7) + (bhattacharyyaSim * 0.3);
+
+            if (combinedSimilarity > bestSimilarity) {
+                bestSimilarity = combinedSimilarity;
             }
         }
 
@@ -123,10 +138,16 @@ public class HistogramRecognizer extends Recognizer {
             Mat enrolledFace = loadAndPreprocessEnrolledFace(imageData);
             if (!enrolledFace.empty()) {
                 Mat enrolledHistogram = calculateHistogram(enrolledFace);
-                double similarity = Imgproc.compareHist(faceHistogram, enrolledHistogram, Imgproc.HISTCMP_CORREL);
 
-                if (similarity > bestSimilarity) {
-                    bestSimilarity = similarity;
+                // Use multiple comparison methods
+                double correl = Imgproc.compareHist(faceHistogram, enrolledHistogram, Imgproc.HISTCMP_CORREL);
+                double bhattacharyya = Imgproc.compareHist(faceHistogram, enrolledHistogram, Imgproc.HISTCMP_BHATTACHARYYA);
+                double bhattacharyyaSim = Math.exp(-bhattacharyya);
+
+                double combinedSimilarity = (correl * 0.7) + (bhattacharyyaSim * 0.3);
+
+                if (combinedSimilarity > bestSimilarity) {
+                    bestSimilarity = combinedSimilarity;
                 }
 
                 enrolledHistogram.release();
@@ -150,17 +171,70 @@ public class HistogramRecognizer extends Recognizer {
     }
 
     private Mat calculateHistogram(Mat image) {
+        // Create a multi-scale, multi-region histogram for better discrimination
+        int height = image.rows();
+        int width = image.cols();
+        int halfHeight = height / 2;
+        int halfWidth = width / 2;
+        int thirdHeight = height / 3;
+        int thirdWidth = width / 3;
+
+        java.util.List<Mat> histograms = new java.util.ArrayList<>();
+
+        // Full face histogram (global appearance)
+        histograms.add(calculateSingleHistogram(image));
+
+        // 4 quadrants (spatial structure)
+        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, 0, halfWidth, halfHeight))));
+        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(halfWidth, 0, width - halfWidth, halfHeight))));
+        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, halfHeight, halfWidth, height - halfHeight))));
+        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(halfWidth, halfHeight, width - halfWidth, height - halfHeight))));
+
+        // 3x3 grid for finer details (eyes, nose, mouth regions)
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                int x = j * thirdWidth;
+                int y = i * thirdHeight;
+                int w = (j == 2) ? (width - x) : thirdWidth;
+                int h = (i == 2) ? (height - y) : thirdHeight;
+                histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(x, y, w, h))));
+            }
+        }
+
+        // Horizontal bands (emphasize eyes and mouth rows)
+        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, 0, width, thirdHeight)))); // Upper third (eyes)
+        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, thirdHeight, width, thirdHeight)))); // Middle third (nose)
+        histograms.add(calculateSingleHistogram(new Mat(image, new org.opencv.core.Rect(0, 2 * thirdHeight, width, height - 2 * thirdHeight)))); // Lower third (mouth)
+
+        // Combine all histograms into one feature vector
+        Mat combined = new Mat();
+        org.opencv.core.Core.vconcat(histograms, combined);
+
+        // Cleanup
+        for (Mat hist : histograms) {
+            hist.release();
+        }
+
+        return combined;
+    }
+
+    private Mat calculateSingleHistogram(Mat image) {
         Mat histogram = new Mat();
         List<Mat> images = Arrays.asList(image);
 
+        // Use more bins for better discrimination (64 bins instead of 256)
+        // Reduces noise while preserving important details
         Imgproc.calcHist(
                 images,
                 new MatOfInt(0),
                 new Mat(),
                 histogram,
-                new MatOfInt(256),
+                new MatOfInt(64),
                 new MatOfFloat(0f, 256f)
         );
+
+        // Normalize using L2 norm for better comparison stability
+        org.opencv.core.Core.normalize(histogram, histogram, 1, 0, org.opencv.core.Core.NORM_L2);
 
         return histogram;
     }
