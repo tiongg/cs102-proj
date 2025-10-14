@@ -153,26 +153,26 @@ public class MyClassesViewController extends PageController {
 
         try (DSLInstance dslInstance = new DSLInstance()) {
             ModuleSectionRepository moduleSectionRepository = new ModuleSectionRepositoryJooq(dslInstance.dsl);
-            moduleSectionRepository.create(
+            String moduleSectionId = moduleSectionRepository.create(
                     module,
                     section,
                     term,
                     dayOfWeek,
                     start, end,
-                    room, AuthenticationContext.getCurrentUser().getID().toString()
+                    room,
+                    AuthenticationContext.getCurrentUser().getID().toString()
             );
+            ModuleSection newModule = new ModuleSection(moduleSectionId, module, section, term, room, dayOfWeek, start, end);
+
+            AuthenticationContext.getCurrentUser().getModuleSections().add(newModule);
+            AuthenticationContext.triggerUserUpdate();
+
+            Toast.show("Class Created!", Toast.ToastType.SUCCESS);
         } catch (SQLException e) {
             System.out.println("Error connecting to the database: " + e.getMessage());
         } catch (DataAccessException e) {
             System.out.println("Error during database operation: " + e.getMessage());
         }
-
-        ModuleSection newModule = new ModuleSection(module, section, term, room, dayOfWeek, start, end);
-
-        AuthenticationContext.getCurrentUser().getModuleSections().add(newModule);
-        AuthenticationContext.triggerUserUpdate();
-
-        Toast.show("Class Created!", Toast.ToastType.SUCCESS);
     }
 
 }

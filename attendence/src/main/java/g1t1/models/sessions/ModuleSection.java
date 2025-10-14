@@ -14,10 +14,6 @@ import java.util.List;
  */
 public class ModuleSection implements TableChipItem {
     /**
-     * Module section id. Used mainly for db stuff
-     */
-    private final String id;
-    /**
      * Module of the class. i.e CS102
      */
     private final String module;
@@ -49,6 +45,10 @@ public class ModuleSection implements TableChipItem {
      * End time of lesson (HH:MM)
      */
     private final String endTime;
+    /**
+     * Module section id. Used mainly for db stuff
+     */
+    private String id;
 
     public ModuleSection(String module, String section, String term, String room, int day, String startTime, String endTime) {
         this.module = module;
@@ -59,6 +59,11 @@ public class ModuleSection implements TableChipItem {
         this.startTime = startTime;
         this.endTime = endTime;
         this.id = module + " - " + section;
+    }
+
+    public ModuleSection(String id, String module, String section, String term, String room, int day, String startTime, String endTime) {
+        this(module, section, term, room, day, startTime, endTime);
+        this.id = id;
     }
 
     public ModuleSection(ModuleSectionRecord dbModuleSection) {

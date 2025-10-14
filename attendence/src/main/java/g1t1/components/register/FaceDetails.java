@@ -1,13 +1,6 @@
 package g1t1.components.register;
 
-import java.util.List;
-
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.Rect;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.videoio.VideoCapture;
-
+import g1t1.App;
 import g1t1.components.Toast;
 import g1t1.components.Toast.ToastType;
 import g1t1.models.interfaces.register.HasFaces;
@@ -15,7 +8,6 @@ import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.RegisterTeacher;
 import g1t1.opencv.config.FaceConfig;
-import g1t1.opencv.models.DetectedFace;
 import g1t1.opencv.services.FaceDetector;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
@@ -31,6 +23,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 
 class CameraRunnable implements Runnable {
     private static final int TARGET_SIZE = 256;
@@ -90,49 +92,19 @@ class CameraRunnable implements Runnable {
             if (!currentFrame.empty()) {
                 MatOfByte buffer = new MatOfByte();
                 Imgcodecs.imencode(".png", currentFrame, buffer);
-                // File file = new File("test-photos/test.png");
-                // try (FileOutputStream writer = new FileOutputStream(file)) {
-                // writer.write(buffer.toArray());
-                // } catch (IOException e) {
-                // }
                 return buffer.toArray();
             }
         }
-        return new byte[] {};
+        return new byte[]{};
     }
 
     public byte[] getFaceInFrame() {
         synchronized (frameLock) {
             if (currentFrame.empty()) {
-                return new byte[] {};
+                return new byte[]{};
             }
 
-            List<DetectedFace> detectedFaces = faceDetector.detectFaces(currentFrame);
-            if (detectedFaces.isEmpty()) {
-                return new byte[] {};
-            }
-
-            DetectedFace detectedFace = detectedFaces.getFirst();
-            Rect boundingBox = detectedFace.getBoundingBox();
-
-            if (boundingBox == null) {
-                return new byte[] {};
-            }
-
-            // Ensure bounding box is within frame boundaries
-            int x = Math.max(0, boundingBox.x - 20);
-            int y = Math.max(0, boundingBox.y - 20);
-            int width = Math.min(boundingBox.width + 40, currentFrame.cols() - x);
-            int height = Math.min(boundingBox.height + 40, currentFrame.rows() - y);
-
-            if (width <= 0 || height <= 0) {
-                return new byte[] {};
-            }
-
-            // Extract face region
-            Rect safeBounds = new Rect(x, y, width, height);
-            Mat faceRegion = new Mat(currentFrame, safeBounds);
-
+            Mat faceRegion = faceDetector.getFaceFromMatrix(currentFrame, 20);
             // Encode to byte array
             MatOfByte buffer = new MatOfByte();
             Imgcodecs.imencode(".png", faceRegion, buffer);
@@ -152,6 +124,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
     private final BooleanProperty cameraFailure = new SimpleBooleanProperty(false);
     private final ListProperty<byte[]> photosTaken = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final int REQUIRED_PICTURE_COUNT = 15;
+    private final FileChooser fileChooser = new FileChooser();
+    private final FaceDetector faceDetector = new FaceDetector();
     private ThreadWithRunnable<CameraRunnable> cameraDaemon;
     private byte[] thumbnailImage;
 
@@ -219,6 +193,7 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
         thumbnailImage = null;
     }
 
+    @FXML
     public void takePicture() {
         // First image taken is thumbnail
         if (thumbnailImage == null) {
@@ -231,5 +206,40 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
             return;
         }
         this.photosTaken.add(faceInFrame);
+    }
+
+    @FXML
+    public void importImages() {
+        List<File> filesSelected = this.fileChooser.showOpenMultipleDialog(App.getRootStage());
+        if (filesSelected == null || filesSelected.size() <= 0) {
+            Toast.show("No files selected!", ToastType.ERROR);
+            return;
+        }
+        int imported = 0;
+        for (File file : filesSelected) {
+            try (FileInputStream fsIn = new FileInputStream(file)) {
+                byte[] imageRaw = fsIn.readAllBytes();
+                // Extract face from imported image
+                MatOfByte matOfByte = new MatOfByte(imageRaw);
+                Mat imageMat = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_COLOR);
+                Mat faceRegion = faceDetector.getFaceFromMatrix(imageMat, 20);
+                if (faceRegion == null) {
+                    continue;
+                }
+
+                // Re-encode it back to byte[]
+                MatOfByte buffer = new MatOfByte();
+                Imgcodecs.imencode(".png", faceRegion, buffer);
+                byte[] image = buffer.toArray();
+                this.photosTaken.add(image);
+                if (thumbnailImage == null) {
+                    thumbnailImage = imageRaw.clone();
+                }
+                imported++;
+            } catch (IOException e) {
+                Toast.show(String.format("Error loading file %s", file.getAbsolutePath()), ToastType.ERROR);
+            }
+        }
+        Toast.show(String.format("Successfully imported %d images!", imported), ToastType.SUCCESS);
     }
 }

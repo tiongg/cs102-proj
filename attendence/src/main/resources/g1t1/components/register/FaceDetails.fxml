@@ -77,10 +77,14 @@
                         </cursor>
                     </VBox>
                     <VBox prefHeight="20.0" prefWidth="400" alignment="CENTER">
-                        <Label text="Import images instead..." textFill="#a6a6a6" underline="true">
+                        <Label text="Import images instead..." textFill="#a6a6a6" underline="true"
+                               onMouseClicked="#importImages">
                             <font>
                                 <Font name="Inter Regular" size="10.0"/>
                             </font>
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
                         </Label>
                     </VBox>
                     <HBox.margin>

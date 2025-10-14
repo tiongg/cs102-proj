@@ -9,6 +9,7 @@ import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Teacher;
 import g1t1.utils.BindingUtils;
 import g1t1.utils.events.authentication.OnLoginEvent;
+import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -63,18 +64,10 @@ public class StudentDetails extends Tab implements RegistrationStep<HasStudentDe
     @FXML
     public void initialize() {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
-            Teacher user = e.user();
-            mbModuleSelection.getItems().clear();
-            for (ModuleSection section : user.getModuleSections()) {
-                MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
-                mbModuleSelection.getItems().add(item);
-                item.setStyle("-fx-pref-width: 385px");
-
-                item.setOnAction(ae -> {
-                    mbModuleSelection.setText(item.getText());
-                    selectedModuleSection.set(section);
-                });
-            }
+            this.setModuleSections();
+        });
+        AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
+            this.setModuleSections();
         });
     }
 
@@ -89,5 +82,20 @@ public class StudentDetails extends Tab implements RegistrationStep<HasStudentDe
         target.setName(this.nameInput.getText());
         target.setEmail(this.emailInput.getText());
         target.setModuleSection(this.selectedModuleSection.get());
+    }
+
+    private void setModuleSections() {
+        Teacher user = AuthenticationContext.getCurrentUser();
+        mbModuleSelection.getItems().clear();
+        for (ModuleSection section : user.getModuleSections()) {
+            MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
+            mbModuleSelection.getItems().add(item);
+            item.setStyle("-fx-pref-width: 385px");
+
+            item.setOnAction(ae -> {
+                mbModuleSelection.setText(item.getText());
+                selectedModuleSection.set(section);
+            });
+        }
     }
 }
