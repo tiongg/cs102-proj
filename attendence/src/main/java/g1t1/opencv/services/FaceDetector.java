@@ -4,7 +4,10 @@ import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.DetectedFace;
 import nu.pattern.OpenCV;
 import org.bytedeco.javacpp.Loader;
-import org.opencv.core.*;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
@@ -12,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,13 +86,13 @@ public class FaceDetector {
             // Detect faces using HaarCascade
             MatOfRect faceDetections = new MatOfRect();
             faceCascade.detectMultiScale(
-                grayFrame,
-                faceDetections,
-                config.getScaleFactor(),
-                config.getMinNeighbors(),
-                0,
-                new Size(config.getMinSize(), config.getMinSize()),
-                new Size()
+                    grayFrame,
+                    faceDetections,
+                    config.getScaleFactor(),
+                    config.getMinNeighbors(),
+                    0,
+                    new Size(config.getMinSize(), config.getMinSize()),
+                    new Size()
             );
 
             Rect[] faces = faceDetections.toArray();
@@ -159,6 +161,37 @@ public class FaceDetector {
      */
     public String getDetectionStats() {
         return String.format("FaceDetector{initialized=%s, nextFaceId=%d}",
-                           isInitialized(), nextFaceId);
+                isInitialized(), nextFaceId);
+    }
+
+    /**
+     * Get only face region from a given matrix
+     */
+    public Mat getFaceFromMatrix(Mat currentFrame, int padding) {
+        List<DetectedFace> detectedFaces = this.detectFaces(currentFrame);
+        if (detectedFaces.isEmpty()) {
+            return null;
+        }
+
+        DetectedFace detectedFace = detectedFaces.getFirst();
+        Rect boundingBox = detectedFace.getBoundingBox();
+
+        if (boundingBox == null) {
+            return null;
+        }
+
+        // Ensure bounding box is within frame boundaries
+        int x = Math.max(0, boundingBox.x - padding);
+        int y = Math.max(0, boundingBox.y - padding);
+        int width = Math.min(boundingBox.width + padding * 2, currentFrame.cols() - x);
+        int height = Math.min(boundingBox.height + padding * 2, currentFrame.rows() - y);
+
+        if (width <= 0 || height <= 0) {
+            return null;
+        }
+
+        // Extract face region
+        Rect safeBounds = new Rect(x, y, width, height);
+        return new Mat(currentFrame, safeBounds);
     }
 }
