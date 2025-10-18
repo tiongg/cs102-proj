@@ -18,7 +18,7 @@ public class ReportBuilder {
      * Notes: ClassSession Contains: 
      * - moduleSection: ModuleSection object 
      * - week: int 
-     * - startTime: Date 
+     * - startTime: LocalDateTime object
      * - sessionStatus: SessionStatus object
      * 
      * SessionStatus Contains: 
@@ -29,10 +29,20 @@ public class ReportBuilder {
      * ModuleSection Contains: 
      * - module: String (eg. CS102) 
      * - section: String (eg.G2) 
+     * - term: String (eg. AY25-26T1)
      * - students: List<Student>
+     * - day: int (1-7, depending on the day)
+     * - room: String (eg. SCIS1 2-4)
+     * - startTime: String (HH:MM)
+     * - endTime: String (HH:MM)
+     * - id: String (used for the database)
      * 
      * Student Contains: 
-     *  - id: String (eg. "01466890")
+     * - id: String (eg. "01466890")
+     * - name: String
+     * - modulesection: ModuleSection Object
+     * - email: String
+     * - faceData: faceData
      * 
      */
 
