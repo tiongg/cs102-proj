@@ -1,7 +1,7 @@
 package g1t1.features.logger;
 
 import g1t1.config.SettingsManager;
-
+// TODO: Logging doesn't seem to actually work, need to re-check
 /**
  * Static logging class.
  * 
