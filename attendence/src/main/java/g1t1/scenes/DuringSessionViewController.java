@@ -1,5 +1,6 @@
 package g1t1.scenes;
 
+import g1t1.config.SettingsManager;
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
@@ -20,8 +21,13 @@ import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 class CameraRunnable implements Runnable {
     private final VideoCapture camera;
@@ -78,6 +84,7 @@ class CameraRunnable implements Runnable {
 public class DuringSessionViewController extends PageController {
     private final BooleanProperty isTeacherInViewProperty = new SimpleBooleanProperty(false);
     private ThreadWithRunnable<CameraRunnable> cameraDaemon;
+    private Timer remainingTimeTimer;
 
     @FXML
     private Label lblModule, lblSection, lblWeek, lblTimeStart, lblRemainingTime, lblPresent;
@@ -109,11 +116,20 @@ public class DuringSessionViewController extends PageController {
         this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
         this.cameraDaemon.setDaemon(true);
         this.cameraDaemon.start();
+
+        // Start timer to update remaining time every minute
+        startRemainingTimeUpdater(session);
     }
 
     @Override
     public void onUnmount() {
-        this.cameraDaemon.interrupt();
+        if (this.cameraDaemon != null) {
+            this.cameraDaemon.interrupt();
+        }
+        if (this.remainingTimeTimer != null) {
+            this.remainingTimeTimer.cancel();
+            this.remainingTimeTimer = null;
+        }
         AttendanceTaker.stop();
     }
 
@@ -125,8 +141,51 @@ public class DuringSessionViewController extends PageController {
 
         this.lblWeek.setText(String.format("Week %d", session.getWeek()));
         this.lblTimeStart.setText(section.getStartTime());
-        //TODO: Settings
+        
+        // Set initial remaining time
+        updateRemainingTime(session);
 
         this.lblPresent.setText(String.format("%d / %d", 0, section.getStudents().size()));
+    }
+
+    private void startRemainingTimeUpdater(ClassSession session) {
+        this.remainingTimeTimer = new Timer(true);
+        this.remainingTimeTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                updateRemainingTime(session);
+            }
+        }, 0, 60000); // Update every minute
+    }
+
+    private void updateRemainingTime(ClassSession session) {
+        try {
+            ModuleSection section = session.getModuleSection();
+            String startTimeStr = section.getStartTime();
+            
+            // Parse start time (format: "HH:mm")
+            LocalTime startTime = LocalTime.parse(startTimeStr, DateTimeFormatter.ofPattern("HH:mm"));
+            
+            // Get late threshold from settings
+            int lateThresholdMins = SettingsManager.getInstance().getLateThresholdMinutes();
+            
+            // Calculate late cutoff time
+            LocalTime lateTime = startTime.plusMinutes(lateThresholdMins);
+            LocalTime now = LocalTime.now();
+            
+            Platform.runLater(() -> {
+                if (now.isBefore(lateTime)) {
+                    long remainingMins = Duration.between(now, lateTime).toMinutes();
+                    lblRemainingTime.setText(remainingMins + " mins");
+                } else {
+                    lblRemainingTime.setText("Late period");
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Error updating remaining time: " + e.getMessage());
+            Platform.runLater(() -> {
+                lblRemainingTime.setText("--");
+            });
+        }
     }
 }

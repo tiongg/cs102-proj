@@ -42,7 +42,7 @@
                 </Label>
                 <TextField fx:id="tfDetectionThreshold" promptText="70" 
                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                <Label text="%%" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                <Label text="\%" GridPane.columnIndex="2" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="14.0"/>
                     </font>
