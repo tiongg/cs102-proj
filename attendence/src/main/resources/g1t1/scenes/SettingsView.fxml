@@ -41,6 +41,7 @@
                     </font>
                 </Label>
                 <TextField fx:id="tfDetectionThreshold" promptText="70" 
+                          styleClass="flat-input"
                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Label text="\%" GridPane.columnIndex="2" GridPane.rowIndex="0">
                     <font>
@@ -63,6 +64,7 @@
                     </font>
                 </Label>
                 <TextField fx:id="tfLateThreshold" promptText="15" 
+                          styleClass="flat-input"
                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Label text="mins" GridPane.columnIndex="2" GridPane.rowIndex="0">
                     <font>
@@ -85,7 +87,7 @@
                     </font>
                 </Label>
                 <ComboBox fx:id="cbCameraDevice" promptText="Select camera..." 
-                         maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                         styleClass="flat-input" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Button fx:id="btnDetectCameras" text="Detect Cameras" onAction="#detectCameras" 
                         prefHeight="30.0" maxWidth="Infinity"
                         style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5;"
@@ -110,6 +112,7 @@
                     </font>
                 </Label>
                 <TextField fx:id="tfLogPath" promptText="logs/" 
+                          styleClass="flat-input"
                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Region GridPane.columnIndex="2" GridPane.rowIndex="0"/>
             </GridPane>
