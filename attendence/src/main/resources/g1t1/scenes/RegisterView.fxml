@@ -7,7 +7,7 @@
 <?import g1t1.components.register.TeacherRegistrationDone?>
 <?import g1t1.components.stepper.StepperControl?>
 <?import javafx.collections.FXCollections?>
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.Cursor?>
@@ -15,70 +15,85 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import java.lang.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
-            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.RegisterViewController">
-    <Label layoutX="280.0" layoutY="23.0" text="Register" AnchorPane.leftAnchor="280.0" AnchorPane.topAnchor="24.0"
-           StackPane.alignment="TOP_LEFT">
+<StackPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
+           xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.RegisterViewController">
+    <Label layoutX="280.0" layoutY="23.0" text="Register" StackPane.alignment="TOP_LEFT">
         <font>
             <Font name="Inter Regular" size="24.0"/>
         </font>
+        <StackPane.margin>
+            <Insets bottom="32.0" left="32.0" right="32.0" top="40.0"/>
+        </StackPane.margin>
     </Label>
 
-    <TabPane fx:id="tabs" layoutX="330.0" layoutY="128.0" prefHeight="700.0" prefWidth="780.0" styleClass="hidden-tabs"
-             tabClosingPolicy="UNAVAILABLE" tabMaxHeight="50.0" tabMaxWidth="150.0" AnchorPane.bottomAnchor="128.0"
-             AnchorPane.topAnchor="128.0">
-        <TeacherRegisterDetails text="Details"/>
-        <PasswordDetails text="Password"/>
-        <FaceDetails/>
-        <TeacherRegistrationDone text="Registration Done"/>
-    </TabPane>
 
-    <HBox fx:id="backButton" alignment="CENTER_LEFT" layoutX="330.0" layoutY="772.0" onMouseClicked="#prev"
-          spacing="8.0" styleClass="flat-button" AnchorPane.bottomAnchor="103" AnchorPane.leftAnchor="330.0">
-        <FontIcon iconLiteral="fas-chevron-left" iconSize="16"/>
-        <Label fx:id="backText" text="Login">
-            <font>
-                <Font name="Inter Regular" size="16.0"/>
-            </font>
-        </Label>
-        <cursor>
-            <Cursor fx:constant="HAND"/>
-        </cursor>
-        <padding>
-            <Insets bottom="8.0" left="16.0" right="16.0" top="8.0"/>
-        </padding>
-    </HBox>
+    <VBox spacing="72" StackPane.alignment="TOP_CENTER" prefWidth="780.0" maxWidth="780">
+        <StepperControl fx:id="stepper" prefHeight="56.0" prefWidth="780.0">
+            <labels>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Details"/>
+                    <String fx:value="Password"/>
+                    <String fx:value="Image Capture"/>
+                    <String fx:value="Complete"/>
+                </FXCollections>
+            </labels>
+        </StepperControl>
+
+        <TabPane fx:id="tabs"
+                 prefHeight="700.0"
+                 prefWidth="780.0"
+                 styleClass="hidden-tabs" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="50.0" tabMaxWidth="150.0">
+            <TeacherRegisterDetails text="Details"/>
+            <PasswordDetails text="Password"/>
+            <FaceDetails/>
+            <TeacherRegistrationDone text="Registration Done"/>
+        </TabPane>
+
+        <StackPane.margin>
+            <Insets bottom="32.0" left="32.0" right="32.0" top="120.0"/>
+        </StackPane.margin>
+    </VBox>
 
 
-    <HBox fx:id="nextButton" alignment="CENTER_LEFT" layoutX="1068.0" layoutY="772.0" onMouseClicked="#next"
-          spacing="8.0" AnchorPane.bottomAnchor="103" AnchorPane.rightAnchor="330.0">
-        <Label fx:id="nextText" text="Next">
-            <font>
-                <Font name="Inter Regular" size="16.0"/>
-            </font>
-        </Label>
-        <FontIcon iconLiteral="fas-chevron-right" iconSize="16"/>
-        <cursor>
-            <Cursor fx:constant="HAND"/>
-        </cursor>
-        <padding>
-            <Insets bottom="8.0" left="16.0" right="16.0" top="8.0"/>
-        </padding>
-        <styleClass>
-            <String fx:value="disabled"/>
-            <String fx:value="flat-button"/>
-        </styleClass>
-    </HBox>
+    <AnchorPane maxHeight="-Infinity" prefHeight="56" StackPane.alignment="BOTTOM_CENTER">
+        <HBox fx:id="backButton" alignment="CENTER" onMouseClicked="#prev" spacing="8.0" styleClass="flat-button"
+              AnchorPane.leftAnchor="128.0">
+            <FontIcon iconLiteral="fas-chevron-left" iconSize="16"/>
+            <Label fx:id="backText" text="Login">
+                <font>
+                    <Font name="Inter Regular" size="16.0"/>
+                </font>
+            </Label>
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+            <padding>
+                <Insets bottom="8.0" left="16.0" right="16.0" top="8.0"/>
+            </padding>
+        </HBox>
 
-    <StepperControl fx:id="stepper" layoutX="328.0" layoutY="56.0" prefHeight="56.0" prefWidth="780.0"
-                    AnchorPane.topAnchor="64.0">
-        <labels>
-            <FXCollections fx:factory="observableArrayList">
-                <String fx:value="Details"/>
-                <String fx:value="Password"/>
-                <String fx:value="Image Capture"/>
-                <String fx:value="Complete"/>
-            </FXCollections>
-        </labels>
-    </StepperControl>
-</AnchorPane>
+
+        <HBox fx:id="nextButton" alignment="CENTER" onMouseClicked="#next" spacing="8.0"
+              AnchorPane.rightAnchor="128.0">
+            <Label fx:id="nextText" text="Next">
+                <font>
+                    <Font name="Inter Regular" size="16.0"/>
+                </font>
+            </Label>
+            <FontIcon iconLiteral="fas-chevron-right" iconSize="16"/>
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+            <padding>
+                <Insets bottom="8.0" left="16.0" right="16.0" top="8.0"/>
+            </padding>
+            <styleClass>
+                <String fx:value="disabled"/>
+                <String fx:value="flat-button"/>
+            </styleClass>
+        </HBox>
+        <StackPane.margin>
+            <Insets bottom="32.0" left="32.0" right="32.0" top="32.0"/>
+        </StackPane.margin>
+    </AnchorPane>
+</StackPane>
