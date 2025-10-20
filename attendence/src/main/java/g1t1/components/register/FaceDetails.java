@@ -104,7 +104,12 @@ class CameraRunnable implements Runnable {
                 return new byte[]{};
             }
 
-            Mat faceRegion = faceDetector.getFaceFromMatrix(currentFrame, 20);
+            Mat faceRegion = faceDetector.getFaceFromMatrix(currentFrame, 0);
+
+            if (faceRegion == null) {
+                return new byte[]{};
+            }
+
             // Encode to byte array
             MatOfByte buffer = new MatOfByte();
             Imgcodecs.imencode(".png", faceRegion, buffer);
@@ -202,7 +207,7 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
         }
         byte[] faceInFrame = this.cameraDaemon.getRunnable().getFaceInFrame();
         if (faceInFrame.length <= 0) {
-            Toast.show("Error taking photo, face not detected!", ToastType.ERROR);
+            Toast.show("Error taking photo, no face detected!", ToastType.ERROR);
             return;
         }
         this.photosTaken.add(faceInFrame);
@@ -222,7 +227,7 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
                 // Extract face from imported image
                 MatOfByte matOfByte = new MatOfByte(imageRaw);
                 Mat imageMat = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_COLOR);
-                Mat faceRegion = faceDetector.getFaceFromMatrix(imageMat, 20);
+                Mat faceRegion = faceDetector.getFaceFromMatrix(imageMat, 0);
                 if (faceRegion == null) {
                     continue;
                 }
