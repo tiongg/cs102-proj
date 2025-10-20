@@ -1,5 +1,6 @@
 package g1t1.opencv.config;
 
+import g1t1.config.SettingsManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -36,7 +37,7 @@ public class FaceConfig {
 
     // Recognition Settings
     public double getRecognitionThreshold() {
-        return Double.parseDouble(properties.getProperty("recognition.threshold", "70.0"));
+        return SettingsManager.getInstance().getDetectionThreshold();
     }
 
     public double getDisplayThreshold() {
@@ -58,7 +59,7 @@ public class FaceConfig {
 
     // Camera Settings
     public int getCameraIndex() {
-        return Integer.parseInt(properties.getProperty("camera.index", "0"));
+        return SettingsManager.getInstance().getCameraDevice();
     }
 
     public int getTargetFps() {

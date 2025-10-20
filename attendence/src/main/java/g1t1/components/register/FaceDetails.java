@@ -45,7 +45,31 @@ class CameraRunnable implements Runnable {
     private final FaceDetector faceDetector;
 
     public CameraRunnable(ImageView display, BooleanProperty cameraFailure) {
-        this.camera = new VideoCapture(FaceConfig.getInstance().getCameraIndex());
+        int configuredCamera = FaceConfig.getInstance().getCameraIndex();
+        VideoCapture tempCamera = new VideoCapture(configuredCamera);
+        
+        // Check if configured camera opened successfully
+        if (!tempCamera.isOpened()) {
+            System.err.println("Camera " + configuredCamera + " failed to open. Trying camera 0...");
+            tempCamera.release();
+            tempCamera = new VideoCapture(0);
+            
+            // If camera 0 also fails, notify user
+            if (!tempCamera.isOpened()) {
+                System.err.println("No cameras available!");
+                Platform.runLater(() -> {
+                    Toast.show("No camera detected! Please import images instead.", 
+                              Toast.ToastType.ERROR);
+                });
+            } else {
+                Platform.runLater(() -> {
+                    Toast.show("Using default camera (Camera " + configuredCamera + " unavailable)", 
+                              Toast.ToastType.WARNING);
+                });
+            }
+        }
+        
+        this.camera = tempCamera;
         this.display = display;
         this.cameraFailure = cameraFailure;
         this.faceDetector = new FaceDetector();
@@ -56,6 +80,13 @@ class CameraRunnable implements Runnable {
         Mat frame = new Mat();
         int consecutiveFailures = 0;
         this.cameraFailure.set(false);
+        
+        // Immediately set failure if camera didn't open
+        if (!camera.isOpened()) {
+            this.cameraFailure.set(true);
+            return;
+        }
+        
         while (camera.isOpened()) {
             if (Thread.currentThread().isInterrupted()) {
                 break;
@@ -83,7 +114,7 @@ class CameraRunnable implements Runnable {
         }
         camera.release();
         if (consecutiveFailures >= MAX_FAILS) {
-            cameraFailure.set(true);
+            this.cameraFailure.set(true);
         }
     }
 

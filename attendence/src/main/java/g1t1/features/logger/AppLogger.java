@@ -1,5 +1,7 @@
 package g1t1.features.logger;
 
+import g1t1.config.SettingsManager;
+// TODO: Logging doesn't seem to actually work, need to re-check
 /**
  * Static logging class.
  * 
@@ -12,9 +14,17 @@ package g1t1.features.logger;
  * </pre>
  */
 public class AppLogger {
-    // TODO(TG/Delroy): File logger path should come from settings
-    private static BaseLogger logger = new FileLogger("./logs/");
+    private static BaseLogger logger;
     private static ConsoleLogger consoleLogger = new ConsoleLogger();
+
+    // Initialize logger lazily to ensure SettingsManager is ready
+    private static BaseLogger getLogger() {
+        if (logger == null) {
+            String logPath = SettingsManager.getInstance().getLogPath();
+            logger = new FileLogger(logPath);
+        }
+        return logger;
+    }
 
     /**
      * Logs message. Defaults to LogLevel.Info.
@@ -24,7 +34,7 @@ public class AppLogger {
     public static void log(String message) {
         try {
             consoleLogger.log(message);
-            logger.log(message);
+            getLogger().log(message);
         } catch (Exception e) {
             consoleLogger.log(LogLevel.Error, e.getMessage());
         }
@@ -39,7 +49,7 @@ public class AppLogger {
     public static void log(LogLevel level, String message) {
         try {
             consoleLogger.log(level, message);
-            logger.log(level, message);
+            getLogger().log(level, message);
         } catch (Exception e) {
             consoleLogger.log(LogLevel.Error, e.getMessage());
         }
