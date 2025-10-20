@@ -1,24 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 <?import g1t1.components.Navbar?>
 
-<?import javafx.scene.text.Font?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             xmlns="http://javafx.com/javafx"
             fx:controller="g1t1.scenes.SettingsViewController"
             prefHeight="900.0" prefWidth="1440.0">
     <Navbar/>
-    <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
-                AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" 
+                AnchorPane.bottomAnchor="0.0"
+                AnchorPane.leftAnchor="250.0" 
+                AnchorPane.rightAnchor="0.0" 
+                AnchorPane.topAnchor="0.0">
+        
         <Label text="Settings" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
             <font>
                 <Font name="Inter Semi Bold" size="26.0"/>
             </font>
         </Label>
+
+        <VBox spacing="24.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="100.0" AnchorPane.rightAnchor="40.0">
+            
+            <!-- Detection Threshold -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <Label text="Detection Threshold" prefWidth="200.0">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="tfDetectionThreshold" prefWidth="400.0" promptText="70"/>
+                <Label text="%%">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+            </HBox>
+
+            <!-- Late Threshold -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <Label text="Late Threshold" prefWidth="200.0">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="tfLateThreshold" prefWidth="400.0" promptText="15"/>
+                <Label text="mins">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+            </HBox>
+
+            <!-- Camera Device -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <Label text="Camera Device" prefWidth="200.0">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+                <ComboBox fx:id="cbCameraDevice" prefWidth="400.0" promptText="Select camera..."/>
+            </HBox>
+
+            <!-- Log Path -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <Label text="Log Path" prefWidth="200.0">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="tfLogPath" prefWidth="400.0" promptText="logs/"/>
+            </HBox>
+
+            <!-- Save Button -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <padding>
+                    <Insets top="20.0"/>
+                </padding>
+                <Region prefWidth="200.0"/>
+                <Button fx:id="btnSave" text="Save Settings" onAction="#saveSettings" prefWidth="150.0" prefHeight="40.0">
+                    <font>
+                        <Font name="Inter Semi Bold" size="14.0"/>
+                    </font>
+                </Button>
+            </HBox>
+
+        </VBox>
+
     </AnchorPane>
 </AnchorPane>
