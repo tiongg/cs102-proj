@@ -23,65 +23,105 @@
             </font>
         </Label>
 
-        <VBox spacing="24.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="100.0" AnchorPane.rightAnchor="40.0">
+        <!-- Center the form with consistent spacing -->
+        <VBox spacing="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="100.0" 
+              AnchorPane.rightAnchor="200.0" maxWidth="900.0">
             
             <!-- Detection Threshold -->
-            <HBox alignment="CENTER_LEFT" spacing="20.0">
-                <Label text="Detection Threshold" prefWidth="200.0">
+            <GridPane hgap="20.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="180.0" prefWidth="180.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="50.0"/>
+                </columnConstraints>
+                
+                <Label text="Detection Threshold" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="tfDetectionThreshold" prefWidth="400.0" promptText="70"/>
-                <Label text="%%">
+                <TextField fx:id="tfDetectionThreshold" promptText="70" 
+                          GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Label text="%%" GridPane.columnIndex="2" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="14.0"/>
                     </font>
                 </Label>
-            </HBox>
+            </GridPane>
 
             <!-- Late Threshold -->
-            <HBox alignment="CENTER_LEFT" spacing="20.0">
-                <Label text="Late Threshold" prefWidth="200.0">
+            <GridPane hgap="20.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="180.0" prefWidth="180.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="50.0"/>
+                </columnConstraints>
+                
+                <Label text="Late Threshold" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="tfLateThreshold" prefWidth="400.0" promptText="15"/>
-                <Label text="mins">
+                <TextField fx:id="tfLateThreshold" promptText="15" 
+                          GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Label text="mins" GridPane.columnIndex="2" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="14.0"/>
                     </font>
                 </Label>
-            </HBox>
+            </GridPane>
 
-            <!-- Camera Device -->
-            <HBox alignment="CENTER_LEFT" spacing="20.0">
-                <Label text="Camera Device" prefWidth="200.0">
+            <!-- Camera Device with Detect Button -->
+            <GridPane hgap="20.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="180.0" prefWidth="180.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="300.0"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="150.0"/>
+                </columnConstraints>
+                
+                <Label text="Camera Device" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="14.0"/>
                     </font>
                 </Label>
-                <ComboBox fx:id="cbCameraDevice" prefWidth="400.0" promptText="Select camera..."/>
-            </HBox>
+                <ComboBox fx:id="cbCameraDevice" promptText="Select camera..." 
+                         maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Button fx:id="btnDetectCameras" text="Detect Cameras" onAction="#detectCameras" 
+                        prefHeight="30.0" maxWidth="Infinity"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5;"
+                        GridPane.columnIndex="2" GridPane.rowIndex="0">
+                    <font>
+                        <Font name="Inter" size="12.0"/>
+                    </font>
+                </Button>
+            </GridPane>
 
             <!-- Log Path -->
-            <HBox alignment="CENTER_LEFT" spacing="20.0">
-                <Label text="Log Path" prefWidth="200.0">
+            <GridPane hgap="20.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="180.0" prefWidth="180.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="50.0"/>
+                </columnConstraints>
+                
+                <Label text="Log Path" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="tfLogPath" prefWidth="400.0" promptText="logs/"/>
-            </HBox>
+                <TextField fx:id="tfLogPath" promptText="logs/" 
+                          GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Region GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            </GridPane>
 
             <!-- Save Button -->
             <HBox alignment="CENTER_LEFT" spacing="20.0">
                 <padding>
                     <Insets top="20.0"/>
                 </padding>
-                <Region prefWidth="200.0"/>
-                <Button fx:id="btnSave" text="Save Settings" onAction="#saveSettings" prefWidth="150.0" prefHeight="40.0">
+                <Region prefWidth="180.0"/>
+                <Button fx:id="btnSave" text="Save Settings" onAction="#saveSettings" 
+                        prefWidth="200.0" prefHeight="40.0">
                     <font>
                         <Font name="Inter Semi Bold" size="14.0"/>
                     </font>
