@@ -14,58 +14,9 @@ import g1t1.models.users.*;
 /**
  * Generates CSV Report which exports to specific file
  */
-public class CSVReport implements ReportGenerator {
-    private String filepath;
+public class CSVReport extends ReportGenerator {
+    public CSVReport(String filepath) { super(filepath); }
 
-    // constructor
-    /**
-     * Generate CSV file with specified filepath
-     * 
-     * @param filepath
-     */
-    public CSVReport(String filepath) {
-        this.filepath = filepath; // where you want the file to be exp
-    }
-
-    // helper functon to build modulesection
-    private String[] buildClassSection(ClassSession session) {
-        ModuleSection section = session.getModuleSection();
-        return new String[] {
-                "Module Section: " + section.getModule() + "-" + section.getSection() + "W" + session.getWeek()}; 
-    }
-
-    // helper function to build header
-    private String[] buildHeader(Report report) {
-        List<String> header = new ArrayList<>();
-        if (report.isIncludeStudentId())
-            header.add("Student ID");
-        if (report.isIncludeName())
-            header.add("Name");
-        if (report.isIncludeStatus())
-            header.add("Status");
-        if (report.isIncludeConfidence())
-            header.add("Confidence");
-        if (report.isIncludeMethod())
-            header.add("Method");
-
-        return header.toArray(new String[0]); // 0 added as dummy
-    }
-
-    // helper function to build student rows
-    private String[] buildRow(SessionAttendance sessionAttendance, Report report) {
-        List<String> row = new ArrayList<>();
-        if (report.isIncludeStudentId())
-            row.add(sessionAttendance.getStudent().getId().toString());
-        if (report.isIncludeName())
-            row.add(sessionAttendance.getStudent().getName());
-        if (report.isIncludeStatus())
-            row.add(sessionAttendance.getStatus().toString());
-        if (report.isIncludeConfidence())
-            row.add(Double.toString(sessionAttendance.getConfidence()));
-        if (report.isIncludeMethod())
-            row.add(sessionAttendance.getMethod().toString());
-        return row.toArray(new String[0]);
-    }
 
     @Override
     public void generate(Report report) {
@@ -81,7 +32,7 @@ public class CSVReport implements ReportGenerator {
             throw new IllegalArgumentException("SessionAttendance cannot be null");
         }
 
-        try (CSVWriter writer = new CSVWriter(new FileWriter(filepath))) {
+        try (CSVWriter writer = new CSVWriter(new FileWriter(getFilepath()))) {
 
             // writing Module Section
             writer.writeNext(buildClassSection(session));
@@ -112,7 +63,7 @@ public class CSVReport implements ReportGenerator {
             for (SessionAttendance sessionAttendance : sessAttendances) {
                 writer.writeNext(buildRow(sessionAttendance, report));
             }
-            System.out.println("File successfully written to " + filepath);
+            System.out.println("File successfully written to " + getFilepath());
         } catch (Exception e) {
             e.printStackTrace();
         }
