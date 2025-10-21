@@ -33,5 +33,8 @@ public class ReportTesting {
 
         CSVReport csvreport = new CSVReport(filePath + "csvfile.csv");
         csvreport.generate(report);
+
+        PDFReport pdfreport = new PDFReport(filePath + "pdfile.pdf");
+        pdfreport.generate(report);
     }
 }
