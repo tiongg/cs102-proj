@@ -119,6 +119,12 @@
             <artifactId>opencsv</artifactId>
             <version>5.9</version>
         </dependency>
+        <!-- PDF -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.5</version>
+        </dependency>
     </dependencies>
 
     <build>
