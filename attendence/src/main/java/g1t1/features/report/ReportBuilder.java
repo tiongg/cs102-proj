@@ -12,14 +12,13 @@ public class ReportBuilder {
     private boolean includeTimeStamp = false;
     private boolean includeConfidence = false;
     private boolean includeMethod = false;
-    private boolean includeNotes = false;
-    private ModuleSection moduleSection;
+    private ClassSession classSession;
 
     /*
      * Notes: ClassSession Contains: 
      * - moduleSection: ModuleSection object 
      * - week: int 
-     * - startTime: Date 
+     * - startTime: LocalDateTime object
      * - sessionStatus: SessionStatus object
      * 
      * SessionStatus Contains: 
@@ -30,16 +29,26 @@ public class ReportBuilder {
      * ModuleSection Contains: 
      * - module: String (eg. CS102) 
      * - section: String (eg.G2) 
+     * - term: String (eg. AY25-26T1)
      * - students: List<Student>
+     * - day: int (1-7, depending on the day)
+     * - room: String (eg. SCIS1 2-4)
+     * - startTime: String (HH:MM)
+     * - endTime: String (HH:MM)
+     * - id: String (used for the database)
      * 
      * Student Contains: 
-     *  - id: String (eg. "01466890")
+     * - id: String (eg. "01466890")
+     * - name: String
+     * - modulesection: ModuleSection Object
+     * - email: String
+     * - faceData: faceData
      * 
      */
 
     // to add data of modulesection that you want data from
-    public ReportBuilder includeReport(ModuleSection moduleSection) {
-        this.moduleSection = moduleSection;
+    public ReportBuilder includeReport(ClassSession classSession) {
+        this.classSession = classSession;
         return this;
     }
 
@@ -55,11 +64,6 @@ public class ReportBuilder {
 
     public ReportBuilder withMethod() {
         this.includeMethod = true;
-        return this;
-    }
-
-    public ReportBuilder withNotes() {
-        this.includeNotes = true;
         return this;
     }
 
@@ -88,12 +92,8 @@ public class ReportBuilder {
         return includeMethod;
     }
 
-    public boolean isIncludeNotes() {
-        return includeNotes;
-    }
-
-    public ModuleSection getModuleSection() {
-        return moduleSection;
+    public ClassSession getClassSession() {
+        return classSession;
     }
 
 }
