@@ -1,5 +1,15 @@
 package g1t1.components.register;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
+
 import g1t1.App;
 import g1t1.components.Toast;
 import g1t1.components.Toast.ToastType;
@@ -24,15 +34,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.videoio.VideoCapture;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
 
 class CameraRunnable implements Runnable {
     private static final int TARGET_SIZE = 256;
@@ -126,19 +127,19 @@ class CameraRunnable implements Runnable {
                 return buffer.toArray();
             }
         }
-        return new byte[]{};
+        return new byte[] {};
     }
 
     public byte[] getFaceInFrame() {
         synchronized (frameLock) {
             if (currentFrame.empty()) {
-                return new byte[]{};
+                return new byte[] {};
             }
 
             Mat faceRegion = faceDetector.getFaceFromMatrix(currentFrame, 0);
 
             if (faceRegion == null) {
-                return new byte[]{};
+                return new byte[] {};
             }
 
             // Encode to byte array
@@ -149,7 +150,6 @@ class CameraRunnable implements Runnable {
             // Cleanup
             faceRegion.release();
             buffer.release();
-
             return result;
         }
     }

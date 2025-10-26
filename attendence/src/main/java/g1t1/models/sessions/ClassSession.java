@@ -6,9 +6,9 @@ import g1t1.models.BaseEntity;
 import g1t1.models.ids.StudentID;
 import g1t1.models.users.Student;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 record AttendanceStats(int present, int expected, int total) {
@@ -18,10 +18,11 @@ record AttendanceStats(int present, int expected, int total) {
  * Class session
  */
 public class ClassSession extends BaseEntity implements TableChipItem {
+    private final int TIME_BEFORE_LATE = 15;
+
     private final ModuleSection moduleSection;
     private final int week;
     private final LocalDateTime startTime;
-    private final ArrayList<SessionAttendance> recentlyMarked = new ArrayList<>();
     private final HashMap<StudentID, SessionAttendance> studentAttendance = new HashMap<>();
     private SessionStatus sessionStatus;
 
@@ -53,6 +54,18 @@ public class ClassSession extends BaseEntity implements TableChipItem {
 
     public ModuleSection getModuleSection() {
         return this.moduleSection;
+    }
+
+    /**
+     * Mark students attendance as the result of this
+     */
+    public AttendanceStatus getCurrentStatus() {
+        Duration timePassed = Duration.between(this.startTime, LocalDateTime.now());
+        if (timePassed.toMinutes() <= TIME_BEFORE_LATE) {
+            return AttendanceStatus.PRESENT;
+        } else {
+            return AttendanceStatus.LATE;
+        }
     }
 
     private String formatModuleSection() {
