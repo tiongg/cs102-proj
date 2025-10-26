@@ -18,7 +18,7 @@ record AttendanceStats(int present, int expected, int total) {
  * Class session
  */
 public class ClassSession extends BaseEntity implements TableChipItem {
-    private final int TIME_BEFORE_LATE = 15;
+    public static final int TIME_BEFORE_LATE = 15;
 
     private final ModuleSection moduleSection;
     private final int week;

@@ -13,10 +13,7 @@ import g1t1.opencv.FaceRecognitionService;
 import g1t1.opencv.models.Recognisable;
 import g1t1.utils.events.opencv.StudentDetectedEvent;
 import javafx.application.Platform;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 
 import java.time.LocalDateTime;
@@ -28,6 +25,7 @@ public class AttendanceTaker {
             new SimpleListProperty<>(FXCollections.observableArrayList());
     public static final ObjectProperty<StudentDetectedEvent> needsConfirmation =
             new SimpleObjectProperty<>();
+    public static final IntegerProperty studentsPresent = new SimpleIntegerProperty();
 
     // Configuration constants
     private static final int MAX_RECENTLY_DISPLAYED = 3;
@@ -154,6 +152,14 @@ public class AttendanceTaker {
     ) {
         attendance.setStatus(status, confidence, method);
         addToRecentlyMarked(attendance);
+        studentsPresent.set(currentSession
+                .getStudentAttendance()
+                .values()
+                .stream()
+                .filter(x -> x.getStatus() == AttendanceStatus.PRESENT || x.getStatus() == AttendanceStatus.LATE)
+                .toList()
+                .size()
+        );
     }
 
     private static void addToRecentlyMarked(SessionAttendance attendance) {
