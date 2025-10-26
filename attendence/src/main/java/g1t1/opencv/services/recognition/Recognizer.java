@@ -3,17 +3,8 @@ package g1t1.opencv.services.recognition;
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.Recognisable;
 import g1t1.opencv.models.RecognitionResult;
-import g1t1.opencv.services.preprocessing.BilateralFilterProcessor;
-import g1t1.opencv.services.preprocessing.CLAHEProcessor;
-import g1t1.opencv.services.preprocessing.GrayscaleProcessor;
-import g1t1.opencv.services.preprocessing.NormalizerProcessor;
-import g1t1.opencv.services.preprocessing.ResizeProcessor;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.Size;
+import g1t1.opencv.services.preprocessing.*;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.HOGDescriptor;
 
@@ -34,27 +25,6 @@ public abstract class Recognizer {
     protected final ResizeProcessor resizer;
     protected final HOGDescriptor hogDescriptor;
 
-    /**
-     * Container for face feature data.
-     */
-    protected static class FaceFeatures {
-        final Mat histogram;
-        final Mat lbp;
-        final Mat hog;
-
-        FaceFeatures(Mat histogram, Mat lbp, Mat hog) {
-            this.histogram = histogram;
-            this.lbp = lbp;
-            this.hog = hog;
-        }
-
-        void release() {
-            histogram.release();
-            lbp.release();
-            hog.release();
-        }
-    }
-
     public Recognizer() {
         this.config = FaceConfig.getInstance();
         this.grayscale = new GrayscaleProcessor();
@@ -63,11 +33,11 @@ public abstract class Recognizer {
         this.clahe = new CLAHEProcessor();
         this.resizer = new ResizeProcessor();
         this.hogDescriptor = new HOGDescriptor(
-            new Size(64, 128),
-            new Size(16, 16),
-            new Size(8, 8),
-            new Size(8, 8),
-            9
+                new Size(64, 128),
+                new Size(16, 16),
+                new Size(8, 8),
+                new Size(8, 8),
+                9
         );
     }
 
@@ -133,15 +103,15 @@ public abstract class Recognizer {
         Recognisable bestMatch = null;
         double bestConfidence = 0.0;
 
-        for (Recognisable student : recognisableList) {
-            if (student.getFaceData() == null || student.getFaceData().getFaceImages() == null) {
+        for (Recognisable recognisable : recognisableList) {
+            if (recognisable.getFaceData() == null || recognisable.getFaceData().getFaceImages() == null) {
                 continue;
             }
 
-            double confidence = compareWithRecognisable(processedFace, student);
+            double confidence = compareWithRecognisable(processedFace, recognisable);
             if (confidence > bestConfidence) {
                 bestConfidence = confidence;
-                bestMatch = student;
+                bestMatch = recognisable;
             }
         }
 
@@ -158,9 +128,9 @@ public abstract class Recognizer {
      */
     protected final FaceFeatures extractFeatures(Mat face) {
         return new FaceFeatures(
-            calculateHistogram(face),
-            calculateLBP(face),
-            calculateHOG(face)
+                calculateHistogram(face),
+                calculateLBP(face),
+                calculateHOG(face)
         );
     }
 
@@ -170,12 +140,12 @@ public abstract class Recognizer {
     protected final Mat calculateHistogram(Mat image) {
         Mat histogram = new Mat();
         Imgproc.calcHist(
-            Arrays.asList(image),
-            new MatOfInt(0),
-            new Mat(),
-            histogram,
-            new MatOfInt(128),
-            new MatOfFloat(0f, 256f)
+                Arrays.asList(image),
+                new MatOfInt(0),
+                new Mat(),
+                histogram,
+                new MatOfInt(128),
+                new MatOfFloat(0f, 256f)
         );
         Core.normalize(histogram, histogram, 1, 0, Core.NORM_L2);
         return histogram;
@@ -213,12 +183,12 @@ public abstract class Recognizer {
 
         Mat lbpHistogram = new Mat();
         Imgproc.calcHist(
-            Arrays.asList(lbpImage),
-            new MatOfInt(0),
-            new Mat(),
-            lbpHistogram,
-            new MatOfInt(256),
-            new MatOfFloat(0f, 256f)
+                Arrays.asList(lbpImage),
+                new MatOfInt(0),
+                new Mat(),
+                lbpHistogram,
+                new MatOfInt(256),
+                new MatOfFloat(0f, 256f)
         );
         Core.normalize(lbpHistogram, lbpHistogram, 1, 0, Core.NORM_L2);
 
@@ -302,4 +272,25 @@ public abstract class Recognizer {
      * Subclasses implement their specific recognition algorithm here.
      */
     public abstract double compareWithRecognisable(Mat processedFace, Recognisable recognisable);
+
+    /**
+     * Container for face feature data.
+     */
+    protected static class FaceFeatures {
+        final Mat histogram;
+        final Mat lbp;
+        final Mat hog;
+
+        FaceFeatures(Mat histogram, Mat lbp, Mat hog) {
+            this.histogram = histogram;
+            this.lbp = lbp;
+            this.hog = hog;
+        }
+
+        void release() {
+            histogram.release();
+            lbp.release();
+            hog.release();
+        }
+    }
 }
