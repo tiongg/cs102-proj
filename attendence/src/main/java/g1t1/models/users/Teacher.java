@@ -4,6 +4,7 @@ import g1t1.db.user_face_images.UserFaceImage;
 import g1t1.db.users.User;
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.TeacherID;
+import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.opencv.models.Recognisable;
 
@@ -17,6 +18,7 @@ public class Teacher extends BaseEntity implements Recognisable {
     private final FaceData faceData;
 
     private final List<ModuleSection> moduleSections = new ArrayList<>();
+    private final List<ClassSession> pastSessions = new ArrayList<>();
 
     public Teacher(String id, String name, String email, FaceData faceData) {
         this.ID = new TeacherID(id);
@@ -56,6 +58,19 @@ public class Teacher extends BaseEntity implements Recognisable {
 
     public List<ModuleSection> getModuleSections() {
         return this.moduleSections;
+    }
+
+    public List<ClassSession> getPastSessions() {
+        return this.pastSessions;
+    }
+
+    // Not exactly the best...
+    // TODO: Use a hashmap
+    public ModuleSection getModuleSectionById(String id) {
+        return this.moduleSections.stream()
+                .filter(x -> x.getId().equals(id))
+                .findFirst()
+                .get();
     }
 
     @Override

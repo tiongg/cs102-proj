@@ -1,5 +1,6 @@
 package g1t1.models.sessions;
 
+import g1t1.db.attendance.AttendanceRecord;
 import g1t1.db.attendance.AttendanceStatus;
 import g1t1.db.attendance.MarkingMethod;
 import g1t1.models.users.Student;
@@ -18,6 +19,14 @@ public class SessionAttendance {
 
     public SessionAttendance(Student student) {
         this.student = student;
+    }
+
+    public SessionAttendance(Student student, AttendanceRecord existingRecord) {
+        this.student = student;
+        this.method = MarkingMethod.valueOf(existingRecord.method());
+        this.statusProperty.set(AttendanceStatus.valueOf(existingRecord.status().toLowerCase()));
+        this.confidence = existingRecord.confidence();
+        this.lastUpdated = existingRecord.recordedTimestamp();
     }
 
     public AttendanceStatus getStatus() {

@@ -2,8 +2,13 @@ package g1t1.features.attendencetaking;
 
 import g1t1.components.Toast;
 import g1t1.config.SettingsManager;
+import g1t1.db.DSLInstance;
+import g1t1.db.attendance.AttendanceRepository;
+import g1t1.db.attendance.AttendanceRepositoryJooq;
 import g1t1.db.attendance.AttendanceStatus;
 import g1t1.db.attendance.MarkingMethod;
+import g1t1.db.sessions.SessionRepository;
+import g1t1.db.sessions.SessionRepositoryJooq;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.features.logger.AppLogger;
 import g1t1.models.ids.StudentID;
@@ -17,7 +22,9 @@ import g1t1.utils.events.opencv.StudentDetectedEvent;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import org.jooq.exception.DataAccessException;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +52,7 @@ public class AttendanceTaker {
 
         if (currentSession != null) {
             currentSession.endSession();
-            // TODO: Save to database
+            saveSessionToDb();
         }
 
         currentSession = null;
@@ -187,5 +194,24 @@ public class AttendanceTaker {
             return null;
         }
         return currentSession.getStudentAttendance().get(studentID);
+    }
+
+    private static void saveSessionToDb() {
+        try (DSLInstance dslInstance = new DSLInstance()) {
+            SessionRepository sessionRepo = new SessionRepositoryJooq(dslInstance.dsl);
+            AttendanceRepository attendanceRepo = new AttendanceRepositoryJooq(dslInstance.dsl);
+
+            ClassSession currentSession = getCurrentSession();
+
+            String sessionId = sessionRepo.create(currentSession);
+            attendanceRepo.createAll(sessionId, currentSession);
+
+            AuthenticationContext.getCurrentUser().getPastSessions().add(currentSession);
+            AuthenticationContext.triggerUserUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+        } catch (DataAccessException e) {
+            System.out.println("Error during database operation: " + e.getMessage());
+        }
     }
 }

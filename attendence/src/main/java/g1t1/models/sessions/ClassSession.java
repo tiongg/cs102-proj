@@ -2,15 +2,20 @@ package g1t1.models.sessions;
 
 import g1t1.components.table.TableChipItem;
 import g1t1.config.SettingsManager;
+import g1t1.db.attendance.AttendanceRecord;
 import g1t1.db.attendance.AttendanceStatus;
+import g1t1.db.attendance.MarkingMethod;
+import g1t1.db.sessions.SessionRecord;
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.StudentID;
 import g1t1.models.users.Student;
+import g1t1.utils.DateUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 
 record AttendanceStats(int present, int expected, int total) {
 }
@@ -23,6 +28,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
     private final int week;
     private final LocalDateTime startTime;
     private final HashMap<StudentID, SessionAttendance> studentAttendance = new HashMap<>();
+    private LocalDateTime endTime;
     private SessionStatus sessionStatus;
 
     public ClassSession(ModuleSection moduleSection, int week, LocalDateTime startTime, SessionStatus status) {
@@ -35,12 +41,38 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         }
     }
 
+    public ClassSession(SessionRecord sessionRecord,
+                        ModuleSection moduleSection,
+                        List<AttendanceRecord> attendanceRecords,
+                        HashMap<String, Student> enrollmentToStudents
+    ) {
+        this.moduleSection = moduleSection;
+        this.sessionStatus = SessionStatus.valueOfLabel(sessionRecord.status());
+        this.week = sessionRecord.week();
+        this.startTime = DateUtils.timestampToLocalDateTime(sessionRecord.startTime());
+        this.endTime = DateUtils.timestampToLocalDateTime(sessionRecord.endTime());
+        for (AttendanceRecord record : attendanceRecords) {
+            Student student = enrollmentToStudents.get(record.enrollmentId());
+            studentAttendance.put(student.getId(), new SessionAttendance(student, record));
+        }
+    }
+
     public void endSession() {
         this.sessionStatus = SessionStatus.Ended;
+        this.endTime = LocalDateTime.now();
+        for (SessionAttendance attendance : this.studentAttendance.values()) {
+            if (attendance.getStatus() == AttendanceStatus.PENDING) {
+                attendance.setStatus(AttendanceStatus.ABSENT, 1, MarkingMethod.MANUAL);
+            }
+        }
     }
 
     public LocalDateTime getStartTime() {
         return this.startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return this.endTime;
     }
 
     public int getWeek() {
@@ -53,6 +85,10 @@ public class ClassSession extends BaseEntity implements TableChipItem {
 
     public ModuleSection getModuleSection() {
         return this.moduleSection;
+    }
+
+    public SessionStatus getSessionStatus() {
+        return this.sessionStatus;
     }
 
     /**

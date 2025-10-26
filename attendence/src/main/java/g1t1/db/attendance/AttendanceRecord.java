@@ -2,7 +2,7 @@ package g1t1.db.attendance;
 
 import java.time.LocalDateTime;
 
-public record Attendance(
+public record AttendanceRecord(
         String sessionId,
         String enrollmentId,
         String status,
