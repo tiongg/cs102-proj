@@ -1,5 +1,17 @@
 package g1t1.scenes;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.opencv.core.Mat;
+import org.opencv.videoio.VideoCapture;
+
+import g1t1.components.session.AttendanceStateList;
 import g1t1.config.SettingsManager;
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.models.scenes.PageController;
@@ -18,16 +30,6 @@ import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import org.opencv.core.Mat;
-import org.opencv.videoio.VideoCapture;
-
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 class CameraRunnable implements Runnable {
     private final VideoCapture camera;
@@ -96,11 +98,18 @@ public class DuringSessionViewController extends PageController {
     private ImageView ivCameraView;
 
     @FXML
+    private AttendanceStateList aslRecent;
+
+    @FXML
+    private AttendanceStateList aslStudents;
+
+    @FXML
     private void initialize() {
         ivCameraView.fitWidthProperty()
                 .bind(ivCameraView.getParent().layoutBoundsProperty().map(bounds -> bounds.getWidth() - 350));
         ivCameraView.fitHeightProperty().bind(ivCameraView.getParent().layoutBoundsProperty().map(Bounds::getHeight));
         btnAdminPanel.disableProperty().bind(this.isTeacherInViewProperty.not());
+        aslRecent.attendances.bind(AttendanceTaker.recentlyMarked);
     }
 
     @Override
@@ -111,6 +120,8 @@ public class DuringSessionViewController extends PageController {
             return;
         }
         assignLabels(session);
+        aslStudents.attendances.clear();
+        aslStudents.attendances.setAll(session.getStudentAttendance().values());
 
         CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView, this.isTeacherInViewProperty);
         this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
@@ -141,7 +152,7 @@ public class DuringSessionViewController extends PageController {
 
         this.lblWeek.setText(String.format("Week %d", session.getWeek()));
         this.lblTimeStart.setText(section.getStartTime());
-        
+
         // Set initial remaining time
         updateRemainingTime(session);
 
@@ -162,17 +173,17 @@ public class DuringSessionViewController extends PageController {
         try {
             ModuleSection section = session.getModuleSection();
             String startTimeStr = section.getStartTime();
-            
+
             // Parse start time (format: "HH:mm")
             LocalTime startTime = LocalTime.parse(startTimeStr, DateTimeFormatter.ofPattern("HH:mm"));
-            
+
             // Get late threshold from settings
             int lateThresholdMins = SettingsManager.getInstance().getLateThresholdMinutes();
-            
+
             // Calculate late cutoff time
             LocalTime lateTime = startTime.plusMinutes(lateThresholdMins);
             LocalTime now = LocalTime.now();
-            
+
             Platform.runLater(() -> {
                 if (now.isBefore(lateTime)) {
                     long remainingMins = Duration.between(now, lateTime).toMinutes();

@@ -9,12 +9,14 @@ import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.sessions.SessionAttendance;
 import g1t1.models.sessions.SessionStatus;
-import g1t1.models.users.Student;
 import g1t1.opencv.FaceRecognitionService;
 import g1t1.opencv.models.Recognisable;
 import g1t1.utils.events.opencv.StudentDetectedEvent;
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import java.time.LocalDateTime;
@@ -22,56 +24,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AttendanceTaker {
-    public static final ListProperty<SessionAttendance> recentlyMarked = new SimpleListProperty<>(FXCollections.observableArrayList());
-    
+    public static final ListProperty<SessionAttendance> recentlyMarked =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
+    public static final ObjectProperty<StudentDetectedEvent> needsConfirmation =
+            new SimpleObjectProperty<>();
+
+    // Configuration constants
     private static final int MAX_RECENTLY_DISPLAYED = 3;
-    private static final double PROMPT_THRESHOLD = 20;  // 20% - 40% above will be prompted for confirmation
-    private static final double AUTO_THRESHOLD = 40; // 40% and above will be auto marked
+    private static final double PROMPT_THRESHOLD = 20.0;  // 20% - 40%: prompt for confirmation
+    private static final double AUTO_THRESHOLD = 40.0;     // 40%+: auto mark
+
     private static ClassSession currentSession;
 
     public static void start(ModuleSection moduleSection, int week, LocalDateTime startTime) {
-        List<Recognisable> recognisableList = new ArrayList<>(moduleSection.getStudents());
-        recognisableList.add(AuthenticationContext.getCurrentUser());
-
-        FaceRecognitionService.getInstance().start(recognisableList);
-        currentSession = new ClassSession(moduleSection, week, startTime, SessionStatus.Active);
-        recentlyMarked.clear();
-
-        FaceRecognitionService.getInstance().getEventEmitter().subscribe(
-                StudentDetectedEvent.class,
-                (e) -> {
-                    if (e.getConfidence() < PROMPT_THRESHOLD) {
-                        return;
-                    }
-
-                    Student detectedStudent = e.getStudent();
-                    SessionAttendance sessionAttendance = currentSession.getStudentAttendance().get(detectedStudent.getId());
-                    if (sessionAttendance == null) {
-                        return;
-                    }
-
-                    sessionAttendance.updateBestConfidence(e.getConfidence());
-                    // Marked already
-                    if (sessionAttendance.getStatus() != AttendanceStatus.PENDING) {
-                        return;
-                    }
-
-                    if (e.getConfidence() >= AUTO_THRESHOLD) {
-                        sessionAttendance.setStatus(currentSession.getCurrentStatus(), e.getConfidence(), MarkingMethod.AUTOMATIC);
-                        recentlyMarked.add(sessionAttendance);
-                        if (recentlyMarked.size() > MAX_RECENTLY_DISPLAYED) {
-                            recentlyMarked.removeFirst();
-                        }
-                        Toast.show(String.format("Marked attendance for %s!", detectedStudent.getName()), 3000, Toast.ToastType.SUCCESS);
-                    }
-                }
-        );
+        initializeRecognitionSystem(moduleSection);
+        initializeSession(moduleSection, week, startTime);
+        subscribeToDetectionEvents();
     }
 
     public static void stop() {
         FaceRecognitionService.getInstance().stop();
-        currentSession.endSession();
-        // Save to db first!!
+
+        if (currentSession != null) {
+            currentSession.endSession();
+            // TODO: Save to database
+        }
 
         currentSession = null;
     }
@@ -81,20 +58,134 @@ public class AttendanceTaker {
     }
 
     public static boolean manualOverride(StudentID studentID, AttendanceStatus status) {
-        SessionAttendance sessionAttendance = currentSession.getStudentAttendance().get(studentID);
-        if (sessionAttendance == null) {
+        SessionAttendance attendance = getAttendanceRecord(studentID);
+        if (attendance == null) {
             return false;
         }
-        sessionAttendance.setStatus(status, 1, MarkingMethod.MANUAL);
+
+        attendance.setStatus(status, 1.0, MarkingMethod.MANUAL);
         return true;
     }
 
     public static boolean confirmMarking(StudentID studentID) {
-        SessionAttendance sessionAttendance = currentSession.getStudentAttendance().get(studentID);
-        if (sessionAttendance == null) {
+        SessionAttendance attendance = getAttendanceRecord(studentID);
+        StudentDetectedEvent event = needsConfirmation.getValue();
+
+        if (attendance == null || event == null) {
             return false;
         }
 
+        markAttendance(
+                attendance,
+                currentSession.getCurrentStatus(),
+                event.getConfidence(),
+                MarkingMethod.AFTER_CONFIRMATION
+        );
+
+        needsConfirmation.set(null);
         return true;
+    }
+
+    private static void initializeRecognitionSystem(ModuleSection moduleSection) {
+        List<Recognisable> recognisableList = new ArrayList<>(moduleSection.getStudents());
+        recognisableList.add(AuthenticationContext.getCurrentUser());
+
+        FaceRecognitionService.getInstance().start(recognisableList);
+    }
+
+    private static void initializeSession(ModuleSection moduleSection, int week, LocalDateTime startTime) {
+        currentSession = new ClassSession(moduleSection, week, startTime, SessionStatus.Active);
+        recentlyMarked.clear();
+    }
+
+    private static void subscribeToDetectionEvents() {
+        FaceRecognitionService.getInstance()
+                .getEventEmitter()
+                .subscribe(StudentDetectedEvent.class, AttendanceTaker::handleDetectionEvent);
+    }
+
+    private static void handleDetectionEvent(StudentDetectedEvent event) {
+        Platform.runLater(() -> processDetection(event));
+    }
+
+    private static void processDetection(StudentDetectedEvent event) {
+        if (event.getConfidence() < PROMPT_THRESHOLD) {
+            return;
+        }
+
+        SessionAttendance attendance = getAttendanceRecord(event.getStudent().getId());
+        if (attendance == null) {
+            return;
+        }
+
+        attendance.updateBestConfidence(event.getConfidence());
+
+        // Skip if already marked
+        if (attendance.getStatus() != AttendanceStatus.PENDING) {
+            return;
+        }
+
+        // Process based on confidence level
+        if (event.getConfidence() >= AUTO_THRESHOLD) {
+            processAutoMarking(event, attendance);
+        } else {
+            requestManualConfirmation(event);
+        }
+    }
+
+    private static void processAutoMarking(StudentDetectedEvent event, SessionAttendance attendance) {
+        markAttendance(
+                attendance,
+                currentSession.getCurrentStatus(),
+                event.getConfidence(),
+                MarkingMethod.AUTOMATIC
+        );
+
+        clearConfirmationIfMatches(event.getStudent().getId());
+
+        showSuccessToast(event.getStudent().getName());
+    }
+
+    private static void markAttendance(
+            SessionAttendance attendance,
+            AttendanceStatus status,
+            double confidence,
+            MarkingMethod method
+    ) {
+        attendance.setStatus(status, confidence, method);
+        addToRecentlyMarked(attendance);
+    }
+
+    private static void addToRecentlyMarked(SessionAttendance attendance) {
+        recentlyMarked.add(attendance);
+
+        // Maintain size limit
+        if (recentlyMarked.size() > MAX_RECENTLY_DISPLAYED) {
+            recentlyMarked.removeFirst();
+        }
+    }
+
+    private static void clearConfirmationIfMatches(StudentID studentID) {
+        StudentDetectedEvent pendingEvent = needsConfirmation.getValue();
+
+        if (pendingEvent != null && studentID.equals(pendingEvent.getStudent().getId())) {
+            needsConfirmation.set(null);
+        }
+    }
+
+    private static void requestManualConfirmation(StudentDetectedEvent event) {
+        needsConfirmation.set(event);
+    }
+
+    private static void showSuccessToast(String studentName) {
+        String message = String.format("Marked attendance for %s!", studentName);
+        Toast.show(message, 3000, Toast.ToastType.SUCCESS);
+    }
+
+    private static SessionAttendance getAttendanceRecord(StudentID studentID) {
+        if (currentSession == null) {
+            return null;
+        }
+        return currentSession.getStudentAttendance().get(studentID);
     }
 }

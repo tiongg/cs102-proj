@@ -3,12 +3,14 @@ package g1t1.models.sessions;
 import g1t1.db.attendance.AttendanceStatus;
 import g1t1.db.attendance.MarkingMethod;
 import g1t1.models.users.Student;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.time.LocalDateTime;
 
 public class SessionAttendance {
     private final Student student;
-    private AttendanceStatus status = AttendanceStatus.PENDING;
+    private final ObjectProperty<AttendanceStatus> statusProperty = new SimpleObjectProperty<>(AttendanceStatus.PENDING);
     private MarkingMethod method = MarkingMethod.MANUAL;
     // Scale of 0-100
     private double confidence = -100d;
@@ -19,7 +21,11 @@ public class SessionAttendance {
     }
 
     public AttendanceStatus getStatus() {
-        return this.status;
+        return this.statusProperty.getValue();
+    }
+
+    public ObjectProperty<AttendanceStatus> getAttendanceProperty() {
+        return this.statusProperty;
     }
 
     public Student getStudent() {
@@ -39,7 +45,7 @@ public class SessionAttendance {
     }
 
     public void setStatus(AttendanceStatus status, double confidence, MarkingMethod method) {
-        this.status = status;
+        this.statusProperty.set(status);
         this.confidence = confidence;
         this.method = method;
         this.lastUpdated = LocalDateTime.now();

@@ -188,6 +188,11 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
             reset();
         });
 
+        fileChooser.setTitle("Select Face Images");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+
         lblTakenPictures.textProperty()
                 .bind(photosTaken.map(x -> String.format("%d / %d", x.size(), REQUIRED_PICTURE_COUNT)));
         isValid.bind(photosTaken.map(x -> x.size() >= REQUIRED_PICTURE_COUNT));
@@ -253,27 +258,48 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
         }
         int imported = 0;
         for (File file : filesSelected) {
+            Mat imageMat = null;
+            Mat faceRegion = null;
+            MatOfByte matOfByte = null;
+            MatOfByte buffer = null;
             try (FileInputStream fsIn = new FileInputStream(file)) {
                 byte[] imageRaw = fsIn.readAllBytes();
                 // Extract face from imported image
-                MatOfByte matOfByte = new MatOfByte(imageRaw);
-                Mat imageMat = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_COLOR);
-                Mat faceRegion = faceDetector.getFaceFromMatrix(imageMat, 0);
+                matOfByte = new MatOfByte(imageRaw);
+                imageMat = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_COLOR);
+                faceRegion = faceDetector.getFaceFromMatrix(imageMat, 0);
                 if (faceRegion == null) {
                     continue;
                 }
 
                 // Re-encode it back to byte[]
-                MatOfByte buffer = new MatOfByte();
+                buffer = new MatOfByte();
                 Imgcodecs.imencode(".png", faceRegion, buffer);
                 byte[] image = buffer.toArray();
                 this.photosTaken.add(image);
                 if (thumbnailImage == null) {
-                    thumbnailImage = imageRaw.clone();
+                    // Crop the thumbnail to match takePicture() behavior
+                    Mat croppedThumbnail = ImageUtils.cropToFit(imageMat, 256, 256);
+                    MatOfByte thumbnailBuffer = new MatOfByte();
+                    Imgcodecs.imencode(".png", croppedThumbnail, thumbnailBuffer);
+                    thumbnailImage = thumbnailBuffer.toArray();
+
+                    // Cleanup thumbnail resources
+                    croppedThumbnail.release();
+                    thumbnailBuffer.release();
                 }
                 imported++;
             } catch (IOException e) {
                 Toast.show(String.format("Error loading file %s", file.getAbsolutePath()), ToastType.ERROR);
+            } finally {
+                if (imageMat != null)
+                    imageMat.release();
+                if (faceRegion != null)
+                    faceRegion.release();
+                if (matOfByte != null)
+                    matOfByte.release();
+                if (buffer != null)
+                    buffer.release();
             }
         }
         Toast.show(String.format("Successfully imported %d images!", imported), ToastType.SUCCESS);
