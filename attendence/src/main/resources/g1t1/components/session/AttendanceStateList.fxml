@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <fx:root xmlns:fx="http://javafx.com/fxml" type="VBox"
          xmlns="http://javafx.com/javafx"
-         style="-fx-background: '#F0F0F0'" prefHeight="Infinity" prefWidth="Infinity">
-    <Label fx:id="lblHeader" text="Header text">
+         style="-fx-background-color: #F0F0F0; -fx-background-radius: 16px;"
+         spacing="8">
+    <padding>
+        <Insets top="8" right="8" bottom="8" left="8"/>
+    </padding>
+
+    <Label fx:id="lblHeader" text="Header text" maxWidth="Infinity" alignment="CENTER">
         <font>
-            <Font name="Inter Semi Bold" size="26.0"/>
+            <Font name="Inter Semi Bold" size="18.0"/>
         </font>
     </Label>
-    <VBox spacing="8" fx:id="vbChips">
 
-    </VBox>
+    <ScrollPane fitToWidth="true"
+                hbarPolicy="NEVER" vbarPolicy="NEVER"
+                style="-fx-background-color: transparent; -fx-background: transparent;"
+                VBox.vgrow="ALWAYS" minHeight="130" maxWidth="Infinity">
+        <VBox spacing="8" fx:id="vbChips"
+              style="-fx-background-color: transparent;"
+              maxWidth="Infinity"/>
+    </ScrollPane>
 </fx:root>

@@ -120,7 +120,6 @@ public class DuringSessionViewController extends PageController {
             return;
         }
         assignLabels(session);
-        aslStudents.attendances.clear();
         aslStudents.attendances.setAll(session.getStudentAttendance().values());
 
         CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView, this.isTeacherInViewProperty);

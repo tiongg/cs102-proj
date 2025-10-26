@@ -31,8 +31,8 @@ public class AttendanceTaker {
 
     // Configuration constants
     private static final int MAX_RECENTLY_DISPLAYED = 3;
-    private static final double PROMPT_THRESHOLD = 20.0;  // 20% - 40%: prompt for confirmation
-    private static final double AUTO_THRESHOLD = 40.0;     // 40%+: auto mark
+    private static final double PROMPT_THRESHOLD = 10.0;  // 20% - 40%: prompt for confirmation
+    private static final double AUTO_THRESHOLD = 30.0;     // 40%+: auto mark
 
     private static ClassSession currentSession;
 

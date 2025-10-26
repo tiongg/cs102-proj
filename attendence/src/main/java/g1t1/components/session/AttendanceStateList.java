@@ -37,6 +37,7 @@ public class AttendanceStateList extends VBox {
     @FXML
     public void initialize() {
         lblHeader.textProperty().bind(titleProperty());
+
         // Rebuild children whenever list changes
         attendances.addListener((observable, oldList, newList) -> {
             updateChips();
