@@ -28,7 +28,7 @@ public class AttendancePiechart {
             emptychart.setTitle("No session data");
             return emptychart;
         }
-        List<SessionAttendance> studentAttendance = session.getStudentAttendance();
+        List<SessionAttendance> studentAttendance = session.getStudentAttendance().values().stream().toList();
 
         // stores the values for each attendancestatus
         Map<AttendanceStatus, Integer> attendenceCounts = new HashMap<>();

@@ -1,22 +1,23 @@
 package g1t1.features.report;
 
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import com.opencsv.CSVWriter;
 
-import g1t1.models.sessions.*;
-import g1t1.models.users.*;
+import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.ModuleSection;
+import g1t1.models.sessions.SessionAttendance;
 
 /**
  * Generates CSV Report which exports to specific file
  */
 public class CSVReport extends ReportGenerator {
-    public CSVReport(String filepath) { super(filepath); }
-
+    public CSVReport(String filepath) {
+        super(filepath);
+    }
 
     @Override
     public void generate(Report report) {
@@ -27,7 +28,7 @@ public class CSVReport extends ReportGenerator {
             throw new IllegalArgumentException("section cannot be null");
         }
 
-        List<SessionAttendance> sessAttendances = session.getStudentAttendance();
+        List<SessionAttendance> sessAttendances = session.getStudentAttendance().values().stream().toList();
         if (sessAttendances == null) {
             throw new IllegalArgumentException("SessionAttendance cannot be null");
         }
