@@ -1,5 +1,5 @@
 {
-  "detectionThreshold": 30,
+  "detectionThreshold": 60,
   "lateThresholdMinutes": 15,
   "cameraDevice": 0,
   "logPath": "logs/"

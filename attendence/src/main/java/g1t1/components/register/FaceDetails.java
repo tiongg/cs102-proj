@@ -4,13 +4,17 @@ import g1t1.App;
 import g1t1.components.Toast;
 import g1t1.components.Toast.ToastType;
 import g1t1.config.SettingsManager;
+import g1t1.features.onboarding.FaceStepTracker;
 import g1t1.models.interfaces.register.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.RegisterTeacher;
+import g1t1.opencv.models.FaceInFrame;
 import g1t1.opencv.services.FaceDetector;
+import g1t1.utils.EventEmitter;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
+import g1t1.utils.events.onboarding.PictureTakenEvent;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -20,13 +24,17 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
 import java.io.File;
@@ -37,18 +45,27 @@ import java.util.List;
 class CameraRunnable implements Runnable {
     private static final int TARGET_SIZE = 256;
     private static final int MAX_FAILS = 100;
+    private static final int CAPTURE_DELAY = 1000 / 5; // Maximum 30 fps
+
+    public final EventEmitter<Object> emitter = new EventEmitter<>();
     private final VideoCapture camera;
     private final ImageView display;
     private final Object frameLock = new Object();
     private final Mat currentFrame = new Mat();
     private final BooleanProperty cameraFailure;
+    private final BooleanProperty isTakingPictures;
     private final FaceDetector faceDetector;
+    private final FaceStepTracker tracker;
+    private long lastTimeTaken = 0;
 
-    public CameraRunnable(ImageView display, BooleanProperty cameraFailure) {
+
+    public CameraRunnable(ImageView display, BooleanProperty cameraFailure, BooleanProperty isTakingPictures, FaceStepTracker tracker) {
         this.camera = SettingsManager.getInstance().getConfiguredCamera();
         this.display = display;
         this.cameraFailure = cameraFailure;
+        this.isTakingPictures = isTakingPictures;
         this.faceDetector = new FaceDetector();
+        this.tracker = tracker;
     }
 
     @Override
@@ -86,6 +103,22 @@ class CameraRunnable implements Runnable {
 
             Platform.runLater(() -> {
                 display.setImage(ImageUtils.matToImage(croppedFrame));
+
+                if (!isTakingPictures.getValue()) {
+                    return;
+                }
+
+                long currentTime = System.currentTimeMillis();
+                long deltaTime = currentTime - this.lastTimeTaken;
+                if (deltaTime >= CAPTURE_DELAY) {
+                    byte[] face = getFaceInFrame();
+                    // No face found
+                    if (face.length <= 0) {
+                        return;
+                    }
+                    emitter.emit(new PictureTakenEvent(face));
+                    this.lastTimeTaken = currentTime;
+                }
             });
         }
         camera.release();
@@ -94,6 +127,7 @@ class CameraRunnable implements Runnable {
         }
     }
 
+    // To take thumbnail picture
     public byte[] getCurrentFrame() {
         synchronized (frameLock) {
             if (!currentFrame.empty()) {
@@ -111,43 +145,61 @@ class CameraRunnable implements Runnable {
                 return new byte[]{};
             }
 
-            Mat faceRegion = faceDetector.getFaceFromMatrix(currentFrame, 0);
+            FaceInFrame faceRegion = faceDetector.getFaceFromMatrix(currentFrame, 0);
 
             if (faceRegion == null) {
                 return new byte[]{};
             }
 
+            // Failed face validation
+            if (!this.tracker.currentStep.getValue().isRegionValid(faceRegion)) {
+                return new byte[]{};
+            }
+
+            // Resize to 200x200
+            Mat resizedFace = new Mat();
+            Imgproc.resize(faceRegion.faceBounds(), resizedFace, new Size(200, 200));
+
             // Encode to byte array
             MatOfByte buffer = new MatOfByte();
-            Imgcodecs.imencode(".png", faceRegion, buffer);
+            Imgcodecs.imencode(".png", resizedFace, buffer);
             byte[] result = buffer.toArray();
 
             // Cleanup
-            faceRegion.release();
+            faceRegion.faceBounds().release();
+            resizedFace.release();
             buffer.release();
             return result;
         }
     }
 }
 
+
 public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
+    private final int REQUIRED_PICTURE_COUNT = 100;
+
     private final BooleanProperty isValid = new SimpleBooleanProperty(true);
     private final BooleanProperty cameraFailure = new SimpleBooleanProperty(false);
+    private final BooleanProperty isTakingPictures = new SimpleBooleanProperty(false);
     private final ListProperty<byte[]> photosTaken = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final int REQUIRED_PICTURE_COUNT = 15;
+
     private final FileChooser fileChooser = new FileChooser();
     private final FaceDetector faceDetector = new FaceDetector();
+    private final FaceStepTracker stepTracker;
     private ThreadWithRunnable<CameraRunnable> cameraDaemon;
     private byte[] thumbnailImage;
-
     @FXML
-    private Label lblTakenPictures;
+    private ProgressBar pbPercentDone;
+    @FXML
+    private Label lblScanText;
     @FXML
     private ImageView ivCameraView;
     @FXML
     private Label lblCameraError;
     @FXML
     private Label lblOnboardType;
+    @FXML
+    private Button btnStartScan;
 
     public FaceDetails() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("FaceDetails.fxml"));
@@ -159,6 +211,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
             e.printStackTrace();
         }
 
+        this.stepTracker = new FaceStepTracker(this.photosTaken);
+
         Router.emitter.subscribe(OnNavigateEvent.class, (e) -> {
             reset();
         });
@@ -168,10 +222,10 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp"),
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
 
-        lblTakenPictures.textProperty()
-                .bind(photosTaken.map(x -> String.format("%d / %d", x.size(), REQUIRED_PICTURE_COUNT)));
+        pbPercentDone.progressProperty().bind(photosTaken.sizeProperty().divide((float) REQUIRED_PICTURE_COUNT));
         isValid.bind(photosTaken.map(x -> x.size() >= REQUIRED_PICTURE_COUNT));
         lblCameraError.visibleProperty().bind(cameraFailure);
+        lblScanText.textProperty().bind(this.stepTracker.instructionProperty());
     }
 
     @Override
@@ -197,31 +251,38 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
             lblOnboardType.setText("Teacher");
         }
 
-        CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView, this.cameraFailure);
+        CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView, this.cameraFailure, this.isTakingPictures, this.stepTracker);
         this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
         this.cameraDaemon.setDaemon(true);
+        this.cameraDaemon.getRunnable().emitter.subscribe(PictureTakenEvent.class, this::handlePictureEvent);
         this.cameraDaemon.start();
     }
 
     @Override
     public void reset() {
         this.photosTaken.clear();
+        this.btnStartScan.visibleProperty().set(true);
         thumbnailImage = null;
     }
 
     @FXML
-    public void takePicture() {
+    public void startTakingPictures() {
+        this.btnStartScan.visibleProperty().set(false);
+        this.isTakingPictures.set(true);
+    }
+
+    public void handlePictureEvent(PictureTakenEvent e) {
         // First image taken is thumbnail
         if (thumbnailImage == null) {
             byte[] frame = this.cameraDaemon.getRunnable().getCurrentFrame();
             thumbnailImage = frame.clone();
         }
-        byte[] faceInFrame = this.cameraDaemon.getRunnable().getFaceInFrame();
-        if (faceInFrame.length <= 0) {
-            Toast.show("Error taking photo, no face detected!", ToastType.ERROR);
-            return;
+        this.photosTaken.add(e.picture());
+
+        if (this.photosTaken.sizeProperty().intValue() >= 100) {
+            Toast.show("All pictures taken!", ToastType.SUCCESS);
+            this.isTakingPictures.set(false);
         }
-        this.photosTaken.add(faceInFrame);
     }
 
     @FXML
@@ -242,10 +303,11 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
                 // Extract face from imported image
                 matOfByte = new MatOfByte(imageRaw);
                 imageMat = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_COLOR);
-                faceRegion = faceDetector.getFaceFromMatrix(imageMat, 0);
-                if (faceRegion == null) {
+                FaceInFrame inFrame = faceDetector.getFaceFromMatrix(imageMat, 0);
+                if (inFrame == null || inFrame.faceBounds() == null) {
                     continue;
                 }
+                faceRegion = inFrame.faceBounds();
 
                 // Re-encode it back to byte[]
                 buffer = new MatOfByte();

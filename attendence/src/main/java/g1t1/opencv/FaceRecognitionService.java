@@ -1,28 +1,10 @@
 package g1t1.opencv;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-
+import g1t1.config.SettingsManager;
 import g1t1.features.logger.AppLogger;
 import g1t1.models.users.Student;
 import g1t1.opencv.config.FaceConfig;
-import g1t1.opencv.models.AttendanceSession;
-import g1t1.opencv.models.DetectedFace;
-import g1t1.opencv.models.DetectionBoundingBox;
-import g1t1.opencv.models.LivenessResult;
-import g1t1.opencv.models.Recognisable;
-import g1t1.opencv.models.RecognitionResult;
+import g1t1.opencv.models.*;
 import g1t1.opencv.services.FaceDetector;
 import g1t1.opencv.services.MaskDetector;
 import g1t1.opencv.services.liveness.LivenessChecker;
@@ -32,6 +14,14 @@ import g1t1.opencv.services.recognition.Recognizer;
 import g1t1.utils.EventEmitter;
 import g1t1.utils.events.opencv.AttendanceSessionEvent;
 import g1t1.utils.events.opencv.StudentDetectedEvent;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Main entry point for face recognition system. Frontend calls start() and
@@ -170,7 +160,7 @@ public class FaceRecognitionService {
         List<DetectedFace> detectedFaces;
         if (frameSkipCounter % FRAME_SKIP_INTERVAL == 0) {
             Mat smallFrame = new Mat();
-            double scaleFactor = 0.5;
+            double scaleFactor = 1;
             Imgproc.resize(frame, smallFrame, new Size(frame.cols() * scaleFactor, frame.rows() * scaleFactor));
 
             List<DetectedFace> smallDetections = faceDetector.detectFaces(smallFrame);
@@ -212,7 +202,7 @@ public class FaceRecognitionService {
                             Recognisable recognisedObject = result.getMatchedObject();
                             double confidence = result.getConfidence();
 
-                            if (confidence >= 5) {
+                            if (confidence >= SettingsManager.getInstance().getDetectionThreshold()) {
                                 boundingBox.setRecognised(recognisedObject, livenessInfo, confidence);
 
                                 handleRecognitionResult(recognisedObject, confidence);
@@ -302,7 +292,7 @@ public class FaceRecognitionService {
      * Get cached recognition result if still valid, otherwise perform recognition.
      */
     private RecognitionResult getCachedOrNewRecognition(Mat faceRegion,
-            List<? extends Recognisable> recognisableObjects, String faceId) {
+                                                        List<? extends Recognisable> recognisableObjects, String faceId) {
         long currentTime = System.currentTimeMillis();
 
         // Check if we have a valid cached result
