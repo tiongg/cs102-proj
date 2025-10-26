@@ -1,6 +1,6 @@
 {
-  "autoMarkThreshold": 80,
   "detectionThreshold": 50,
+  "autoMarkThreshold": 80,
   "lateThresholdMinutes": 15,
   "cameraDevice": 0,
   "logPath": "logs/"

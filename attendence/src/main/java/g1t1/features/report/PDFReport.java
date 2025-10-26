@@ -7,14 +7,15 @@ import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
-import g1t1.models.sessions.*;
-
+import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.ModuleSection;
+import g1t1.models.sessions.SessionAttendance;
 
 public class PDFReport extends ReportGenerator {
     public PDFReport(String filepath) {
@@ -32,7 +33,7 @@ public class PDFReport extends ReportGenerator {
         return y - (fontSize + 2f);
     }
 
-    // helper function to create table 
+    // helper function to create table
     private void drawRow(PDPageContentStream cs, float yTop, float startX, float colWidth, String[] cells, PDFont font,
             float fontSize, float rowHeight, boolean isHeader) throws IOException {
         cs.setLineWidth(0.5f);
@@ -67,38 +68,38 @@ public class PDFReport extends ReportGenerator {
             x += colWidth;
         }
     }
-    
+
     @Override
     public void generate(Report report) {
         ClassSession session = report.getClassSession();
         ModuleSection section = session.getModuleSection();
-        
+
         if (section == null) {
             throw new IllegalArgumentException("section cannot be null");
         }
 
-        List<SessionAttendance> sessAttendances = session.getStudentAttendance();
+        List<SessionAttendance> sessAttendances = session.getStudentAttendance().values().stream().toList();
         if (sessAttendances == null) {
             throw new IllegalArgumentException("SessionAttendance cannot be null");
         }
 
         String[] header = buildHeader(report);
-        
+
         try (PDDocument doc = new PDDocument()) {
-            //Fonts
+            // Fonts
             float fontSize = 11f;
             PDFont fontHeader = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
             PDFont fontText = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
-            //Page size and margins 
+            // Page size and margins
             PDRectangle pageSize = PDRectangle.A4;
             float margin = 48f;
             float tableTopMargin = 16f;
-            
-            //Cell height and width
+
+            // Cell height and width
             float padTop = 6f;
             float padBottom = 6f;
-            float rowHeight = padTop + fontSize + padBottom;             
+            float rowHeight = padTop + fontSize + padBottom;
             int colCount = header.length;
             float usableWidth = pageSize.getWidth() - 2 * margin;
             float colWidth = usableWidth / colCount;
@@ -110,7 +111,7 @@ public class PDFReport extends ReportGenerator {
             float y = pageSize.getHeight() - margin;
 
             // Module Section
-            String sectionLine = buildClassSection(session)[0]; 
+            String sectionLine = buildClassSection(session)[0];
             y = drawText(cs, fontHeader, fontSize, margin, y, sectionLine);
 
             // Teacher
@@ -120,7 +121,7 @@ public class PDFReport extends ReportGenerator {
             }
             y = drawText(cs, fontHeader, fontSize, margin, y, teacher);
 
-            // Timestamp 
+            // Timestamp
             if (report.isIncludeTimeStamp()) {
                 LocalDateTime currDateTime = LocalDateTime.now();
                 DateTimeFormatter formattedDateObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -159,4 +160,3 @@ public class PDFReport extends ReportGenerator {
     }
 
 }
-

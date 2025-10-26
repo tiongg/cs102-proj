@@ -2,6 +2,7 @@ package g1t1.opencv.services;
 
 import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.DetectedFace;
+import g1t1.opencv.models.FaceInFrame;
 import nu.pattern.OpenCV;
 import org.bytedeco.javacpp.Loader;
 import org.opencv.core.Mat;
@@ -167,7 +168,7 @@ public class FaceDetector {
     /**
      * Get only face region from a given matrix
      */
-    public Mat getFaceFromMatrix(Mat currentFrame, int padding) {
+    public FaceInFrame getFaceFromMatrix(Mat currentFrame, int padding) {
         List<DetectedFace> detectedFaces = this.detectFaces(currentFrame);
         if (detectedFaces.isEmpty()) {
             return null;
@@ -192,6 +193,7 @@ public class FaceDetector {
 
         // Extract face region
         Rect safeBounds = new Rect(x, y, width, height);
-        return new Mat(currentFrame, safeBounds);
+        Mat faceBounds = new Mat(currentFrame, safeBounds);
+        return new FaceInFrame(x, y, faceBounds, currentFrame.width(), currentFrame.height());
     }
 }

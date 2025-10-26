@@ -1,5 +1,10 @@
 package g1t1.db.attendance;
 
+import g1t1.db.enrollments.Enrollment;
+import g1t1.db.enrollments.EnrollmentRepository;
+import g1t1.db.enrollments.EnrollmentRepositoryJooq;
+import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.SessionAttendance;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Table;
@@ -31,7 +36,7 @@ public class AttendanceRepositoryJooq implements AttendanceRepository {
         return dsl.insertInto(ATTENDANCE_TABLE)
                 .set(SESSION_ID, sessionId)
                 .set(ENROLLMENT_ID, enrollmentId)
-                .set(STATUS, status.toString())
+                .set(STATUS, status.toString().toLowerCase())
                 .set(CONFIDENCE, confidence)
                 .set(METHOD, method.toString())
                 .set(RECORDED_TIMESTAMP, LocalDateTime.now())
@@ -39,11 +44,33 @@ public class AttendanceRepositoryJooq implements AttendanceRepository {
     }
 
     @Override
-    public List<Attendance> fetchAttendenceBySessionId(String sessionId) {
+    public boolean createAll(String sessionId, ClassSession session) {
+        EnrollmentRepository enrollmentRepository = new EnrollmentRepositoryJooq(this.dsl);
+
+        Map<String, String> studentIdToEnrollmentId = new HashMap<>();
+        for (Enrollment enrollment : enrollmentRepository.fetchEnrollmentsByModuleSectionId(session.getModuleSection().getId())) {
+            studentIdToEnrollmentId.put(enrollment.studentId(), enrollment.enrollmentId());
+        }
+
+        for (SessionAttendance attendance : session.getStudentAttendance().values()) {
+            create(
+                    sessionId,
+                    studentIdToEnrollmentId.get(attendance.getStudent().getId().toString()),
+                    attendance.getStatus(),
+                    attendance.getConfidence(),
+                    attendance.getMethod()
+            );
+        }
+
+        return true;
+    }
+
+    @Override
+    public List<AttendanceRecord> fetchAttendenceBySessionId(String sessionId) {
         return dsl.select(SESSION_ID, ENROLLMENT_ID, STATUS, RECORDED_TIMESTAMP)
                 .from(ATTENDANCE_TABLE)
                 .where(SESSION_ID.eq(sessionId))
-                .fetch(record -> new Attendance(
+                .fetch(record -> new AttendanceRecord(
                         record.get(SESSION_ID),
                         record.get(ENROLLMENT_ID),
                         record.get(STATUS),
@@ -54,11 +81,11 @@ public class AttendanceRepositoryJooq implements AttendanceRepository {
     }
 
     @Override
-    public List<Attendance> fetchAttendenceByEnrollmentId(String enrollmentId) {
+    public List<AttendanceRecord> fetchAttendenceByEnrollmentId(String enrollmentId) {
         return dsl.select(SESSION_ID, ENROLLMENT_ID, STATUS, RECORDED_TIMESTAMP)
                 .from(ATTENDANCE_TABLE)
                 .where(ENROLLMENT_ID.eq(enrollmentId))
-                .fetch(record -> new Attendance(
+                .fetch(record -> new AttendanceRecord(
                         record.get(SESSION_ID),
                         record.get(ENROLLMENT_ID),
                         record.get(STATUS),

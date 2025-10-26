@@ -1,22 +1,25 @@
 package g1t1.testing;
 
-import g1t1.models.sessions.*;
-import g1t1.models.users.*;
-import g1t1.models.ids.StudentID;
-import g1t1.db.attendance.AttendanceStatus;
-import g1t1.db.attendance.MarkingMethod;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import g1t1.db.attendance.AttendanceStatus;
+import g1t1.db.attendance.MarkingMethod;
+import g1t1.models.ids.StudentID;
+import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.ModuleSection;
+import g1t1.models.sessions.SessionAttendance;
+import g1t1.models.sessions.SessionStatus;
+import g1t1.models.users.Student;
 
 public class SampleClassSessions {
 
     public static List<ClassSession> generateSampleData() {
         // 1️⃣ Fixed ModuleSections
-        ModuleSection cs102 = new ModuleSection("CS102", "G1","AY25-26T1","SCIS1 2-4", 1, "09:00", "11:00");
-        ModuleSection cs203 = new ModuleSection("CS203", "G2","AY25-26T1","SCIS1 2-4", 3, "10:00", "12:00");
-        ModuleSection cs301 = new ModuleSection("CS301", "G3","AY25-26T1","SCIS1 2-4", 5, "14:00", "16:00");
+        ModuleSection cs102 = new ModuleSection("CS102", "G1", "AY25-26T1", "SCIS1 2-4", 1, "09:00", "11:00");
+        ModuleSection cs203 = new ModuleSection("CS203", "G2", "AY25-26T1", "SCIS1 2-4", 3, "10:00", "12:00");
+        ModuleSection cs301 = new ModuleSection("CS301", "G3", "AY25-26T1", "SCIS1 2-4", 5, "14:00", "16:00");
 
         // 2️⃣ Fixed Students (20 total, 7 per section except last with 6)
         List<Student> students = new ArrayList<>();
@@ -67,13 +70,13 @@ public class SampleClassSessions {
 
     private static void markAttendance(ClassSession session) {
         int i = 0;
-        for (SessionAttendance sa : session.getStudentAttendance()) {
+        for (SessionAttendance sa : session.getStudentAttendance().values()) {
             if (i % 5 == 0) {
-                sa.markLate(0.75, MarkingMethod.MANUAL);
+                sa.setStatus(AttendanceStatus.LATE, 0.75, MarkingMethod.MANUAL);
             } else if (i % 4 == 0) {
-                sa.excuseStudent();
+                sa.setStatus(AttendanceStatus.EXCUSED, 1, MarkingMethod.MANUAL);
             } else {
-                sa.markPresent(0.95, MarkingMethod.AUTOMATIC);
+                sa.setStatus(AttendanceStatus.PRESENT, 0.95, MarkingMethod.AUTOMATIC);
             }
             i++;
         }
@@ -83,12 +86,11 @@ public class SampleClassSessions {
     public static void main(String[] args) {
         List<ClassSession> sessions = generateSampleData();
         for (ClassSession cs : sessions) {
-            System.out.println("=== " + cs.getModuleSection().getModule() + " " + cs.getModuleSection().getSection() + " ===");
+            System.out.println(
+                    "=== " + cs.getModuleSection().getModule() + " " + cs.getModuleSection().getSection() + " ===");
             System.out.println("Week: " + cs.getWeek());
-            for (SessionAttendance sa : cs.getStudentAttendance()) {
-                System.out.printf("  %-15s %-10s (%.2f)\n",
-                        sa.getStudent().getName(),
-                        sa.getStatus(),
+            for (SessionAttendance sa : cs.getStudentAttendance().values()) {
+                System.out.printf("  %-15s %-10s (%.2f)\n", sa.getStudent().getName(), sa.getStatus(),
                         sa.getConfidence());
             }
             System.out.println();

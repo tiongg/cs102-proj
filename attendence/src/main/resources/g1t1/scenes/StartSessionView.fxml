@@ -4,6 +4,7 @@
 <?import g1t1.components.TimePicker?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
@@ -52,16 +53,24 @@
                     <TimePicker fx:id="tpStartTime" prefHeight="40.0" prefWidth="Infinity" style="-fx-font-size: 16px"/>
                 </VBox>
             </HBox>
+            <HBox alignment="TOP_CENTER" spacing="32.0">
+                <Label fx:id="lblRoom"/>
+                <Label fx:id="lblExpectedStudents"/>
+                <Label fx:id="lblTiming"/>
+            </HBox>
             <StackPane.margin>
                 <Insets bottom="48.0" left="48.0" right="48.0" top="200.0"/>
             </StackPane.margin>
         </VBox>
 
         <Button fx:id="btnStartSession" alignment="CENTER" mnemonicParsing="false" onAction="#startSession"
-                prefWidth="240.0" text="Start session" StackPane.alignment="BOTTOM_CENTER">
+                prefWidth="240.0" text="Start session" StackPane.alignment="BOTTOM_CENTER" styleClass="flat-input">
             <StackPane.margin>
                 <Insets bottom="120.0"/>
             </StackPane.margin>
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
         </Button>
     </StackPane>
 </AnchorPane>

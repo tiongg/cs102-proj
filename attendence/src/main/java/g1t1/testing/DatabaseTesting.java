@@ -8,7 +8,7 @@ import g1t1.db.enrollments.EnrollmentRepositoryJooq;
 import g1t1.db.module_sections.ModuleSectionRecord;
 import g1t1.db.module_sections.ModuleSectionRepository;
 import g1t1.db.module_sections.ModuleSectionRepositoryJooq;
-import g1t1.db.sessions.Session;
+import g1t1.db.sessions.SessionRecord;
 import g1t1.db.sessions.SessionRepository;
 import g1t1.db.sessions.SessionRepositoryJooq;
 import g1t1.db.students.StudentRecord;
@@ -17,6 +17,7 @@ import g1t1.db.students.StudentRepositoryJooq;
 import g1t1.db.users.User;
 import g1t1.db.users.UserRepository;
 import g1t1.db.users.UserRepositoryJooq;
+import g1t1.models.sessions.SessionStatus;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
@@ -240,20 +241,20 @@ public class DatabaseTesting {
 
     private static List<String> testSessionRepo(SessionRepository sessionRepo, List<String> moduleSectionIds, List<String> teacherUserIds) {
         // Create sessions
-        String idA = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-20"), (short) 1, Timestamp.valueOf("2025-08-20 08:15:00"), null, "ongoing");
-        String idB = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-27"), (short) 2, Timestamp.valueOf("2025-08-27 08:15:00"), null, "ongoing");
+        String idA = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-20"), (short) 1, Timestamp.valueOf("2025-08-20 08:15:00"), null, SessionStatus.Active);
+        String idB = sessionRepo.create(moduleSectionIds.get(0), Date.valueOf("2025-08-27"), (short) 2, Timestamp.valueOf("2025-08-27 08:15:00"), null, SessionStatus.Active);
         System.out.println("Inserted Session IDs: " + List.of(idA, idB));
 
         // Fetch session by id 
         System.out.println("Fetch by id(session A): " + sessionRepo.fetchSessionById(idA));
 
         // Fetch sessions by module section id
-        List<Session> sessionsByModuleSection = sessionRepo.fetchSessionsByModuleSectionId(moduleSectionIds.get(0));
+        List<SessionRecord> sessionsByModuleSection = sessionRepo.fetchSessionsByModuleSectionId(moduleSectionIds.get(0));
         System.out.println("Fetch by module section id count = " + sessionsByModuleSection.size());
         dumpSessions("Sessions for module section " + moduleSectionIds.get(0), sessionsByModuleSection);
 
         // Fetch sessions by teacher user id + week
-        List<Session> sessionsByTeacherAndWeek = sessionRepo.fetchSessionsByTeacherUserIdAndWeek(teacherUserIds.get(0), (short) 1);
+        List<SessionRecord> sessionsByTeacherAndWeek = sessionRepo.fetchSessionsByTeacherUserIdAndWeek(teacherUserIds.get(0), (short) 1);
         System.out.println("Fetch by teacher user id + week count = " + sessionsByTeacherAndWeek.size());
         dumpSessions("Sessions for teacher " + teacherUserIds.get(0) + " in week 1", sessionsByTeacherAndWeek);
 
@@ -268,9 +269,9 @@ public class DatabaseTesting {
         return List.of(idA);
     }
 
-    private static void dumpSessions(String title, List<Session> sessions) {
+    private static void dumpSessions(String title, List<SessionRecord> sessions) {
         System.out.println("=== " + title + " ===");
-        for (Session s : sessions) {
+        for (SessionRecord s : sessions) {
             System.out.println(s.sessionId() + " | " + s.moduleSectionId() + " | " + s.date() + " | Week " + s.week() + " | " + s.startTime() + " - " + s.endTime() + " | " + s.status() + " | Created at: " + s.createdAt());
         }
     }
@@ -281,12 +282,12 @@ public class DatabaseTesting {
         System.out.println("Record attendance A result = " + recA);
 
         // Fetch by session id
-        List<Attendance> attendanceBySession = attendanceRepo.fetchAttendenceBySessionId(sessionIds.get(0));
+        List<AttendanceRecord> attendanceBySession = attendanceRepo.fetchAttendenceBySessionId(sessionIds.get(0));
         System.out.println("Fetch by session id count = " + attendanceBySession.size());
         dumpAttendances("Attendance records for session " + sessionIds.get(0), attendanceBySession);
 
         // Fetch by enrollment id
-        List<Attendance> attendanceByEnrollment = attendanceRepo.fetchAttendenceByEnrollmentId(enrollmentIds.get(0));
+        List<AttendanceRecord> attendanceByEnrollment = attendanceRepo.fetchAttendenceByEnrollmentId(enrollmentIds.get(0));
         System.out.println("Fetch by enrollment id count = " + attendanceByEnrollment.size());
         dumpAttendances("Attendance records for enrollment " + enrollmentIds.get(0), attendanceByEnrollment);
 
@@ -295,14 +296,14 @@ public class DatabaseTesting {
         System.out.println("Update attendance record A result = " + updA);
 
         // Fetch again to verify update
-        List<Attendance> updatedAttendance = attendanceRepo.fetchAttendenceBySessionId(sessionIds.get(0));
+        List<AttendanceRecord> updatedAttendance = attendanceRepo.fetchAttendenceBySessionId(sessionIds.get(0));
         dumpAttendances("Updated attendance records for session " + sessionIds.get(0), updatedAttendance);
 
     }
 
-    private static void dumpAttendances(String title, List<Attendance> attendances) {
+    private static void dumpAttendances(String title, List<AttendanceRecord> attendances) {
         System.out.println("=== " + title + " ===");
-        for (Attendance a : attendances) {
+        for (AttendanceRecord a : attendances) {
             System.out.println(a.sessionId() + " | " + a.enrollmentId() + " | " + a.status() + " | Recorded at: " + a.recordedTimestamp());
         }
     }

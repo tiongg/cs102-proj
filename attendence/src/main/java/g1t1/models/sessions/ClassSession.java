@@ -1,14 +1,24 @@
 package g1t1.models.sessions;
 
 import g1t1.components.table.TableChipItem;
+import g1t1.config.SettingsManager;
+import g1t1.db.attendance.AttendanceRecord;
 import g1t1.db.attendance.AttendanceStatus;
+import g1t1.db.attendance.MarkingMethod;
+import g1t1.db.sessions.SessionRecord;
 import g1t1.models.BaseEntity;
+import g1t1.models.ids.StudentID;
 import g1t1.models.users.Student;
+import g1t1.utils.DateUtils;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+record AttendanceStats(int present, int expected, int total) {
+}
 
 /**
  * Class session
@@ -17,7 +27,8 @@ public class ClassSession extends BaseEntity implements TableChipItem {
     private final ModuleSection moduleSection;
     private final int week;
     private final LocalDateTime startTime;
-    private final ArrayList<SessionAttendance> studentAttendance = new ArrayList<>();
+    private final HashMap<StudentID, SessionAttendance> studentAttendance = new HashMap<>();
+    private LocalDateTime endTime;
     private SessionStatus sessionStatus;
 
     public ClassSession(ModuleSection moduleSection, int week, LocalDateTime startTime, SessionStatus status) {
@@ -26,28 +37,70 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         this.startTime = startTime;
         this.week = week;
         for (Student student : moduleSection.getStudents()) {
-            studentAttendance.add(new SessionAttendance(student));
+            studentAttendance.put(student.getId(), new SessionAttendance(student));
+        }
+    }
+
+    public ClassSession(SessionRecord sessionRecord,
+                        ModuleSection moduleSection,
+                        List<AttendanceRecord> attendanceRecords,
+                        HashMap<String, Student> enrollmentToStudents
+    ) {
+        this.moduleSection = moduleSection;
+        this.sessionStatus = SessionStatus.valueOfLabel(sessionRecord.status());
+        this.week = sessionRecord.week();
+        this.startTime = DateUtils.timestampToLocalDateTime(sessionRecord.startTime());
+        this.endTime = DateUtils.timestampToLocalDateTime(sessionRecord.endTime());
+        for (AttendanceRecord record : attendanceRecords) {
+            Student student = enrollmentToStudents.get(record.enrollmentId());
+            studentAttendance.put(student.getId(), new SessionAttendance(student, record));
         }
     }
 
     public void endSession() {
         this.sessionStatus = SessionStatus.Ended;
+        this.endTime = LocalDateTime.now();
+        for (SessionAttendance attendance : this.studentAttendance.values()) {
+            if (attendance.getStatus() == AttendanceStatus.PENDING) {
+                attendance.setStatus(AttendanceStatus.ABSENT, 1, MarkingMethod.MANUAL);
+            }
+        }
     }
 
     public LocalDateTime getStartTime() {
         return this.startTime;
     }
 
+    public LocalDateTime getEndTime() {
+        return this.endTime;
+    }
+
     public int getWeek() {
         return this.week;
     }
 
-    public List<SessionAttendance> getStudentAttendance() {
+    public HashMap<StudentID, SessionAttendance> getStudentAttendance() {
         return this.studentAttendance;
     }
 
     public ModuleSection getModuleSection() {
         return this.moduleSection;
+    }
+
+    public SessionStatus getSessionStatus() {
+        return this.sessionStatus;
+    }
+
+    /**
+     * Mark students attendance as the result of this
+     */
+    public AttendanceStatus getCurrentStatus() {
+        Duration timePassed = Duration.between(this.startTime, LocalDateTime.now());
+        if (timePassed.toMinutes() <= SettingsManager.getInstance().getLateThresholdMinutes()) {
+            return AttendanceStatus.PRESENT;
+        } else {
+            return AttendanceStatus.LATE;
+        }
     }
 
     private String formatModuleSection() {
@@ -56,10 +109,10 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return String.format("%s - %s", module, section);
     }
 
-    private String formatAttendance() {
+    private AttendanceStats attendanceStats() {
         int present = 0;
         int expected = 0;
-        for (SessionAttendance attendance : this.studentAttendance) {
+        for (SessionAttendance attendance : this.studentAttendance.values()) {
             if (attendance.getStatus() == AttendanceStatus.PENDING) {
                 // ???
                 continue;
@@ -73,31 +126,21 @@ public class ClassSession extends BaseEntity implements TableChipItem {
                 present++;
             }
         }
+        return new AttendanceStats(present, expected, this.studentAttendance.size());
+    }
 
-        return String.format("%d / %d", present, expected);
+    private String formatAttendance() {
+        AttendanceStats stats = attendanceStats();
+        return String.format("%d / %d", stats.present(), stats.expected());
     }
 
     private String formatRate() {
-        int present = 0;
-        int expected = 0;
-        for (SessionAttendance attendance : this.studentAttendance) {
-            if (attendance.getStatus() == AttendanceStatus.PENDING) {
-                // ???
-                continue;
-            }
-            // Don't count excused students
-            if (attendance.getStatus() == AttendanceStatus.EXCUSED) {
-                continue;
-            }
-            expected++;
-            if (attendance.getStatus() != AttendanceStatus.LATE) {
-                present++;
-            }
-        }
-        if (expected == 0) {
+        AttendanceStats stats = attendanceStats();
+
+        if (stats.expected() == 0) {
             return "0%";
         }
-        int percent = (int) (((double) present / expected) * 100);
+        int percent = (int) (((double) stats.present() / stats.expected()) * 100);
         return String.format("%d %s", percent, "%");
     }
 

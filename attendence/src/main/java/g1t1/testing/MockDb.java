@@ -1,5 +1,6 @@
 package g1t1.testing;
 
+import g1t1.db.attendance.AttendanceStatus;
 import g1t1.db.attendance.MarkingMethod;
 import g1t1.models.ids.StudentID;
 import g1t1.models.ids.TeacherID;
@@ -44,14 +45,9 @@ public class MockDb {
                         new ClassSession(afternoonClass, 1, LocalDateTime.of(2025, 9, 3, 15, 30), SessionStatus.Ended),
                         new ClassSession(morningClass, 1, LocalDateTime.of(2025, 9, 10, 8, 0), SessionStatus.Ended))));
 
-        for (SessionAttendance attendance : morningSession.getStudentAttendance()) {
-            attendance.markPresent(1, MarkingMethod.MANUAL);
+        for (SessionAttendance attendance : morningSession.getStudentAttendance().values()) {
+            attendance.setStatus(AttendanceStatus.PRESENT, 1, MarkingMethod.AUTOMATIC);
         }
-    }
-
-    public static List<ModuleSection> getUserModuleSections(TeacherID id) {
-        // First one
-        return teacherClasses.get(teacherClasses.keySet().iterator().next());
     }
 
     public static List<ClassSession> getPastSessions(TeacherID id) {
