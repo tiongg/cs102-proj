@@ -69,7 +69,6 @@ class CameraRunnable implements Runnable {
 
         while (camera.isOpened()) {
             if (Thread.currentThread().isInterrupted()) {
-                camera.release();
                 break;
             }
 
@@ -134,6 +133,9 @@ public class DuringSessionViewController extends PageController {
     private AttendanceStateList aslStudents;
 
     @FXML
+    private AttendanceStateList aslMarkableStudents;
+
+    @FXML
     private VBox vbxDefaultPanel, vbxAdminPanel;
 
     @FXML
@@ -160,6 +162,7 @@ public class DuringSessionViewController extends PageController {
 
         assignLabels(session);
         aslStudents.attendances.setAll(session.getStudentAttendance().values());
+        aslMarkableStudents.attendances.setAll(session.getStudentAttendance().values());
 
         this.lblPresent.textProperty().bind(AttendanceTaker.studentsPresent
                 .map(x -> String.format("%d / %d", x.intValue(), session.getStudentAttendance().size())));
@@ -186,7 +189,9 @@ public class DuringSessionViewController extends PageController {
         }
 
         this.lblPresent.textProperty().unbind();
-        AttendanceTaker.stop();
+        this.cameraDaemon = null;
+        this.countdownTimer = null;
+        this.isAdminPanelOpen.set(false);
     }
 
     private void assignLabels(ClassSession session) {

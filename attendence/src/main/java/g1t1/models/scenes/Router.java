@@ -38,7 +38,7 @@ public class Router {
 
     public static void changePage(PageName newPageName) {
         if (getCurrentPage() != null) {
-            getCurrentPage().getController().onMount();
+            getCurrentPage().getController().onUnmount();
         }
         Page page = scenes.get(newPageName);
         currentPage = page;

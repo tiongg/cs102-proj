@@ -1,10 +1,7 @@
 package g1t1.components.session;
 
 import g1t1.models.sessions.SessionAttendance;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
@@ -16,6 +13,7 @@ import javafx.scene.layout.VBox;
 public class AttendanceStateList extends VBox {
     public final ListProperty<SessionAttendance> attendances = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty title = new SimpleStringProperty();
+    private final BooleanProperty editable = new SimpleBooleanProperty(false);
 
     @FXML
     private Label lblHeader;
@@ -61,10 +59,22 @@ public class AttendanceStateList extends VBox {
         return this.title;
     }
 
+    public boolean getEditable() {
+        return this.editableProperty().get();
+    }
+
+    public void setEditable(boolean editable) {
+        this.editableProperty().set(editable);
+    }
+
+    public BooleanProperty editableProperty() {
+        return this.editable;
+    }
+
     private void updateChips() {
         vbChips.getChildren().clear();
         for (SessionAttendance attendance : attendances) {
-            AttendanceChip chip = new AttendanceChip(attendance);
+            AttendanceChip chip = new AttendanceChip(attendance, this.getEditable());
             vbChips.getChildren().add(chip);
         }
     }
