@@ -4,6 +4,8 @@ import g1t1.components.session.AttendanceStateList;
 import g1t1.config.SettingsManager;
 import g1t1.features.attendencetaking.AttendanceTaker;
 import g1t1.models.scenes.PageController;
+import g1t1.models.scenes.PageName;
+import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.opencv.FaceRecognitionService;
@@ -225,5 +227,11 @@ public class DuringSessionViewController extends PageController {
     @FXML
     public void toggleAdminPanel() {
         this.isAdminPanelOpen.set(!this.isAdminPanelOpen.get());
+    }
+
+    @FXML
+    public void stopSession() {
+        AttendanceTaker.stop();
+        Router.changePage(PageName.PastRecords);
     }
 }

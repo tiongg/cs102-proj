@@ -4,6 +4,7 @@
 <?import g1t1.components.TimePicker?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
@@ -67,6 +68,9 @@
             <StackPane.margin>
                 <Insets bottom="120.0"/>
             </StackPane.margin>
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
         </Button>
     </StackPane>
 </AnchorPane>
