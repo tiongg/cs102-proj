@@ -1,8 +1,5 @@
 package g1t1.scenes;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import g1t1.components.TimePicker;
 import g1t1.components.Toast;
 import g1t1.features.attendencetaking.AttendanceTaker;
@@ -20,10 +17,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class StartSessionViewController extends PageController {
     private final int TOTAL_WEEKS = 13;
@@ -44,6 +41,9 @@ public class StartSessionViewController extends PageController {
 
     @FXML
     private Button btnStartSession;
+
+    @FXML
+    private Label lblRoom, lblExpectedStudents, lblTiming;
 
     @FXML
     public void startSession() {
@@ -73,37 +73,19 @@ public class StartSessionViewController extends PageController {
         }
 
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
-            Teacher user = e.user();
-            mbModuleSections.getItems().clear();
-            for (ModuleSection section : user.getModuleSections()) {
-                MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
-                mbModuleSections.getItems().add(item);
-                item.setStyle("-fx-pref-width: 385px");
-
-                item.setOnAction(ae -> {
-                    mbModuleSections.setText(item.getText());
-                    moduleSectionValue.set(section);
-                });
-            }
+            setModuleSectionSelections();
         });
         AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
-            Teacher user = e.user();
-            mbModuleSections.getItems().clear();
-            for (ModuleSection section : user.getModuleSections()) {
-                MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
-                mbModuleSections.getItems().add(item);
-                item.setStyle("-fx-pref-width: 385px");
-
-                item.setOnAction(ae -> {
-                    mbModuleSections.setText(item.getText());
-                    moduleSectionValue.set(section);
-                });
-            }
+            setModuleSectionSelections();
         });
 
         BooleanBinding shouldDisable = moduleSectionValue.isNull().or(weekValue.lessThanOrEqualTo(0))
                 .or(dpClassDate.valueProperty().isNull());
         btnStartSession.disableProperty().bind(shouldDisable);
+
+        lblRoom.textProperty().bind(moduleSectionValue.map(ms -> String.format("Room: %s", ms.getRoom())));
+        lblExpectedStudents.textProperty().bind(moduleSectionValue.map(ms -> String.format("Expecting: %s students", ms.getStudents().size())));
+        lblTiming.textProperty().bind(moduleSectionValue.map(ms -> String.format("From: %s - %s", ms.getStartTime(), ms.getEndTime())));
     }
 
     @Override
@@ -112,5 +94,20 @@ public class StartSessionViewController extends PageController {
         tpStartTime.getHourProperty().set(dt.getHour());
         tpStartTime.getMinuteProperty().set(dt.getMinute());
         dpClassDate.setValue(LocalDate.now());
+    }
+
+    private void setModuleSectionSelections() {
+        Teacher user = AuthenticationContext.getCurrentUser();
+        mbModuleSections.getItems().clear();
+        for (ModuleSection section : user.getModuleSections()) {
+            MenuItem item = new MenuItem(String.format("%s - %s", section.getModule(), section.getSection()));
+            mbModuleSections.getItems().add(item);
+            item.setStyle("-fx-pref-width: 385px");
+
+            item.setOnAction(ae -> {
+                mbModuleSections.setText(item.getText());
+                moduleSectionValue.set(section);
+            });
+        }
     }
 }
