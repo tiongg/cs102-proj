@@ -2,6 +2,9 @@ package g1t1.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import g1t1.components.Toast;
+import javafx.application.Platform;
+import org.opencv.videoio.VideoCapture;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,10 +16,10 @@ import java.io.IOException;
  * Handles loading settings from JSON file and saving changes back.
  */
 public class SettingsManager {
-    private static SettingsManager instance;
     private static final String SETTINGS_FILE = "settings.json";
-    private AppSettings settings;
+    private static SettingsManager instance;
     private final Gson gson;
+    private AppSettings settings;
 
     private SettingsManager() {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -35,7 +38,7 @@ public class SettingsManager {
      */
     private void loadSettings() {
         File settingsFile = new File(SETTINGS_FILE);
-        
+
         if (!settingsFile.exists()) {
             // Create default settings file
             this.settings = new AppSettings();
@@ -84,22 +87,14 @@ public class SettingsManager {
         return settings.getDetectionThreshold();
     }
 
-    public int getLateThresholdMinutes() {
-        return settings.getLateThresholdMinutes();
-    }
-
-    public int getCameraDevice() {
-        return settings.getCameraDevice();
-    }
-
-    public String getLogPath() {
-        return settings.getLogPath();
-    }
-
     // Convenience setters that auto-save
     public void setDetectionThreshold(int threshold) {
         settings.setDetectionThreshold(threshold);
         saveSettings();
+    }
+
+    public int getLateThresholdMinutes() {
+        return settings.getLateThresholdMinutes();
     }
 
     public void setLateThresholdMinutes(int minutes) {
@@ -107,13 +102,46 @@ public class SettingsManager {
         saveSettings();
     }
 
+    public int getCameraDevice() {
+        return settings.getCameraDevice();
+    }
+
     public void setCameraDevice(int device) {
         settings.setCameraDevice(device);
         saveSettings();
     }
 
+    public String getLogPath() {
+        return settings.getLogPath();
+    }
+
     public void setLogPath(String path) {
         settings.setLogPath(path);
         saveSettings();
+    }
+
+    public VideoCapture getConfiguredCamera() {
+        VideoCapture camera = new VideoCapture(getCameraDevice());
+
+        // Check if configured camera opened successfully
+        if (!camera.isOpened()) {
+            System.err.println("Camera " + getCameraDevice() + " failed to open. Trying camera 0...");
+            camera.release();
+            camera = new VideoCapture(0);
+
+            // If camera 0 also fails, notify user
+            if (!camera.isOpened()) {
+                System.err.println("No cameras available!");
+                Platform.runLater(() -> {
+                    Toast.show("No camera detected!", Toast.ToastType.ERROR);
+                });
+            } else {
+                Platform.runLater(() -> {
+                    Toast.show("Using default camera (Camera " + getCameraDevice() + " unavailable)",
+                            Toast.ToastType.WARNING);
+                });
+            }
+        }
+        return camera;
     }
 }

@@ -9,11 +9,24 @@
 <?import javafx.scene.text.Font?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="750.0" prefWidth="1440.0"
             xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.DuringSessionViewController">
-    <ImageView fx:id="ivCameraView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-               AnchorPane.rightAnchor="350.0" AnchorPane.topAnchor="0.0"/>
+
+    <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="350.0"
+               AnchorPane.topAnchor="0.0">
+        <ImageView fx:id="ivCameraView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="350.0" AnchorPane.topAnchor="0.0"/>
+        <!-- Error label overlaid at bottom -->
+        <Label fx:id="lblCameraError"
+               style="-fx-background-color: rgba(139, 0, 0, 0.85); -fx-padding: 4 8 4 8; -fx-background-radius: 4;"
+               text="Camera Error!" textFill="white" translateZ="-99.0" visible="false"
+               StackPane.alignment="BOTTOM_CENTER" viewOrder="-10">
+            <StackPane.margin>
+                <Insets bottom="64.0"/>
+            </StackPane.margin>
+        </Label>
+    </StackPane>
     <VBox fx:id="vbxDefaultPanel" alignment="TOP_CENTER" prefWidth="350" spacing="8"
-          style="-fx-background-color: #d7d7d7;" styleClass=""
-          AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+          style="-fx-background-color: #d7d7d7;" styleClass="" AnchorPane.bottomAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <Label alignment="CENTER" prefHeight="64.0" prefWidth="350.0" text="Currently Marking" textAlignment="CENTER">
             <font>
                 <Font name="Inter Semi Bold" size="26.0"/>
@@ -54,7 +67,7 @@
         </VBox>
 
         <HBox alignment="CENTER" spacing="4">
-            <Button fx:id="btnAdminPanel" styleClass="flat-input" text="Admin panel" onMouseClicked="#toggleAdminPanel">
+            <Button fx:id="btnAdminPanel" onMouseClicked="#toggleAdminPanel" styleClass="flat-input" text="Admin panel">
                 <cursor>
                     <Cursor fx:constant="HAND"/>
                 </cursor>
@@ -66,10 +79,10 @@
     </VBox>
 
     <VBox fx:id="vbxAdminPanel" alignment="TOP_CENTER" prefWidth="350" spacing="8"
-          style="-fx-background-color: #d7d7d7;" styleClass=""
-          AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+          style="-fx-background-color: #d7d7d7;" styleClass="" AnchorPane.bottomAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <HBox alignment="CENTER" spacing="4">
-            <Button styleClass="flat-input" text="Admin panel" onMouseClicked="#toggleAdminPanel">
+            <Button onMouseClicked="#toggleAdminPanel" styleClass="flat-input" text="Admin panel">
                 <cursor>
                     <Cursor fx:constant="HAND"/>
                 </cursor>

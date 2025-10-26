@@ -1,6 +1,7 @@
 package g1t1.models.sessions;
 
 import g1t1.components.table.TableChipItem;
+import g1t1.config.SettingsManager;
 import g1t1.db.attendance.AttendanceStatus;
 import g1t1.models.BaseEntity;
 import g1t1.models.ids.StudentID;
@@ -18,8 +19,6 @@ record AttendanceStats(int present, int expected, int total) {
  * Class session
  */
 public class ClassSession extends BaseEntity implements TableChipItem {
-    public static final int TIME_BEFORE_LATE = 15;
-
     private final ModuleSection moduleSection;
     private final int week;
     private final LocalDateTime startTime;
@@ -61,7 +60,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
      */
     public AttendanceStatus getCurrentStatus() {
         Duration timePassed = Duration.between(this.startTime, LocalDateTime.now());
-        if (timePassed.toMinutes() <= TIME_BEFORE_LATE) {
+        if (timePassed.toMinutes() <= SettingsManager.getInstance().getLateThresholdMinutes()) {
             return AttendanceStatus.PRESENT;
         } else {
             return AttendanceStatus.LATE;

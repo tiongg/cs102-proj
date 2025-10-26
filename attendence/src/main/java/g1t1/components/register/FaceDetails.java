@@ -1,23 +1,13 @@
 package g1t1.components.register;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.videoio.VideoCapture;
-
 import g1t1.App;
 import g1t1.components.Toast;
 import g1t1.components.Toast.ToastType;
+import g1t1.config.SettingsManager;
 import g1t1.models.interfaces.register.HasFaces;
 import g1t1.models.scenes.Router;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.RegisterTeacher;
-import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.services.FaceDetector;
 import g1t1.utils.ImageUtils;
 import g1t1.utils.ThreadWithRunnable;
@@ -34,6 +24,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 
 class CameraRunnable implements Runnable {
     private static final int TARGET_SIZE = 256;
@@ -46,31 +45,7 @@ class CameraRunnable implements Runnable {
     private final FaceDetector faceDetector;
 
     public CameraRunnable(ImageView display, BooleanProperty cameraFailure) {
-        int configuredCamera = FaceConfig.getInstance().getCameraIndex();
-        VideoCapture tempCamera = new VideoCapture(configuredCamera);
-        
-        // Check if configured camera opened successfully
-        if (!tempCamera.isOpened()) {
-            System.err.println("Camera " + configuredCamera + " failed to open. Trying camera 0...");
-            tempCamera.release();
-            tempCamera = new VideoCapture(0);
-            
-            // If camera 0 also fails, notify user
-            if (!tempCamera.isOpened()) {
-                System.err.println("No cameras available!");
-                Platform.runLater(() -> {
-                    Toast.show("No camera detected! Please import images instead.", 
-                              Toast.ToastType.ERROR);
-                });
-            } else {
-                Platform.runLater(() -> {
-                    Toast.show("Using default camera (Camera " + configuredCamera + " unavailable)", 
-                              Toast.ToastType.WARNING);
-                });
-            }
-        }
-        
-        this.camera = tempCamera;
+        this.camera = SettingsManager.getInstance().getConfiguredCamera();
         this.display = display;
         this.cameraFailure = cameraFailure;
         this.faceDetector = new FaceDetector();
@@ -81,13 +56,13 @@ class CameraRunnable implements Runnable {
         Mat frame = new Mat();
         int consecutiveFailures = 0;
         this.cameraFailure.set(false);
-        
+
         // Immediately set failure if camera didn't open
         if (!camera.isOpened()) {
             this.cameraFailure.set(true);
             return;
         }
-        
+
         while (camera.isOpened()) {
             if (Thread.currentThread().isInterrupted()) {
                 break;
@@ -127,19 +102,19 @@ class CameraRunnable implements Runnable {
                 return buffer.toArray();
             }
         }
-        return new byte[] {};
+        return new byte[]{};
     }
 
     public byte[] getFaceInFrame() {
         synchronized (frameLock) {
             if (currentFrame.empty()) {
-                return new byte[] {};
+                return new byte[]{};
             }
 
             Mat faceRegion = faceDetector.getFaceFromMatrix(currentFrame, 0);
 
             if (faceRegion == null) {
-                return new byte[] {};
+                return new byte[]{};
             }
 
             // Encode to byte array
