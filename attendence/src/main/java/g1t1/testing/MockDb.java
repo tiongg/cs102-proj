@@ -44,7 +44,7 @@ public class MockDb {
                         new ClassSession(afternoonClass, 1, LocalDateTime.of(2025, 9, 3, 15, 30), SessionStatus.Ended),
                         new ClassSession(morningClass, 1, LocalDateTime.of(2025, 9, 10, 8, 0), SessionStatus.Ended))));
 
-        for (SessionAttendance attendance : morningSession.getStudentAttendance()) {
+        for (SessionAttendance attendance : morningSession.getStudentAttendance().values()) {
             attendance.markPresent(1, MarkingMethod.MANUAL);
         }
     }
