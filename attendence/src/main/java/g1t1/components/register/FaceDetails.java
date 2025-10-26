@@ -174,7 +174,6 @@ class CameraRunnable implements Runnable {
     }
 }
 
-
 public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
     private final int REQUIRED_PICTURE_COUNT = 100;
 

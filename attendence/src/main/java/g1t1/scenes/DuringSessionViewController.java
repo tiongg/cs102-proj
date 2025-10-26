@@ -24,6 +24,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.opencv.core.Mat;
@@ -118,7 +119,8 @@ public class DuringSessionViewController extends PageController {
     private LocalDateTime sessionStartTime;
 
     @FXML
-    private Label lblModule, lblSection, lblWeek, lblTimeStart, lblRemainingTime, lblPresent;
+    private Label lblModule, lblSection, lblWeek, lblTimeStart,
+            lblRemainingTime, lblPresent, lblConfirmStudentName;
 
     @FXML
     private Button btnAdminPanel;
@@ -139,6 +141,9 @@ public class DuringSessionViewController extends PageController {
     private VBox vbxDefaultPanel, vbxAdminPanel;
 
     @FXML
+    private HBox hbxConfirmStudent;
+
+    @FXML
     private Label lblCameraError;
 
     @FXML
@@ -147,6 +152,14 @@ public class DuringSessionViewController extends PageController {
         ivCameraView.fitHeightProperty().bind(ivCameraView.getParent().layoutBoundsProperty().map(Bounds::getHeight));
         this.btnAdminPanel.disableProperty().bind(this.isTeacherInViewProperty.not());
         this.aslRecent.attendances.bind(AttendanceTaker.recentlyMarked);
+
+        this.hbxConfirmStudent.visibleProperty().bind(AttendanceTaker.needsConfirmation.isNotNull());
+        this.lblConfirmStudentName.textProperty().bind(AttendanceTaker.needsConfirmation.map(x -> {
+            if (x == null) {
+                return "";
+            }
+            return String.format("Confirm: %s", x.getStudent().getName());
+        }));
 
         this.vbxDefaultPanel.visibleProperty().bind(isAdminPanelOpen.not());
         this.vbxAdminPanel.visibleProperty().bind(isAdminPanelOpen);
@@ -238,5 +251,15 @@ public class DuringSessionViewController extends PageController {
     public void stopSession() {
         AttendanceTaker.stop();
         Router.changePage(PageName.PastRecords);
+    }
+
+    @FXML
+    public void acceptStudentAttendance() {
+        AttendanceTaker.acceptPrompt();
+    }
+
+    @FXML
+    public void rejectStudentAttendance() {
+        AttendanceTaker.rejectPrompt();
     }
 }

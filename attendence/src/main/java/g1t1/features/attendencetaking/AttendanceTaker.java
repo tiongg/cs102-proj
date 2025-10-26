@@ -5,6 +5,7 @@ import g1t1.config.SettingsManager;
 import g1t1.db.attendance.AttendanceStatus;
 import g1t1.db.attendance.MarkingMethod;
 import g1t1.features.authentication.AuthenticationContext;
+import g1t1.features.logger.AppLogger;
 import g1t1.models.ids.StudentID;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
@@ -28,9 +29,7 @@ public class AttendanceTaker {
             new SimpleObjectProperty<>();
     public static final IntegerProperty studentsPresent = new SimpleIntegerProperty();
 
-    // Configuration constants
     private static final int MAX_RECENTLY_DISPLAYED = 3;
-    private static final double PROMPT_THRESHOLD = 10.0; // Above this -> Prompt for confirmation
 
     private static ClassSession currentSession;
 
@@ -41,6 +40,7 @@ public class AttendanceTaker {
     }
 
     public static void stop() {
+        AppLogger.log("Stopped attendance taking");
         FaceRecognitionService.getInstance().stop();
 
         if (currentSession != null) {
@@ -55,21 +55,14 @@ public class AttendanceTaker {
         return currentSession;
     }
 
-    public static boolean manualOverride(StudentID studentID, AttendanceStatus status) {
-        SessionAttendance attendance = getAttendanceRecord(studentID);
-        if (attendance == null) {
-            return false;
-        }
-
-        attendance.setStatus(status, 1.0, MarkingMethod.MANUAL);
-        return true;
-    }
-
-    public static boolean confirmMarking(StudentID studentID) {
-        SessionAttendance attendance = getAttendanceRecord(studentID);
+    public static boolean acceptPrompt() {
         StudentDetectedEvent event = needsConfirmation.getValue();
 
-        if (attendance == null || event == null) {
+        if (event == null) {
+            return false;
+        }
+        SessionAttendance attendance = getAttendanceRecord(event.getStudent().getId());
+        if (attendance == null) {
             return false;
         }
 
@@ -82,6 +75,10 @@ public class AttendanceTaker {
 
         needsConfirmation.set(null);
         return true;
+    }
+
+    public static void rejectPrompt() {
+        needsConfirmation.set(null);
     }
 
     private static void initializeRecognitionSystem(ModuleSection moduleSection) {
@@ -107,10 +104,6 @@ public class AttendanceTaker {
     }
 
     private static void processDetection(StudentDetectedEvent event) {
-        if (event.getConfidence() < PROMPT_THRESHOLD) {
-            return;
-        }
-
         SessionAttendance attendance = getAttendanceRecord(event.getStudent().getId());
         if (attendance == null) {
             return;
@@ -124,7 +117,7 @@ public class AttendanceTaker {
         }
 
         // Process based on confidence level
-        if (event.getConfidence() >= SettingsManager.getInstance().getDetectionThreshold()) {
+        if (event.getConfidence() >= SettingsManager.getInstance().getSettings().getAutoMarkThreshold()) {
             processAutoMarking(event, attendance);
         } else {
             requestManualConfirmation(event);
@@ -132,6 +125,7 @@ public class AttendanceTaker {
     }
 
     private static void processAutoMarking(StudentDetectedEvent event, SessionAttendance attendance) {
+        AppLogger.log(String.format("Auto marked %s", attendance.getStudent().getName()));
         markAttendance(
                 attendance,
                 currentSession.getCurrentStatus(),

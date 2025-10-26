@@ -6,6 +6,7 @@ package g1t1.config;
  */
 public class AppSettings {
     private int detectionThreshold;
+    private int autoMarkThreshold;
     private int lateThresholdMinutes;
     private int cameraDevice;
     private String logPath;
@@ -14,50 +15,47 @@ public class AppSettings {
      * Constructor with default values
      */
     public AppSettings() {
-        this.detectionThreshold = 70;
+        this.detectionThreshold = 50;
+        this.autoMarkThreshold = 80;
         this.lateThresholdMinutes = 15;
         this.cameraDevice = 0;
         this.logPath = "logs/";
     }
 
-    /**
-     * Constructor with all parameters
-     */
-    public AppSettings(int detectionThreshold, int lateThresholdMinutes, int cameraDevice, String logPath) {
-        this.detectionThreshold = detectionThreshold;
-        this.lateThresholdMinutes = lateThresholdMinutes;
-        this.cameraDevice = cameraDevice;
-        this.logPath = logPath;
-    }
-
-    // Getters
     public int getDetectionThreshold() {
         return detectionThreshold;
+    }
+
+    public void setDetectionThreshold(int detectionThreshold) {
+        this.detectionThreshold = detectionThreshold;
+    }
+
+    public int getAutoMarkThreshold() {
+        return autoMarkThreshold;
+    }
+
+    public void setAutoMarkThreshold(int autoMarkThreshold) {
+        this.autoMarkThreshold = autoMarkThreshold;
     }
 
     public int getLateThresholdMinutes() {
         return lateThresholdMinutes;
     }
 
-    public int getCameraDevice() {
-        return cameraDevice;
-    }
-
-    public String getLogPath() {
-        return logPath;
-    }
-
-    // Setters
-    public void setDetectionThreshold(int detectionThreshold) {
-        this.detectionThreshold = detectionThreshold;
-    }
-
     public void setLateThresholdMinutes(int lateThresholdMinutes) {
         this.lateThresholdMinutes = lateThresholdMinutes;
     }
 
+    public int getCameraDevice() {
+        return cameraDevice;
+    }
+
     public void setCameraDevice(int cameraDevice) {
         this.cameraDevice = cameraDevice;
+    }
+
+    public String getLogPath() {
+        return logPath;
     }
 
     public void setLogPath(String logPath) {
