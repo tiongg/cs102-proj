@@ -3,12 +3,16 @@ package g1t1.models.sessions;
 import g1t1.components.table.TableChipItem;
 import g1t1.db.attendance.AttendanceStatus;
 import g1t1.models.BaseEntity;
+import g1t1.models.ids.StudentID;
 import g1t1.models.users.Student;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+
+record AttendanceStats(int present, int expected, int total) {
+}
 
 /**
  * Class session
@@ -17,7 +21,8 @@ public class ClassSession extends BaseEntity implements TableChipItem {
     private final ModuleSection moduleSection;
     private final int week;
     private final LocalDateTime startTime;
-    private final ArrayList<SessionAttendance> studentAttendance = new ArrayList<>();
+    private final ArrayList<SessionAttendance> recentlyMarked = new ArrayList<>();
+    private final HashMap<StudentID, SessionAttendance> studentAttendance = new HashMap<>();
     private SessionStatus sessionStatus;
 
     public ClassSession(ModuleSection moduleSection, int week, LocalDateTime startTime, SessionStatus status) {
@@ -26,7 +31,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         this.startTime = startTime;
         this.week = week;
         for (Student student : moduleSection.getStudents()) {
-            studentAttendance.add(new SessionAttendance(student));
+            studentAttendance.put(student.getId(), new SessionAttendance(student));
         }
     }
 
@@ -42,7 +47,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return this.week;
     }
 
-    public List<SessionAttendance> getStudentAttendance() {
+    public HashMap<StudentID, SessionAttendance> getStudentAttendance() {
         return this.studentAttendance;
     }
 
@@ -56,10 +61,10 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return String.format("%s - %s", module, section);
     }
 
-    private String formatAttendance() {
+    private AttendanceStats attendanceStats() {
         int present = 0;
         int expected = 0;
-        for (SessionAttendance attendance : this.studentAttendance) {
+        for (SessionAttendance attendance : this.studentAttendance.values()) {
             if (attendance.getStatus() == AttendanceStatus.PENDING) {
                 // ???
                 continue;
@@ -73,31 +78,21 @@ public class ClassSession extends BaseEntity implements TableChipItem {
                 present++;
             }
         }
+        return new AttendanceStats(present, expected, this.studentAttendance.size());
+    }
 
-        return String.format("%d / %d", present, expected);
+    private String formatAttendance() {
+        AttendanceStats stats = attendanceStats();
+        return String.format("%d / %d", stats.present(), stats.expected());
     }
 
     private String formatRate() {
-        int present = 0;
-        int expected = 0;
-        for (SessionAttendance attendance : this.studentAttendance) {
-            if (attendance.getStatus() == AttendanceStatus.PENDING) {
-                // ???
-                continue;
-            }
-            // Don't count excused students
-            if (attendance.getStatus() == AttendanceStatus.EXCUSED) {
-                continue;
-            }
-            expected++;
-            if (attendance.getStatus() != AttendanceStatus.LATE) {
-                present++;
-            }
-        }
-        if (expected == 0) {
+        AttendanceStats stats = attendanceStats();
+
+        if (stats.expected() == 0) {
             return "0%";
         }
-        int percent = (int) (((double) present / expected) * 100);
+        int percent = (int) (((double) stats.present() / stats.expected()) * 100);
         return String.format("%d %s", percent, "%");
     }
 
