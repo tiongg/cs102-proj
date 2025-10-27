@@ -36,5 +36,8 @@ public class ReportTesting {
 
         PDFReport pdfreport = new PDFReport(filePath + "pdfile.pdf");
         pdfreport.generate(report);
+
+        XLSXReport xlsxreport = new XLSXReport(filePath + "xlsxfile.xlsx");
+        xlsxreport.generate(report);
     }
 }
