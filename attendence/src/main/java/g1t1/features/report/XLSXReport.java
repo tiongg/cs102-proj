@@ -41,7 +41,7 @@ public class XLSXReport extends ReportGenerator {
             throw new IllegalArgumentException("section cannot be null");
         }
 
-        List<SessionAttendance> sessAttendances = session.getStudentAttendance();
+        List<SessionAttendance> sessAttendances = session.getStudentAttendance().values().stream().toList();
         if (sessAttendances == null) {
             throw new IllegalArgumentException("SessionAttendance cannot be null");
         }
