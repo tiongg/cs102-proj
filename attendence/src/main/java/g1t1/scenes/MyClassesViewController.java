@@ -1,7 +1,5 @@
 package g1t1.scenes;
 
-// for table 
-
 import g1t1.components.TimePicker;
 import g1t1.components.Toast;
 import g1t1.components.table.Table;

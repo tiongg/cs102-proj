@@ -67,7 +67,7 @@ public class AttendanceRepositoryJooq implements AttendanceRepository {
 
     @Override
     public List<AttendanceRecord> fetchAttendenceBySessionId(String sessionId) {
-        return dsl.select(SESSION_ID, ENROLLMENT_ID, STATUS, RECORDED_TIMESTAMP)
+        return dsl.select(SESSION_ID, ENROLLMENT_ID, CONFIDENCE, STATUS, RECORDED_TIMESTAMP, METHOD)
                 .from(ATTENDANCE_TABLE)
                 .where(SESSION_ID.eq(sessionId))
                 .fetch(record -> new AttendanceRecord(

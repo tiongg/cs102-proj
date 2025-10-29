@@ -24,7 +24,7 @@ public class SessionAttendance {
     public SessionAttendance(Student student, AttendanceRecord existingRecord) {
         this.student = student;
         this.method = MarkingMethod.valueOf(existingRecord.method());
-        this.statusProperty.set(AttendanceStatus.valueOf(existingRecord.status().toLowerCase()));
+        this.statusProperty.set(AttendanceStatus.valueOf(existingRecord.status().toUpperCase()));
         this.confidence = existingRecord.confidence();
         this.lastUpdated = existingRecord.recordedTimestamp();
     }
