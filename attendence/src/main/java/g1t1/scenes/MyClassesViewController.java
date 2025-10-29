@@ -10,7 +10,6 @@ import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
-import g1t1.testing.MockDb;
 import g1t1.utils.DateUtils;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
@@ -88,7 +87,7 @@ public class MyClassesViewController extends PageController {
         addClassBtn.setVisible(false);
         availableClasses.setText(null);
         classesTable.setTableHeaders("Class", "Date", "Time", "Attendance", "Rate");
-        List<ClassSession> sessions = MockDb.getPastSessions(AuthenticationContext.getCurrentUser().getID()).stream()
+        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
                 .filter(session -> session.getModuleSection().equals(ms)).toList();
 
         classesTable.createBody(sessions);
