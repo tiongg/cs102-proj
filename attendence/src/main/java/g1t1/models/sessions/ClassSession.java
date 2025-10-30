@@ -149,9 +149,14 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return this.startTime.format(customFormatter);
     }
 
+    private String formatStartTime() {
+        DateTimeFormatter hhmmFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        return this.startTime.format(hhmmFormatter) + " - " + this.endTime.format(hhmmFormatter);
+    }
+
     @Override
     public String[] getChipData() {
-        return new String[]{this.formatModuleSection(), this.formatDate(), this.moduleSection.getStartTime(),
+        return new String[]{this.formatModuleSection(), this.formatDate(), this.formatStartTime(),
                 this.formatAttendance(), this.formatRate()};
     }
 }
