@@ -1,5 +1,9 @@
 package g1t1.components.table;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
@@ -18,6 +22,7 @@ public class Table extends StackPane {
 
     private final HBox tableHeaderElement;
     private final VBox tableBodyElement;
+    private final ListProperty<TableChipItem> chipItems = new SimpleListProperty<>(FXCollections.observableArrayList());
     private Consumer<TableChipItem> onChipClick;
 
     public Table() {
@@ -30,9 +35,17 @@ public class Table extends StackPane {
 
         this.tableBodyElement = new VBox(12);
         this.tableBodyElement.getStyleClass().add("table-body");
+
         this.tableContainer.getChildren().addAll(tableHeaderElement, tableBodyElement);
 
         getChildren().add(tableContainer);
+        chipItems.addListener((ob, oldList, newList) -> {
+            updateTableBody();
+        });
+
+        chipItems.addListener((ListChangeListener<TableChipItem>) change -> {
+            updateTableBody();
+        });
     }
 
     public void setTableHeaders(String... tableHeaders) {
@@ -48,10 +61,22 @@ public class Table extends StackPane {
         }
     }
 
-    public void createBody(List<? extends TableChipItem> chips) {
+    public void setTableBody(List<? extends TableChipItem> chips) {
+        chipItems.setAll(chips);
+    }
+
+    public ListProperty<TableChipItem> getChipItems() {
+        return chipItems;
+    }
+
+    public void setOnChipClick(Consumer<TableChipItem> handler) {
+        this.onChipClick = handler;
+    }
+
+    private void updateTableBody() {
         this.tableBodyElement.getChildren().clear();
 
-        for (TableChipItem chipData : chips) {
+        for (TableChipItem chipData : chipItems) {
             HBox chip = new HBox(128);
             chip.getStyleClass().add("table-item");
             chip.setAlignment(Pos.CENTER);
@@ -72,9 +97,5 @@ public class Table extends StackPane {
             }
             this.tableBodyElement.getChildren().add(chip);
         }
-    }
-
-    public void setOnChipClick(Consumer<TableChipItem> handler) {
-        this.onChipClick = handler;
     }
 }

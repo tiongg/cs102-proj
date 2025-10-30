@@ -31,7 +31,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
         ModuleSection ms = this.props.moduleSection();
         List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
                 .filter(session -> session.getModuleSection().equals(ms)).toList();
-        this.tblSessions.createBody(sessions);
+        this.tblSessions.setTableBody(sessions);
         this.lblClassHeader.setText(String.format("My classes - %s - %s", ms.getModule(), ms.getSection()));
     }
 
