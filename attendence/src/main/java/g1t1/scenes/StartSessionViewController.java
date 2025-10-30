@@ -9,7 +9,6 @@ import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Teacher;
-import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
@@ -71,10 +70,6 @@ public class StartSessionViewController extends PageController {
                 weekValue.set(week);
             });
         }
-
-        AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
-            setModuleSectionSelections();
-        });
         AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
             setModuleSectionSelections();
         });

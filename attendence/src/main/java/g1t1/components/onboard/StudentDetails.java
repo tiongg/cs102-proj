@@ -8,7 +8,6 @@ import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Teacher;
 import g1t1.utils.BindingUtils;
-import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.beans.property.BooleanProperty;
@@ -63,9 +62,6 @@ public class StudentDetails extends Tab implements RegistrationStep<HasStudentDe
 
     @FXML
     public void initialize() {
-        AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
-            this.setModuleSections();
-        });
         AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
             this.setModuleSections();
         });

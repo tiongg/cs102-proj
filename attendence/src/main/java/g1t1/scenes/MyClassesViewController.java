@@ -13,7 +13,6 @@ import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.props.IndividualClassViewProps;
 import g1t1.utils.DateUtils;
-import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -25,12 +24,15 @@ import javafx.scene.layout.StackPane;
 import org.jooq.exception.DataAccessException;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class MyClassesViewController extends PageController {
     private final IntegerProperty newClassWeekValue = new SimpleIntegerProperty(-1);
 
     @FXML
     private Table classesTable;
+    @FXML
+    private StackPane stkEmptyPrompt;
 
     @FXML
     private StackPane addClassOverlay;
@@ -58,9 +60,6 @@ public class MyClassesViewController extends PageController {
                 showSessions(ms);
             }
         });
-        AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
-            updateModuleSections();
-        });
         AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
             updateModuleSections();
         });
@@ -84,7 +83,9 @@ public class MyClassesViewController extends PageController {
 
     private void updateModuleSections() {
         addClassOverlay.setVisible(false);
-        classesTable.createBody(AuthenticationContext.getCurrentUser().getModuleSections());
+        List<ModuleSection> moduleSections = AuthenticationContext.getCurrentUser().getModuleSections();
+        stkEmptyPrompt.visibleProperty().set(moduleSections.isEmpty());
+        classesTable.setTableBody(moduleSections);
     }
 
     @FXML

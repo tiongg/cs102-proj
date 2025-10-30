@@ -50,6 +50,14 @@
 
                 <Table fx:id="classesTable" VBox.vgrow="ALWAYS"/>
             </VBox>
+
+            <StackPane fx:id="stkEmptyPrompt" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0"
+                       AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="90.0">
+                <VBox spacing="8" alignment="CENTER">
+                    <Label text="No classes yet!"/>
+                    <Label text="Create a new class with the button above"/>
+                </VBox>
+            </StackPane>
         </AnchorPane>
     </AnchorPane>
 
