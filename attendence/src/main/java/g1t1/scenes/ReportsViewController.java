@@ -5,17 +5,12 @@ import g1t1.features.authentication.AuthenticationContext;
 import g1t1.features.report.*;
 import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
-import g1t1.models.sessions.ModuleSection;
-import g1t1.models.sessions.SessionAttendance;
-import g1t1.utils.DateUtils; //idk if this is necessary
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 
