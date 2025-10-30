@@ -144,6 +144,7 @@ public class AuthenticationContext {
 
         currentUser = teacher;
         emitter.emit(new OnLoginEvent(teacher));
+        triggerUserUpdate();
         return true;
     }
 }
