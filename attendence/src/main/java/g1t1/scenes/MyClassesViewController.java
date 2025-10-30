@@ -17,6 +17,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import org.jooq.exception.DataAccessException;
 
@@ -39,7 +40,7 @@ public class MyClassesViewController extends PageController {
     private Button classesBackBtn;
 
     @FXML
-    private Button addClassBtn;
+    private HBox hbAddClass;
 
     @FXML
     private StackPane addClassOverlay;
@@ -84,7 +85,7 @@ public class MyClassesViewController extends PageController {
     private void showSessions(ModuleSection ms) {
         myClasses.setText("My Classes - " + ms.getModule() + " - " + ms.getSection());
         classesBackBtn.setVisible(true);
-        addClassBtn.setVisible(false);
+        hbAddClass.setVisible(false);
         availableClasses.setText(null);
         classesTable.setTableHeaders("Class", "Date", "Time", "Attendance", "Rate");
         List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
@@ -98,7 +99,7 @@ public class MyClassesViewController extends PageController {
         availableClasses.setText("Available Classes");
         classesBackBtn.setVisible(false);
         addClassOverlay.setVisible(false);
-        addClassBtn.setVisible(true);
+        hbAddClass.setVisible(true);
         classesTable.setTableHeaders("Module", "Section", "Day", "Time", "Enrolled");
         classesTable.createBody(AuthenticationContext.getCurrentUser().getModuleSections());
 

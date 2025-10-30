@@ -4,73 +4,74 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Table extends VBox {
+public class Table extends StackPane {
+    private static int LABEL_WIDTH = 100;
+
+    private VBox tableContainer;
+
     private HBox tableHeaderElement;
     private VBox tableBodyElement;
     private Consumer<TableChipItem> onChipClick;
 
-    // FXMLLoader throwing tantrum because of how it is initialised
     public Table() {
-        super(10);
-    }
+        this.tableContainer = new VBox(0);
+        VBox.setVgrow(this.tableContainer, Priority.ALWAYS);
 
-    public void setOnRowClick(Consumer<TableChipItem> handler) {
-        this.onChipClick = handler;
+        this.tableHeaderElement = new HBox(128);
+        this.tableHeaderElement.setAlignment(Pos.CENTER);
+        this.tableHeaderElement.getStyleClass().add("table-header");
+
+        this.tableBodyElement = new VBox(12);
+        this.tableBodyElement.getStyleClass().add("table-body");
+        this.tableContainer.getChildren().addAll(tableHeaderElement, tableBodyElement);
+
+        getChildren().add(tableContainer);
     }
 
     public void setTableHeaders(String... tableHeaders) {
-        tableHeaderElement = new HBox(100);
-        tableHeaderElement.setAlignment(Pos.CENTER);
-        tableHeaderElement.setStyle(
-                "-fx-background-color: #838383ff; -fx-background-radius: 20; -fx-padding: 8; -fx-font-weight: bold;");
+        this.tableHeaderElement.getChildren().clear();
 
-        // clear prev values
-        getChildren().clear();
         for (String header : tableHeaders) {
             Label label = new Label(header);
-            label.setStyle("-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: Inter;");
-            label.setMinWidth(80);
-            label.setMaxWidth(80);
-            label.setTextAlignment(TextAlignment.CENTER);
+            label.getStyleClass().add("table-header-label");
+            label.setMinWidth(LABEL_WIDTH);
+            label.setMaxWidth(LABEL_WIDTH);
+            label.setAlignment(Pos.CENTER);
             tableHeaderElement.getChildren().add(label);
         }
-
-        getChildren().add(tableHeaderElement);
     }
 
     public void createBody(List<? extends TableChipItem> chips) {
-        if (tableBodyElement != null) {
-            getChildren().remove(tableBodyElement);
-        }
-        this.tableBodyElement = new VBox(10);
+        this.tableBodyElement.getChildren().clear();
 
         for (TableChipItem chipData : chips) {
-            HBox chip = new HBox(100);
+            HBox chip = new HBox(128);
+            chip.getStyleClass().add("table-item");
             chip.setAlignment(Pos.CENTER);
-            chip.setStyle("-fx-background-color: #a4a4a4ff; -fx-background-radius: 20; -fx-padding: 4;");
 
             for (String data : chipData.getChipData()) {
                 Label label = new Label(data);
-                label.setStyle("-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: Inter;");
-                label.setMinWidth(80);
-                label.setMaxWidth(80);
-                label.setTextAlignment(TextAlignment.CENTER);
+                label.getStyleClass().add("table-item-label");
+                label.setMinWidth(LABEL_WIDTH);
+                label.setMaxWidth(LABEL_WIDTH);
+                label.setAlignment(Pos.CENTER);
                 chip.getChildren().add(label);
             }
             chip.setCursor(Cursor.HAND);
             chip.setOnMouseClicked(e -> {
-                if (onChipClick != null)
+                if (onChipClick != null) {
                     onChipClick.accept(chipData);
+                }
             });
-            tableBodyElement.getChildren().add(chip);
+            this.tableBodyElement.getChildren().add(chip);
         }
-        getChildren().add(tableBodyElement);
     }
 
     public void setOnChipClick(Consumer<TableChipItem> handler) {

@@ -3,51 +3,62 @@
 <?import g1t1.components.Navbar?>
 <?import g1t1.components.table.Table?>
 <?import g1t1.components.TimePicker?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<StackPane xmlns:fx="http://javafx.com/fxml"
-           xmlns="http://javafx.com/javafx" fx:controller="g1t1.scenes.MyClassesViewController" prefHeight="700.0"
-           prefWidth="900.0">
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="900.0"
+           xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.MyClassesViewController">
 
     <AnchorPane>
         <Navbar/>
         <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="Infinity" AnchorPane.bottomAnchor="0.0"
                     AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-            <HBox spacing="450" alignment="CENTER_LEFT" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
+            <HBox alignment="CENTER_LEFT" spacing="450" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
                 <Label fx:id="myClasses" text="My Classes">
                     <font>
                         <Font name="Inter Semi Bold" size="26.0"/>
                     </font>
                 </Label>
 
-                <Button fx:id="classesBackBtn" text="Back" visible="false" onAction="#classesBack"
-                        style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"/>
+                <Button fx:id="classesBackBtn" onAction="#classesBack"
+                        style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"
+                        text="Back" visible="false"/>
             </HBox>
 
-            <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="90.0"
-                  AnchorPane.leftAnchor="40.0">
-                <HBox spacing="700" alignment="CENTER_LEFT">
-                    <Label fx:id="availableClasses" text="Available Classes">
+            <VBox spacing="20" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+                  AnchorPane.topAnchor="90.0">
+                <HBox alignment="CENTER_LEFT" minHeight="40.0">
+                    <Label fx:id="availableClasses" text="Available Classes" HBox.hgrow="ALWAYS">
                         <font>
-                            <Font name="Inter" size="16.0"/>
+                            <Font name="Inter Semi Bold" size="18.0"/>
                         </font>
                     </Label>
-                    <Button fx:id="addClassBtn" text="Add class" onAction="#openAddClass"
-                            style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"/>
+                    <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <HBox fx:id="hbAddClass" alignment="CENTER" onMouseClicked="#openAddClass" spacing="8.0"
+                              style="-fx-background-color: #d9d9d9; -fx-background-radius: 999; -fx-text-fill: white; -fx-cursor: hand;">
+                            <FontIcon iconLiteral="ion4-ios-add-circle-outline" iconSize="18"/>
+                            <Label text="Add class"/>
+                            <padding>
+                                <Insets left="12.0" right="12.0"/>
+                            </padding>
+                            <HBox.margin>
+                                <Insets bottom="4.0" top="4.0"/>
+                            </HBox.margin>
+                        </HBox>
+                    </HBox>
                 </HBox>
 
-                <Table fx:id="classesTable"/>
+                <Table fx:id="classesTable" VBox.vgrow="ALWAYS"/>
             </VBox>
         </AnchorPane>
     </AnchorPane>
 
-    <StackPane fx:id="addClassOverlay" visible="false" pickOnBounds="true"
-               style="-fx-background-color: rgba(0,0,0,0.35);">
-        <VBox spacing="12" alignment="CENTER_LEFT"
-              style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;" maxWidth="700"
-              maxHeight="400">
+    <StackPane fx:id="addClassOverlay" style="-fx-background-color: rgba(0,0,0,0.35);" visible="false">
+        <VBox alignment="CENTER_LEFT" maxHeight="400" maxWidth="700" spacing="12"
+              style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;">
             <Label text="Create new class">
                 <font>
                     <Font name="Inter Semi Bold" size="20"/>
@@ -62,34 +73,41 @@
                     <ColumnConstraints percentWidth="35"/>
                 </columnConstraints>
 
-                <Label text="Module Title:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="tfModule" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="Module Title:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="tfModule" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-                <Label text="Section:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                <TextField fx:id="tfSection" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                <Label text="Section:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <TextField fx:id="tfSection" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
-                <Label text="Term:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextField fx:id="tfTerm" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="Term:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="tfTerm" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                <Label text="Day of Week:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                <MenuButton fx:id="mbDay" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                <Label text="Day of Week:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                <MenuButton fx:id="mbDay" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
 
-                <Label text="Start Time:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <TimePicker fx:id="tfStart" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="Start Time:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TimePicker fx:id="tfStart" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
 
-                <Label text="End Time:" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
-                <TimePicker fx:id="tfEnd" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+                <Label text="End Time:" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <TimePicker fx:id="tfEnd" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
 
-                <Label text="Room:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <TextField fx:id="tfRoom" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label text="Room:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <TextField fx:id="tfRoom" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <rowConstraints>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                </rowConstraints>
             </GridPane>
 
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button text="Cancel" onAction="#closeAddClass"
-                        style="-fx-background-color: transparent; -fx-text-fill: black;"/>
-                <Button text="Create" onAction="#createClass"
-                        style="-fx-background-color: black; -fx-text-fill: white; -fx-background-radius: 20;"/>
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button onAction="#closeAddClass" style="-fx-background-color: transparent; -fx-text-fill: black;"
+                        text="Cancel"/>
+                <Button onAction="#createClass"
+                        style="-fx-background-color: black; -fx-text-fill: white; -fx-background-radius: 20;"
+                        text="Create"/>
             </HBox>
         </VBox>
     </StackPane>
