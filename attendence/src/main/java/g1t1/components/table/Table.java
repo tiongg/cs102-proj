@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class Table extends StackPane {
-    private static int LABEL_WIDTH = 100;
+    private static final int LABEL_WIDTH = 100;
 
-    private VBox tableContainer;
+    private final VBox tableContainer;
 
-    private HBox tableHeaderElement;
-    private VBox tableBodyElement;
+    private final HBox tableHeaderElement;
+    private final VBox tableBodyElement;
     private Consumer<TableChipItem> onChipClick;
 
     public Table() {
@@ -64,12 +64,12 @@ public class Table extends StackPane {
                 label.setAlignment(Pos.CENTER);
                 chip.getChildren().add(label);
             }
-            chip.setCursor(Cursor.HAND);
-            chip.setOnMouseClicked(e -> {
-                if (onChipClick != null) {
+            if (onChipClick != null) {
+                chip.setCursor(Cursor.HAND);
+                chip.setOnMouseClicked(e -> {
                     onChipClick.accept(chipData);
-                }
-            });
+                });
+            }
             this.tableBodyElement.getChildren().add(chip);
         }
     }

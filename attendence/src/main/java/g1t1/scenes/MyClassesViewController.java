@@ -8,39 +8,29 @@ import g1t1.db.module_sections.ModuleSectionRepository;
 import g1t1.db.module_sections.ModuleSectionRepositoryJooq;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
-import g1t1.models.sessions.ClassSession;
+import g1t1.models.scenes.PageName;
+import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ModuleSection;
+import g1t1.props.IndividualClassViewProps;
 import g1t1.utils.DateUtils;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import org.jooq.exception.DataAccessException;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class MyClassesViewController extends PageController {
     private final IntegerProperty newClassWeekValue = new SimpleIntegerProperty(-1);
 
     @FXML
     private Table classesTable;
-
-    @FXML
-    private Label myClasses;
-
-    @FXML
-    private Label availableClasses;
-
-    @FXML
-    private Button classesBackBtn;
-
-    @FXML
-    private HBox hbAddClass;
 
     @FXML
     private StackPane addClassOverlay;
@@ -62,11 +52,17 @@ public class MyClassesViewController extends PageController {
 
     @FXML
     private void initialize() {
+        classesTable.setTableHeaders("Module", "Section", "Day", "Time", "Enrolled");
+        classesTable.setOnChipClick(item -> {
+            if (item instanceof ModuleSection ms) {
+                showSessions(ms);
+            }
+        });
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
-            switchToModuleView();
+            updateModuleSections();
         });
         AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
-            switchToModuleView();
+            updateModuleSections();
         });
 
         for (int i = 0; i < DateUtils.daysOfWeek.length; i++) {
@@ -83,36 +79,12 @@ public class MyClassesViewController extends PageController {
     }
 
     private void showSessions(ModuleSection ms) {
-        myClasses.setText("My Classes - " + ms.getModule() + " - " + ms.getSection());
-        classesBackBtn.setVisible(true);
-        hbAddClass.setVisible(false);
-        availableClasses.setText(null);
-        classesTable.setTableHeaders("Class", "Date", "Time", "Attendance", "Rate");
-        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
-                .filter(session -> session.getModuleSection().equals(ms)).toList();
-
-        classesTable.createBody(sessions);
+        Router.changePage(PageName.IndividualClass, new IndividualClassViewProps(ms));
     }
 
-    private void switchToModuleView() {
-        myClasses.setText("My Classes");
-        availableClasses.setText("Available Classes");
-        classesBackBtn.setVisible(false);
+    private void updateModuleSections() {
         addClassOverlay.setVisible(false);
-        hbAddClass.setVisible(true);
-        classesTable.setTableHeaders("Module", "Section", "Day", "Time", "Enrolled");
         classesTable.createBody(AuthenticationContext.getCurrentUser().getModuleSections());
-
-        classesTable.setOnChipClick(item -> {
-            if (item instanceof ModuleSection ms) {
-                showSessions(ms);
-            }
-        });
-    }
-
-    @FXML
-    private void classesBack() {
-        switchToModuleView();
     }
 
     @FXML

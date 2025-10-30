@@ -16,29 +16,26 @@
         <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="Infinity" AnchorPane.bottomAnchor="0.0"
                     AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-            <HBox alignment="CENTER_LEFT" spacing="450" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
-                <Label fx:id="myClasses" text="My Classes">
-                    <font>
-                        <Font name="Inter Semi Bold" size="26.0"/>
-                    </font>
-                </Label>
-
-                <Button fx:id="classesBackBtn" onAction="#classesBack"
-                        style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"
-                        text="Back" visible="false"/>
-            </HBox>
+            <Label text="My Classes" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0"
+                   StackPane.alignment="TOP_LEFT">
+                <font>
+                    <Font name="Inter Semi Bold" size="26.0"/>
+                </font>
+                <StackPane.margin>
+                    <Insets bottom="32.0" left="32.0" right="32.0" top="40.0"/>
+                </StackPane.margin>
+            </Label>
 
             <VBox spacing="20" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
                   AnchorPane.topAnchor="90.0">
                 <HBox alignment="CENTER_LEFT" minHeight="40.0">
-                    <Label fx:id="availableClasses" text="Available Classes" HBox.hgrow="ALWAYS">
+                    <Label text="Available Classes" HBox.hgrow="ALWAYS">
                         <font>
                             <Font name="Inter Semi Bold" size="18.0"/>
                         </font>
                     </Label>
                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                        <HBox fx:id="hbAddClass" alignment="CENTER" onMouseClicked="#openAddClass" spacing="8.0"
-                              style="-fx-background-color: #d9d9d9; -fx-background-radius: 999; -fx-text-fill: white; -fx-cursor: hand;">
+                        <HBox alignment="CENTER" onMouseClicked="#openAddClass" spacing="8.0" styleClass="flat-button">
                             <FontIcon iconLiteral="ion4-ios-add-circle-outline" iconSize="18"/>
                             <Label text="Add class"/>
                             <padding>

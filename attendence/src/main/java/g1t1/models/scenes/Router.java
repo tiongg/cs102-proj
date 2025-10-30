@@ -19,6 +19,7 @@ public class Router {
                 entry(PageName.Register, "scenes/RegisterView.fxml"),
                 entry(PageName.PastRecords, "scenes/ReportsView.fxml"),
                 entry(PageName.MyClasses, "scenes/MyClassesView.fxml"),
+                entry(PageName.IndividualClass, "scenes/IndividualClassView.fxml"),
                 entry(PageName.Onboard, "scenes/OnboardView.fxml"),
                 entry(PageName.StartSession, "scenes/StartSessionView.fxml"),
                 entry(PageName.DuringSession, "scenes/DuringSessionView.fxml"),
@@ -44,6 +45,16 @@ public class Router {
         currentPage = page;
         emitter.emit(new OnNavigateEvent(page));
         page.getController().onMount();
+    }
+
+    public static void changePage(PageName newPageName, Object props) {
+        if (getCurrentPage() != null) {
+            getCurrentPage().getController().onUnmount();
+        }
+        Page page = scenes.get(newPageName);
+        currentPage = page;
+        emitter.emit(new OnNavigateEvent(page));
+        page.getController().onMount(props);
     }
 
     public static Page getCurrentPage() {
