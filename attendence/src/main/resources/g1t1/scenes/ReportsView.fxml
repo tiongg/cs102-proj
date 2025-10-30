@@ -26,7 +26,7 @@
 
             <!-- TO-DO: add search bar, filter, and search button -->
             <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="90.0"
-                testAnchorPane.leftAnchor="40.0">
+                AnchorPane.leftAnchor="40.0">
                 <HBox spacing="700" alignment="CENTER_LEFT">
                     <Label fx:id="allPastReports" text="All Past Reports">
                         <font>
