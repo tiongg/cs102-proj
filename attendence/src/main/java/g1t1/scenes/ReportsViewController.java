@@ -1,5 +1,6 @@
 package g1t1.scenes;
 
+import g1t1.components.Toast;
 import g1t1.components.table.Table;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.features.report.*;
@@ -7,16 +8,23 @@ import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Window;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
 public class ReportsViewController extends PageController {
+    private final ObjectProperty<ClassSession> selectedSession = new SimpleObjectProperty<>(null);
+    private final DirectoryChooser chooser = new DirectoryChooser();
+    private File exportDir = null;
 
     @FXML
     private Table reportsTable;
@@ -35,16 +43,16 @@ public class ReportsViewController extends PageController {
 
     @FXML
     private MenuButton formatBtn;
-    
+
     @FXML
-    private Label includeText; 
+    private Label includeText;
     @FXML
     private CheckBox cbTimestamp, cbConfidence, cbMethod;
-    
+
     @FXML
     private Button exportBtn;
 
-    @FXML 
+    @FXML
     private HBox footerBar;
 
     @FXML
@@ -55,6 +63,12 @@ public class ReportsViewController extends PageController {
         AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
             switchToAllReportsView();
         });
+
+        chooser.setTitle("Choose a folder");
+        File home = new File(System.getProperty("user.home"));
+        if (home.exists()) {
+            chooser.setInitialDirectory(home);
+        }
     }
 
     @Override
@@ -66,6 +80,7 @@ public class ReportsViewController extends PageController {
     }
 
     private void switchToAllReportsView() {
+        selectedSession.set(null);
         pastReports.setText("Past Reports");
         allPastReports.setText("All Past Reports");
         reportsBackBtn.setVisible(false);
@@ -88,6 +103,7 @@ public class ReportsViewController extends PageController {
     }
 
     private void showIndivReport(ClassSession cs) {
+        selectedSession.set(cs);
         exportText.setText("Export as");
         formatBtn.setVisible(true);
         includeText.setText("Include:");
@@ -102,13 +118,11 @@ public class ReportsViewController extends PageController {
         LocalDateTime currDateTime = LocalDateTime.now();
         DateTimeFormatter formattedDateObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         String formattedDate = currDateTime.format(formattedDateObj);
-        allPastReports.setText(
-                "Module Session: " + cs.getModuleSection().getModule() + " - " + cs.getModuleSection().getSection() + "\n" + 
-                "Teacher: " + AuthenticationContext.getCurrentUser().getName() + "\n" + 
-                "Timestamp: " + formattedDate
-            );
-            reportsBackBtn.setVisible(true);
-            reportsTable.setTableHeaders("StuID", "StuName", "Status", "Confidence", "Method");
+        allPastReports.setText("Module Session: " + cs.getModuleSection().getModule() + " - "
+                + cs.getModuleSection().getSection() + "\n" + "Teacher: "
+                + AuthenticationContext.getCurrentUser().getName() + "\n" + "Timestamp: " + formattedDate);
+        reportsBackBtn.setVisible(true);
+        reportsTable.setTableHeaders("StuID", "StuName", "Status", "Confidence", "Method");
         //TO-DO: does not show data right now 
     }
 
@@ -121,12 +135,12 @@ public class ReportsViewController extends PageController {
     private void choosePdf() {
         formatBtn.setText("PDF");
     }
-    
+
     @FXML
     private void chooseCsv() {
         formatBtn.setText("CSV");
     }
-    
+
     @FXML
     private void chooseXlsx() {
         formatBtn.setText("XLSX");
@@ -134,11 +148,66 @@ public class ReportsViewController extends PageController {
 
     @FXML
     private void export() {
-        String format = formatBtn.getText(); // "PDF" | "CSV" | "XLSX"
-        boolean includeTimestamp  = cbTimestamp.isSelected();
-        boolean includeConfidence= cbConfidence.isSelected();
-        boolean includeMethod= cbMethod.isSelected();
+        if (exportDir == null) {
+            Toast.show("Choose an export folder.", Toast.ToastType.WARNING);
+            return;
+        }
 
-        //TO-DO: call actual export functions
+        ClassSession cs = selectedSession.get();
+        String format = formatBtn.getText(); // "PDF" | "CSV" | "XLSX"
+        boolean includeTimestamp = cbTimestamp.isSelected();
+        boolean includeConfidence = cbConfidence.isSelected();
+        boolean includeMethod = cbMethod.isSelected();
+
+        ReportBuilder builder = new ReportBuilder().includeReport(cs);
+        if (includeTimestamp) {
+            builder.withTimeStamp();
+        }
+        if (includeConfidence) {
+            builder.withConfidence();
+        }
+        if (includeMethod) {
+            builder.withMethod();
+        }
+        Report report = new Report(builder);
+
+        String mod  = cs.getModuleSection().getModule().replaceAll("\\s+", "");
+        String sec  = cs.getModuleSection().getSection().replaceAll("\\s+", "");
+        String ts   = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
+        String base = mod + "-" + sec + "_" + ts;
+
+        File target = null;
+        if ("PDF".equals(format)) {
+            target = new File(exportDir, base + ".pdf");
+            PDFReport pdfreport = new PDFReport(target.getAbsolutePath());
+            pdfreport.generate(report);
+        }
+        if ("CSV".equals(format)) {
+            target = new File(exportDir, base + ".csv");
+            CSVReport csvreport = new CSVReport(target.getAbsolutePath());
+            csvreport.generate(report);
+        }
+        if ("XLSX".equals(format)) {
+            target = new File(exportDir, base + ".xlsx");
+            XLSXReport xlsxreport = new XLSXReport(target.getAbsolutePath());
+            xlsxreport.generate(report);
+        }
+        Toast.show("Exported to " + target.getAbsolutePath(),Toast.ToastType.SUCCESS);
+    }
+
+    @FXML
+    private Label statusLabel;
+
+    @FXML
+    private void onChoose() {
+        Window owner = statusLabel.getScene().getWindow();
+        File dir = chooser.showDialog(owner);
+        if (dir != null) {
+            exportDir = dir;
+            statusLabel.setText(dir.getAbsolutePath() + " selected!");
+            chooser.setInitialDirectory(dir);
+        }
+
     }
 }
+
