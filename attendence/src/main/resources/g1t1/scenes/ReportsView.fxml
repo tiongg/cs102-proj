@@ -38,8 +38,9 @@
                 <Table fx:id="reportsTable"/>
             </VBox>
 
-            <!-- TO-DO: make footer look nicer -->
-            <HBox spacing="20" alignment="CENTER_LEFT" styleClass="table-footer" prefHeight="56.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0">
+            <!-- TO-DO: make footer width same as table and change color? -->
+            <HBox fx:id="footerBar" spacing="20" alignment="CENTER_LEFT" prefHeight="56.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="24.0" AnchorPane.bottomAnchor="24.0" visible="false"
+                    style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 10 14; -fx-border-color: #c6c5c5ff; -fx-border-radius: 14;">
             <!-- Export as -->
             <HBox spacing="8" alignment="CENTER_LEFT">
                 <Label fx:id="exportText" text="Export as"/>

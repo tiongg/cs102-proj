@@ -9,6 +9,8 @@ import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -42,6 +44,9 @@ public class ReportsViewController extends PageController {
     @FXML
     private Button exportBtn;
 
+    @FXML 
+    private HBox footerBar;
+
     @FXML
     private void initialize() {
         AuthenticationContext.emitter.subscribe(OnLoginEvent.class, (e) -> {
@@ -71,6 +76,7 @@ public class ReportsViewController extends PageController {
         cbConfidence.setVisible(false);
         cbMethod.setVisible(false);
         exportBtn.setVisible(false);
+        footerBar.setVisible(false);
         reportsTable.setTableHeaders("Class", "Date", "Time", "Attendance", "Rate");
         reportsTable.createBody(AuthenticationContext.getCurrentUser().getPastSessions());
 
@@ -89,6 +95,7 @@ public class ReportsViewController extends PageController {
         cbConfidence.setVisible(true);
         cbMethod.setVisible(true);
         exportBtn.setVisible(true);
+        footerBar.setVisible(true);
         ReportBuilder builder = new ReportBuilder().includeReport(cs).withTimeStamp().withConfidence().withMethod();
         Report report = new Report(builder);
         pastReports.setText("Past Report");
