@@ -25,7 +25,6 @@
                         style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"/>
             </HBox>
 
-            <!-- TO-DO: add search bar, filter, and search button -->
             <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="90.0"
                 AnchorPane.leftAnchor="40.0">
                 <HBox spacing="700" alignment="CENTER_LEFT">

@@ -4,8 +4,10 @@ import g1t1.components.Toast;
 import g1t1.components.table.Table;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.features.report.*;
+import g1t1.models.ids.StudentID;
 import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.SessionAttendance;
 import g1t1.utils.events.authentication.OnLoginEvent;
 import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.property.ObjectProperty;
@@ -18,8 +20,10 @@ import javafx.stage.Window;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
+import java.util.Map;
 
 public class ReportsViewController extends PageController {
     private final ObjectProperty<ClassSession> selectedSession = new SimpleObjectProperty<>(null);
@@ -123,7 +127,13 @@ public class ReportsViewController extends PageController {
                 + AuthenticationContext.getCurrentUser().getName() + "\n" + "Timestamp: " + formattedDate);
         reportsBackBtn.setVisible(true);
         reportsTable.setTableHeaders("StuID", "StuName", "Status", "Confidence", "Method");
-        //TO-DO: does not show data right now 
+        List<StudentChip> tableData = new ArrayList<>();
+        Map<StudentID, SessionAttendance> attendance = cs.getStudentAttendance();
+        Collection<SessionAttendance> allAttendances = attendance.values();
+        for(SessionAttendance indivAttendance: allAttendances){
+            tableData.add(new StudentChip(indivAttendance));
+        }
+        reportsTable.createBody(tableData);
     }
 
     @FXML
@@ -171,9 +181,9 @@ public class ReportsViewController extends PageController {
         }
         Report report = new Report(builder);
 
-        String mod  = cs.getModuleSection().getModule().replaceAll("\\s+", "");
-        String sec  = cs.getModuleSection().getSection().replaceAll("\\s+", "");
-        String ts   = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
+        String mod = cs.getModuleSection().getModule().replaceAll("\\s+", "");
+        String sec = cs.getModuleSection().getSection().replaceAll("\\s+", "");
+        String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
         String base = mod + "-" + sec + "_" + ts;
 
         File target = null;
@@ -192,7 +202,7 @@ public class ReportsViewController extends PageController {
             XLSXReport xlsxreport = new XLSXReport(target.getAbsolutePath());
             xlsxreport.generate(report);
         }
-        Toast.show("Exported to " + target.getAbsolutePath(),Toast.ToastType.SUCCESS);
+        Toast.show("Exported to " + target.getAbsolutePath(), Toast.ToastType.SUCCESS);
     }
 
     @FXML
@@ -210,4 +220,3 @@ public class ReportsViewController extends PageController {
 
     }
 }
-
