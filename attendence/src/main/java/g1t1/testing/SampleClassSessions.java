@@ -32,6 +32,7 @@ public class SampleClassSessions {
         students.add(new Student(new StudentID("S00005"), "Eve Wong", cs102, "e@mail.com"));
         students.add(new Student(new StudentID("S00006"), "Fiona Koh", cs102, "f@mail.com"));
         students.add(new Student(new StudentID("S00007"), "George Yeo", cs102, "g@mail.com"));
+        students.add(new Student(new StudentID("S00008"), "Super Duper Long Name Testing Table", cs102, "g@mail.com"));
 
         // CS203 students
         students.add(new Student(new StudentID("S00008"), "Hannah Peh", cs203, "h@mail.com"));
