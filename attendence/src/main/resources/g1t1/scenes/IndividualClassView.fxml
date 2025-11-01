@@ -38,8 +38,8 @@
                 </Label>
                 <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER" onMouseClicked="#sortAndFilter" spacing="8.0" styleClass="flat-button">
-                        <FontIcon iconLiteral="gmi-filter-list" iconSize="18"/>
-                        <Label text="Sort / Filter"/>
+                        <FontIcon iconLiteral="gmi-search" iconSize="18"/>
+                        <Label text="Search"/>
                         <padding>
                             <Insets left="12.0" right="12.0"/>
                         </padding>

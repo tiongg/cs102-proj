@@ -13,6 +13,8 @@ import g1t1.utils.DateUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -158,5 +160,24 @@ public class ClassSession extends BaseEntity implements TableChipItem {
     public String[] getChipData() {
         return new String[]{this.formatModuleSection(), this.formatDate(), this.formatStartTime(),
                 this.formatAttendance(), this.formatRate()};
+    }
+
+    @Override
+    public long[] getComparatorKeys() {
+        long startDateMilliseconds = this.startTime.with(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long startTimeSeconds = this.startTime.getHour() * 60 + this.startTime.getMinute();
+        AttendanceStats stats = attendanceStats();
+
+        int percent = 0;
+        if (stats.expected() != 0) {
+            percent = (int) (((double) stats.present() / stats.expected()) * 100);
+        }
+        return new long[]{
+                this.formatModuleSection().length(),
+                startDateMilliseconds,
+                startTimeSeconds,
+                stats.present(),
+                percent
+        };
     }
 }

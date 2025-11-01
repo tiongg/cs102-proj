@@ -11,7 +11,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -23,6 +27,8 @@ public class Table extends StackPane {
     private final HBox tableHeaderElement;
     private final VBox tableBodyElement;
     private final ListProperty<TableChipItem> chipItems = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Integer> sortOrders = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final List<FontIcon> headerIcons = new ArrayList<>();
     private Consumer<TableChipItem> onChipClick;
 
     public Table() {
@@ -46,18 +52,44 @@ public class Table extends StackPane {
         chipItems.addListener((ListChangeListener<TableChipItem>) change -> {
             updateTableBody();
         });
+
+        sortOrders.addListener((ListChangeListener<Integer>) change -> {
+            updateHeaderIcons();
+        });
     }
 
     public void setTableHeaders(String... tableHeaders) {
         this.tableHeaderElement.getChildren().clear();
+        this.headerIcons.clear();
+        this.sortOrders.clear();
 
-        for (String header : tableHeaders) {
-            Label label = new Label(header);
+        for (int index = 0; index < tableHeaders.length; index++) {
+            HBox headerItem = new HBox(12);
+            headerItem.setMinWidth(LABEL_WIDTH);
+            headerItem.setMaxWidth(LABEL_WIDTH);
+            headerItem.setAlignment(Pos.CENTER);
+
+            Label label = new Label(tableHeaders[index]);
             label.getStyleClass().add("table-header-label");
-            label.setMinWidth(LABEL_WIDTH);
-            label.setMaxWidth(LABEL_WIDTH);
-            label.setAlignment(Pos.CENTER);
-            tableHeaderElement.getChildren().add(label);
+
+            FontIcon icon = new FontIcon();
+            icon.setIconLiteral("ion4-md-arrow-round-up");
+            icon.setVisible(false);
+            headerIcons.add(icon);
+
+            // Not sorting based on this
+            sortOrders.add(0);
+            final int i = index;
+            headerItem.setOnMouseClicked((e) -> {
+                int prevSortOrder = sortOrders.get(i);
+                Collections.fill(sortOrders, 0);
+                int newSortOrder = prevSortOrder < 1 ? 1 : -1;
+                sortOrders.set(i, newSortOrder);
+                this.chipItems.sort(Comparator.comparingLong(x -> x.getComparatorKeys()[i] * newSortOrder));
+            });
+
+            headerItem.getChildren().setAll(label, icon);
+            tableHeaderElement.getChildren().add(headerItem);
         }
     }
 
@@ -96,6 +128,24 @@ public class Table extends StackPane {
                 });
             }
             this.tableBodyElement.getChildren().add(chip);
+        }
+    }
+
+    private void updateHeaderIcons() {
+        for (int i = 0; i < headerIcons.size() && i < sortOrders.size(); i++) {
+            FontIcon icon = headerIcons.get(i);
+            int sortOrder = sortOrders.get(i);
+
+            if (sortOrder == 0) {
+                // Not sorting - hide icon
+                icon.setVisible(false);
+            } else if (sortOrder > 0) {
+                icon.setVisible(true);
+                icon.setIconLiteral("ion4-md-arrow-round-up");
+            } else {
+                icon.setVisible(true);
+                icon.setIconLiteral("ion4-md-arrow-round-down");
+            }
         }
     }
 }

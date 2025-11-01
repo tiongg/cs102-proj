@@ -162,10 +162,26 @@ public class ModuleSection implements TableChipItem {
     }
 
     @Override
+    public long[] getComparatorKeys() {
+        String[] startTimeRaw = this.startTime.split(":");
+        int hours = Integer.parseInt(startTimeRaw[0]);
+        int minutes = Integer.parseInt(startTimeRaw[1]);
+        int totalMinutes = hours * 60 + minutes;
+        return new long[]{
+                this.module.length(),
+                this.section.length(),
+                this.getDay(),
+                totalMinutes,
+                this.students.size()
+        };
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other instanceof ModuleSection otherSection) {
             return this.id.equals(otherSection.getId());
         }
         return false;
     }
+
 }
