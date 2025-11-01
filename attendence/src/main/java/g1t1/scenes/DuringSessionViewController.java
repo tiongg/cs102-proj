@@ -86,7 +86,12 @@ class CameraRunnable implements Runnable {
             long currentTime = System.currentTimeMillis();
             if (currentTime - previousTick >= msPerProcess) {
                 previousTick = currentTime;
-                this.service.processFrame(frame, this.boxes);
+                if (this.service.isRunning()) {
+                    this.service.processFrame(frame, this.boxes);
+                } else {
+                    this.boxes.clear();
+                    break;  // Exit camera loop, to avoid race condition upon face recognition stopped
+                }
             }
 
             boolean teacherFound = false;
