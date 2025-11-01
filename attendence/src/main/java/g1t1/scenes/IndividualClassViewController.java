@@ -41,7 +41,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
     }
 
     @FXML
-    public void sortAndFilter() {
+    public void search() {
 
     }
 }

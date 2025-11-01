@@ -65,12 +65,13 @@ public class Table extends StackPane {
 
         for (int index = 0; index < tableHeaders.length; index++) {
             HBox headerItem = new HBox(12);
-            headerItem.setMinWidth(LABEL_WIDTH);
-            headerItem.setMaxWidth(LABEL_WIDTH);
             headerItem.setAlignment(Pos.CENTER);
 
             Label label = new Label(tableHeaders[index]);
             label.getStyleClass().add("table-header-label");
+            label.setMinWidth(LABEL_WIDTH);
+            label.setMaxWidth(LABEL_WIDTH);
+            label.setAlignment(Pos.CENTER);
 
             FontIcon icon = new FontIcon();
             icon.setIconLiteral("ion4-md-arrow-round-up");
@@ -114,12 +115,22 @@ public class Table extends StackPane {
             chip.setAlignment(Pos.CENTER);
 
             for (String data : chipData.getChipData()) {
+                HBox item = new HBox(12);
+                item.setAlignment(Pos.CENTER);
+
+                // Dummy icon for alignment
+                FontIcon icon = new FontIcon();
+                icon.setIconLiteral("ion4-md-arrow-round-up");
+                icon.setVisible(false);
+
                 Label label = new Label(data);
                 label.getStyleClass().add("table-item-label");
+                label.setAlignment(Pos.CENTER);
                 label.setMinWidth(LABEL_WIDTH);
                 label.setMaxWidth(LABEL_WIDTH);
-                label.setAlignment(Pos.CENTER);
-                chip.getChildren().add(label);
+
+                item.getChildren().addAll(label, icon);
+                chip.getChildren().add(item);
             }
             if (onChipClick != null) {
                 chip.setCursor(Cursor.HAND);

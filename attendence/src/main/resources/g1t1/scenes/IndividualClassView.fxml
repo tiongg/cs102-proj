@@ -23,7 +23,6 @@
             </Label>
 
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-
                 <Button minWidth="100.0" onAction="#classesBack" styleClass="flat-button" text="Back"/>
             </HBox>
         </HBox>
@@ -37,7 +36,7 @@
                     </font>
                 </Label>
                 <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                    <HBox alignment="CENTER" onMouseClicked="#sortAndFilter" spacing="8.0" styleClass="flat-button">
+                    <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button">
                         <FontIcon iconLiteral="gmi-search" iconSize="18"/>
                         <Label text="Search"/>
                         <padding>

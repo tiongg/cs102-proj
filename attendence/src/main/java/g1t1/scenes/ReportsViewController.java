@@ -220,6 +220,9 @@ public class ReportsViewController extends PageController {
             statusLabel.setText(dir.getAbsolutePath() + " selected!");
             chooser.setInitialDirectory(dir);
         }
+    }
 
+    @FXML
+    private void search() {
     }
 }
