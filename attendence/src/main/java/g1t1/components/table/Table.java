@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 public class Table extends StackPane {
     private static final int LABEL_WIDTH = 100;
+    private static final int COLUMN_SPACING = 64;
 
     private final VBox tableContainer;
 
@@ -35,7 +36,7 @@ public class Table extends StackPane {
         this.tableContainer = new VBox(0);
         VBox.setVgrow(this.tableContainer, Priority.ALWAYS);
 
-        this.tableHeaderElement = new HBox(128);
+        this.tableHeaderElement = new HBox();
         this.tableHeaderElement.setAlignment(Pos.CENTER);
         this.tableHeaderElement.getStyleClass().add("table-header");
 
@@ -66,6 +67,7 @@ public class Table extends StackPane {
         for (int index = 0; index < tableHeaders.length; index++) {
             HBox headerItem = new HBox(12);
             headerItem.setAlignment(Pos.CENTER);
+            HBox.setHgrow(headerItem, Priority.ALWAYS);
 
             Label label = new Label(tableHeaders[index]);
             label.getStyleClass().add("table-header-label");
@@ -110,13 +112,14 @@ public class Table extends StackPane {
         this.tableBodyElement.getChildren().clear();
 
         for (TableChipItem chipData : chipItems) {
-            HBox chip = new HBox(128);
+            HBox chip = new HBox();
             chip.getStyleClass().add("table-item");
             chip.setAlignment(Pos.CENTER);
 
             for (String data : chipData.getChipData()) {
                 HBox item = new HBox(12);
                 item.setAlignment(Pos.CENTER);
+                HBox.setHgrow(item, Priority.ALWAYS);
 
                 // Dummy icon for alignment
                 FontIcon icon = new FontIcon();

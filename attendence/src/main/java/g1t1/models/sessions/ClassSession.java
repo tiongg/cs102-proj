@@ -19,8 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
-record AttendanceStats(int present, int expected, int total) {
-}
 
 /**
  * Class session
@@ -111,7 +109,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return String.format("%s - %s", module, section);
     }
 
-    private AttendanceStats attendanceStats() {
+    public AttendanceStats attendanceStats() {
         int present = 0;
         int expected = 0;
         for (SessionAttendance attendance : this.studentAttendance.values()) {
@@ -142,7 +140,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         if (stats.expected() == 0) {
             return "0%";
         }
-        int percent = (int) (((double) stats.present() / stats.expected()) * 100);
+        int percent = (int) stats.percent();
         return String.format("%d %s", percent, "%");
     }
 
@@ -158,7 +156,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
 
     @Override
     public String[] getChipData() {
-        return new String[]{this.formatModuleSection(), this.formatDate(), this.formatStartTime(),
+        return new String[]{this.formatModuleSection(), this.formatDate(), Integer.toString(this.getWeek()), this.formatStartTime(),
                 this.formatAttendance(), this.formatRate()};
     }
 
@@ -170,11 +168,12 @@ public class ClassSession extends BaseEntity implements TableChipItem {
 
         int percent = 0;
         if (stats.expected() != 0) {
-            percent = (int) (((double) stats.present() / stats.expected()) * 100);
+            percent = (int) stats.percent();
         }
         return new long[]{
                 this.formatModuleSection().length(),
                 startDateMilliseconds,
+                this.getWeek(),
                 startTimeSeconds,
                 stats.present(),
                 percent

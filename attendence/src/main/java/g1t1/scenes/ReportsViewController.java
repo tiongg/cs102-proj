@@ -102,7 +102,7 @@ public class ReportsViewController extends PageController {
         cbMethod.setVisible(false);
         exportBtn.setVisible(false);
         footerBar.setVisible(false);
-        reportsTable.setTableHeaders("Class", "Date", "Time", "Attendance", "Rate");
+        reportsTable.setTableHeaders("Class", "Date", "Week", "Time", "Attendance", "Rate");
         reportsTable.setTableBody(AuthenticationContext.getCurrentUser().getPastSessions());
 
         reportsTable.setOnChipClick(item -> {
