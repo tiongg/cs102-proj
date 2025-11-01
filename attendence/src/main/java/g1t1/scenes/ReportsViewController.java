@@ -13,10 +13,14 @@ import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
+
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -58,6 +62,8 @@ public class ReportsViewController extends PageController {
 
     @FXML
     private HBox footerBar;
+    @FXML
+    private Label statusLabel;
 
     @FXML
     private void initialize() {
@@ -97,7 +103,7 @@ public class ReportsViewController extends PageController {
         exportBtn.setVisible(false);
         footerBar.setVisible(false);
         reportsTable.setTableHeaders("Class", "Date", "Time", "Attendance", "Rate");
-        reportsTable.createBody(AuthenticationContext.getCurrentUser().getPastSessions());
+        reportsTable.setTableBody(AuthenticationContext.getCurrentUser().getPastSessions());
 
         reportsTable.setOnChipClick(item -> {
             if (item instanceof ClassSession cs) {
@@ -130,10 +136,10 @@ public class ReportsViewController extends PageController {
         List<StudentChip> tableData = new ArrayList<>();
         Map<StudentID, SessionAttendance> attendance = cs.getStudentAttendance();
         Collection<SessionAttendance> allAttendances = attendance.values();
-        for(SessionAttendance indivAttendance: allAttendances){
+        for (SessionAttendance indivAttendance : allAttendances) {
             tableData.add(new StudentChip(indivAttendance));
         }
-        reportsTable.createBody(tableData);
+        reportsTable.setTableBody(tableData);
     }
 
     @FXML
@@ -204,9 +210,6 @@ public class ReportsViewController extends PageController {
         }
         Toast.show("Exported to " + target.getAbsolutePath(), Toast.ToastType.SUCCESS);
     }
-
-    @FXML
-    private Label statusLabel;
 
     @FXML
     private void onChoose() {

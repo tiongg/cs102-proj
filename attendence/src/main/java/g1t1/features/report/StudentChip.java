@@ -1,8 +1,9 @@
 package g1t1.features.report;
-import java.text.DecimalFormat;
 
 import g1t1.components.table.TableChipItem;
 import g1t1.models.sessions.SessionAttendance;
+
+import java.text.DecimalFormat;
 
 public class StudentChip implements TableChipItem {
 
@@ -21,11 +22,18 @@ public class StudentChip implements TableChipItem {
         //StudentId, Name, Status, Confidence, Method
         DecimalFormat df = new DecimalFormat("#.##");
         return new String[]{
-            attendance.getStudent().getId().toString(),
-            attendance.getStudent().getName(),
-            attendance.getStatus().toString(),
-            df.format(attendance.getConfidence()),
-            attendance.getMethod().toString()
+                attendance.getStudent().getId().toString(),
+                attendance.getStudent().getName(),
+                attendance.getStatus().toString(),
+                df.format(attendance.getConfidence()),
+                attendance.getMethod().toString()
+        };
+    }
+
+    @Override
+    public long[] getComparatorKeys() {
+        return new long[]{
+                0, 0, 0, (long) attendance.getConfidence(), 0
         };
     }
 }
