@@ -49,31 +49,31 @@
                 </HBox>
             </HBox>
 
-            <Table fx:id="tblSessions" VBox.vgrow="ALWAYS" emptyMessage="No past sessions found!"
-                   emptyMessageDescription="Start a new session, or try different filters!"/>
+            <Table fx:id="tblSessions" emptyMessage="No past sessions found!"
+                   emptyMessageDescription="Start a new session, or try different filters!" VBox.vgrow="ALWAYS"/>
         </VBox>
     </AnchorPane>
 
-    <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity" visible="false"
-               style="-fx-background-color: rgba(0,0,0,0.35);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0"
-               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity"
+               style="-fx-background-color: rgba(0,0,0,0.35);" visible="true" AnchorPane.bottomAnchor="0.0"
+               AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <VBox maxHeight="400" maxWidth="700"
               style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;">
-            <HBox VBox.vgrow="ALWAYS" spacing="12">
+            <HBox spacing="12" VBox.vgrow="ALWAYS">
                 <VBox prefHeight="43.0" prefWidth="200">
                     <Label text="Min attendance rate"/>
-                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" text="All"/>
+                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" text="All" styleClass="flat-input"/>
                 </VBox>
 
                 <VBox prefHeight="43.0" prefWidth="200">
                     <Label text="Selected Weeks"/>
-                    <CheckComboBox fx:id="cbSelectedWeeks"/>
+                    <CheckComboBox fx:id="cbSelectedWeeks" styleClass="flat-input"/>
                 </VBox>
             </HBox>
 
             <HBox alignment="BOTTOM_RIGHT" spacing="24">
-                <Button text="Cancel" onMouseClicked="#closeFilter" styleClass="flat-button" minWidth="120"/>
-                <Button text="Filter!" onMouseClicked="#filter" styleClass="flat-button" minWidth="120"/>
+                <Button minWidth="120" onMouseClicked="#closeFilter" styleClass="flat-button" text="Cancel"/>
+                <Button minWidth="120" onMouseClicked="#filter" styleClass="flat-button" text="Filter!"/>
             </HBox>
         </VBox>
     </StackPane>

@@ -19,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import org.controlsfx.control.CheckComboBox;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 record AttendanceRateOption(double minRate, String label) {
 };
@@ -45,7 +46,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
     @FXML
     private MenuButton mbMinAttendanceRate;
 
-
     @FXML
     private CheckComboBox<Integer> cbSelectedWeeks;
 
@@ -56,6 +56,14 @@ public class IndividualClassViewController extends PageController<IndividualClas
         for (int i = 1; i <= 13; i++) {
             cbSelectedWeeks.getItems().add(i);
         }
+
+        cbSelectedWeeks.getCheckModel().getCheckedItems().addListener(
+                (javafx.collections.ListChangeListener<Integer>) change -> {
+                    updateWeekSelectionTitle();
+                }
+        );
+        updateWeekSelectionTitle();
+
     }
 
     @Override
@@ -114,4 +122,24 @@ public class IndividualClassViewController extends PageController<IndividualClas
         }
         cbSelectedWeeks.getCheckModel().checkAll();
     }
+
+    private void updateWeekSelectionTitle() {
+        ObservableList<Integer> checked = cbSelectedWeeks.getCheckModel().getCheckedItems();
+        int totalCount = cbSelectedWeeks.getItems().size();
+
+        if (checked.isEmpty()) {
+            cbSelectedWeeks.setTitle("No weeks selected");
+        } else if (checked.size() == totalCount) {
+            cbSelectedWeeks.setTitle("All weeks");
+        } else if (checked.size() <= 3) {
+            // Show specific weeks if 3 or fewer selected
+            String weeks = checked.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            cbSelectedWeeks.setTitle("Week " + weeks);
+        } else {
+            cbSelectedWeeks.setTitle(checked.size() + " weeks selected");
+        }
+    }
+
 }
