@@ -40,10 +40,11 @@ public class IndividualClassViewController extends PageController<IndividualClas
     private Table tblSessions;
 
     @FXML
-    private StackPane stkSearchPane;
+    private StackPane stkFilterPane;
 
     @FXML
     private MenuButton mbMinAttendanceRate;
+
 
     @FXML
     private CheckComboBox<Integer> cbSelectedWeeks;
@@ -55,7 +56,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
         for (int i = 1; i <= 13; i++) {
             cbSelectedWeeks.getItems().add(i);
         }
-
     }
 
     @Override
@@ -76,7 +76,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
 
     @FXML
     public void search() {
-        stkSearchPane.visibleProperty().set(true);
+        stkFilterPane.visibleProperty().set(true);
     }
 
     @FXML
@@ -97,7 +97,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
 
     @FXML
     public void closeFilter() {
-        stkSearchPane.visibleProperty().set(false);
+        stkFilterPane.visibleProperty().set(false);
     }
 
     private void resetSearchFields() {

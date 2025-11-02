@@ -49,31 +49,23 @@
                 </HBox>
             </HBox>
 
-            <Table fx:id="tblSessions" VBox.vgrow="ALWAYS"/>
+            <Table fx:id="tblSessions" VBox.vgrow="ALWAYS" emptyMessage="No past sessions found!"
+                   emptyMessageDescription="Start a new session, or try different filters!"/>
         </VBox>
     </AnchorPane>
 
-    <StackPane fx:id="stkSearchPane" prefHeight="Infinity" prefWidth="Infinity" visible="false"
+    <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity" visible="false"
                style="-fx-background-color: rgba(0,0,0,0.35);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0"
                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <VBox maxHeight="400" maxWidth="700"
               style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;">
             <HBox VBox.vgrow="ALWAYS" spacing="12">
-                <VBox prefHeight="43.0" prefWidth="150">
-                    <Label text="Module section filter"/>
-                    <TextField>
-                        <font>
-                            <Font name="Inter Regular" size="16.0"/>
-                        </font>
-                    </TextField>
-                </VBox>
-
                 <VBox prefHeight="43.0" prefWidth="200">
                     <Label text="Min attendance rate"/>
                     <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" text="All"/>
                 </VBox>
 
-                <VBox prefHeight="43.0" prefWidth="150">
+                <VBox prefHeight="43.0" prefWidth="200">
                     <Label text="Selected Weeks"/>
                     <CheckComboBox fx:id="cbSelectedWeeks"/>
                 </VBox>

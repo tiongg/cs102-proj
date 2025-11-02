@@ -2,6 +2,8 @@ package g1t1.components.table;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
@@ -11,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
@@ -21,20 +24,19 @@ import java.util.function.Consumer;
 
 public class Table extends StackPane {
     private static final int LABEL_WIDTH = 100;
-    private static final int COLUMN_SPACING = 64;
-
-    private final VBox tableContainer;
 
     private final HBox tableHeaderElement;
     private final VBox tableBodyElement;
     private final ListProperty<TableChipItem> chipItems = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Integer> sortOrders = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final List<FontIcon> headerIcons = new ArrayList<>();
+    private final StringProperty emptyMessage = new SimpleStringProperty("Empty!");
+    private final StringProperty emptyMessageDescription = new SimpleStringProperty();
     private Consumer<TableChipItem> onChipClick;
 
     public Table() {
-        this.tableContainer = new VBox(0);
-        VBox.setVgrow(this.tableContainer, Priority.ALWAYS);
+        VBox tableContainer = new VBox(0);
+        VBox.setVgrow(tableContainer, Priority.ALWAYS);
 
         this.tableHeaderElement = new HBox();
         this.tableHeaderElement.setAlignment(Pos.CENTER);
@@ -42,8 +44,10 @@ public class Table extends StackPane {
 
         this.tableBodyElement = new VBox(12);
         this.tableBodyElement.getStyleClass().add("table-body");
+        VBox.setVgrow(this.tableBodyElement, Priority.ALWAYS);
 
-        this.tableContainer.getChildren().addAll(tableHeaderElement, tableBodyElement);
+        tableContainer.getChildren().addAll(tableHeaderElement, tableBodyElement);
+        VBox.setVgrow(tableContainer, Priority.ALWAYS);
 
         getChildren().add(tableContainer);
         chipItems.addListener((ob, oldList, newList) -> {
@@ -98,6 +102,7 @@ public class Table extends StackPane {
 
     public void setTableBody(List<? extends TableChipItem> chips) {
         chipItems.setAll(chips);
+        updateTableBody();
     }
 
     public ListProperty<TableChipItem> getChipItems() {
@@ -110,6 +115,30 @@ public class Table extends StackPane {
 
     private void updateTableBody() {
         this.tableBodyElement.getChildren().clear();
+
+        if (chipItems.size() <= 0) {
+            StackPane emptyStack = new StackPane();
+            emptyStack.setAlignment(Pos.CENTER);
+            VBox.setVgrow(emptyStack, Priority.ALWAYS);
+
+            VBox emptyContainer = new VBox();
+            emptyContainer.setAlignment(Pos.CENTER);
+
+            FontIcon icon = new FontIcon();
+            icon.setIconLiteral("gmi-inbox");
+            icon.setIconSize(64);
+            icon.setIconColor(Color.LIGHTGRAY);
+
+            Label lblEmpty = new Label(getEmptyMessage());
+            Label lblSecondary = new Label(getEmptyMessageDescription());
+            lblSecondary.setStyle("-fx-font-size: 12px; -fx-text-fill: #999999;");
+
+            emptyContainer.getChildren().addAll(icon, lblEmpty, lblSecondary);
+            emptyStack.getChildren().add(emptyContainer);
+            this.tableBodyElement.getChildren().add(emptyStack);
+
+            return;
+        }
 
         for (TableChipItem chipData : chipItems) {
             HBox chip = new HBox();
@@ -161,5 +190,29 @@ public class Table extends StackPane {
                 icon.setIconLiteral("ion4-md-arrow-round-down");
             }
         }
+    }
+
+    public StringProperty emptyMessageProperty() {
+        return this.emptyMessage;
+    }
+
+    public String getEmptyMessage() {
+        return this.emptyMessageProperty().get();
+    }
+
+    public void setEmptyMessage(String emptyMessage) {
+        this.emptyMessageProperty().set(emptyMessage);
+    }
+
+    public StringProperty emptyMessageDescriptionProperty() {
+        return this.emptyMessageDescription;
+    }
+
+    public String getEmptyMessageDescription() {
+        return this.emptyMessageDescriptionProperty().get();
+    }
+
+    public void setEmptyMessageDescription(String emptyMessageDescription) {
+        this.emptyMessageDescriptionProperty().set(emptyMessageDescription);
     }
 }

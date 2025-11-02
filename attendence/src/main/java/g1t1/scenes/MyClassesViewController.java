@@ -31,8 +31,6 @@ public class MyClassesViewController extends PageController {
 
     @FXML
     private Table classesTable;
-    @FXML
-    private StackPane stkEmptyPrompt;
 
     @FXML
     private StackPane addClassOverlay;
@@ -84,7 +82,6 @@ public class MyClassesViewController extends PageController {
     private void updateModuleSections() {
         addClassOverlay.setVisible(false);
         List<ModuleSection> moduleSections = AuthenticationContext.getCurrentUser().getModuleSections();
-        stkEmptyPrompt.visibleProperty().set(moduleSections.isEmpty());
         classesTable.setTableBody(moduleSections);
     }
 
@@ -145,5 +142,4 @@ public class MyClassesViewController extends PageController {
             System.out.println("Error during database operation: " + e.getMessage());
         }
     }
-
 }
