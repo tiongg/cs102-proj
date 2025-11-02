@@ -1,87 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import g1t1.components.Navbar?>
 <?import g1t1.components.table.Table?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import javafx.geometry.Insets?>
-
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
             xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.ReportsViewController">
     <Navbar/>
     <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        
-        <HBox spacing="450" alignment="CENTER_LEFT" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="32.0">
-                <Label fx:id="pastReports" text="Past Reports">
+
+        <HBox alignment="CENTER_LEFT" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+              AnchorPane.topAnchor="32.0">
+            <Label fx:id="pastReports" text="Past Reports">
+                <font>
+                    <Font name="Inter Semi Bold" size="26.0"/>
+                </font>
+            </Label>
+
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                <Button fx:id="reportsBackBtn" minWidth="100.0" onAction="#reportsBack" styleClass="flat-button"
+                        text="Back"/>
+            </HBox>
+        </HBox>
+
+        <VBox spacing="20" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+              AnchorPane.topAnchor="90.0">
+            <HBox alignment="CENTER_LEFT" minHeight="40.0">
+                <Label fx:id="allPastReports" text="All Past Reports">
                     <font>
-                        <Font name="Inter Semi Bold" size="26.0"/>
+                        <Font name="Inter" size="16.0"/>
                     </font>
                 </Label>
-
-                <Button fx:id="reportsBackBtn" text="Back" visible="false" onAction="#reportsBack"
-                        style="-fx-background-color: black; -fx-background-radius: 20; -fx-text-fill: white; -fx-cursor: hand;"/>
+                <HBox alignment="CENTER_RIGHT" maxHeight="40" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button">
+                        <FontIcon iconLiteral="gmi-search" iconSize="18"/>
+                        <Label text="Search"/>
+                        <padding>
+                            <Insets left="12.0" right="12.0"/>
+                        </padding>
+                        <HBox.margin>
+                            <Insets bottom="4.0" top="4.0"/>
+                        </HBox.margin>
+                    </HBox>
+                </HBox>
             </HBox>
 
-            <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="90.0"
-                AnchorPane.leftAnchor="40.0">
-                <HBox spacing="700" alignment="CENTER_LEFT">
-                    <Label fx:id="allPastReports" text="All Past Reports">
-                        <font>
-                            <Font name="Inter" size="16.0"/>
-                        </font>
-                    </Label>
-                </HBox>
+            <Table fx:id="reportsTable" VBox.vgrow="ALWAYS" emptyMessage="No reports!"
+                   emptyMessageDescription="Start a session, and access the past reports here!"/>
+        </VBox>
 
-                <Table fx:id="reportsTable"/>
-            </VBox>
-
-            <!-- TO-DO: make footer width same as table and change color? and clean up the look -->
-            <HBox fx:id="footerBar" spacing="20" alignment="CENTER_LEFT" prefHeight="56.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="24.0" AnchorPane.bottomAnchor="24.0" visible="false"
-                    style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 10 14; -fx-border-color: #c6c5c5ff; -fx-border-radius: 14;">
+        <!-- TO-DO: make footer width same as table and change color? and clean up the look -->
+        <HBox fx:id="footerBar" alignment="CENTER_LEFT" prefHeight="56.0" spacing="20"
+              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 10 14; -fx-border-color: #c6c5c5ff; -fx-border-radius: 14;"
+              visible="false" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0">
             <!-- Export as -->
-            <HBox spacing="8" alignment="CENTER_LEFT">
+            <HBox alignment="CENTER_LEFT" spacing="8">
                 <Label fx:id="exportText" text="Export as"/>
                 <MenuButton fx:id="formatBtn" text="PDF" visible="false">
-                <items>
-                    <MenuItem text="PDF" onAction="#choosePdf"/>
-                    <MenuItem text="CSV" onAction="#chooseCsv"/>
-                    <MenuItem text="XLSX" onAction="#chooseXlsx"/>
-                </items>
+                    <items>
+                        <MenuItem onAction="#choosePdf" text="PDF"/>
+                        <MenuItem onAction="#chooseCsv" text="CSV"/>
+                        <MenuItem onAction="#chooseXlsx" text="XLSX"/>
+                    </items>
                 </MenuButton>
             </HBox>
 
             <!-- Include: -->
-            <HBox spacing="8" alignment="CENTER_LEFT">
+            <HBox alignment="CENTER_LEFT" spacing="8">
                 <Label fx:id="includeText" text="Include:"/>
                 <CheckBox fx:id="cbTimestamp" text="Timestamp" visible="false"/>
                 <CheckBox fx:id="cbConfidence" text="Confidence" visible="false"/>
-                <CheckBox fx:id="cbMethod"     text="Method" visible="false"/>
+                <CheckBox fx:id="cbMethod" text="Method" visible="false"/>
             </HBox>
-            
+
             <!-- Directory picker -->
-            <VBox spacing="8" alignment="CENTER_LEFT">
+            <VBox alignment="CENTER_LEFT" spacing="8">
                 <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
+                    <Insets bottom="20" left="20" right="20" top="20"/>
                 </padding>
 
                 <children>
                     <Label fx:id="statusLabel" text="no directory selected"/>
-                    <Button text="Choose directory" onAction="#onChoose"/>
+                    <Button onAction="#onChoose" text="Choose directory"/>
                 </children>
             </VBox>
 
 
             <Pane HBox.hgrow="ALWAYS"/> <!-- pushes Export button to the right -->
 
-            <Button fx:id="exportBtn" visible="false" text="Export" onAction="#export"/>
-            </HBox>
-            
+            <Button fx:id="exportBtn" onAction="#export" text="Export" visible="false"/>
+        </HBox>
 
 
-        
     </AnchorPane>
 
 </AnchorPane>

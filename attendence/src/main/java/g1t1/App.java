@@ -7,6 +7,7 @@ import g1t1.models.scenes.Router;
 import g1t1.utils.events.routing.OnNavigateEvent;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import nu.pattern.OpenCV;
 
@@ -46,6 +47,7 @@ public class App extends Application {
         Scene scene = new Scene(basePage.getRoot(), WIDTH, HEIGHT);
         instance.currentScene = scene;
 
+        loadFonts();
         loadCss(scene);
         Router.changePage(initialPage);
         stage.setScene(scene);
@@ -64,7 +66,7 @@ public class App extends Application {
     private void loadCss(Scene scene) {
         String[] cssFiles = {
                 "app.css", "button.css", "date-picker.css", "stepper.css",
-                "tabs.css", "toast.css"
+                "tabs.css", "toast.css", "table.css"
         };
 
         for (String cssFile : cssFiles) {
@@ -74,6 +76,17 @@ public class App extends Application {
             } else {
                 System.err.println("CSS not found: " + cssFile);
             }
+        }
+    }
+
+    private void loadFonts() {
+        String[] variants = {
+                "Black", "Bold", "ExtraBold", "ExtraLight", "Light",
+                "Medium", "Regular", "SemiBold", "Thin"
+        };
+        for (String variant : variants) {
+            Font.loadFont(getClass().getResourceAsStream(String.format("/fonts/Inter_18pt-%s.ttf", variant)), 18);
+
         }
     }
 }

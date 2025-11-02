@@ -55,6 +55,11 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.1.2</version>
+        </dependency>
 
         <!-- Icon pack -->
         <dependency>
@@ -124,7 +129,7 @@
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>3.0.5</version>
-        </dependency>  
+        </dependency>
         <!-- XLSX-->
         <dependency>
             <groupId>org.apache.poi</groupId>

@@ -13,12 +13,12 @@ import g1t1.utils.DateUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
-record AttendanceStats(int present, int expected, int total) {
-}
 
 /**
  * Class session
@@ -109,7 +109,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return String.format("%s - %s", module, section);
     }
 
-    private AttendanceStats attendanceStats() {
+    public AttendanceStats attendanceStats() {
         int present = 0;
         int expected = 0;
         for (SessionAttendance attendance : this.studentAttendance.values()) {
@@ -140,7 +140,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         if (stats.expected() == 0) {
             return "0%";
         }
-        int percent = (int) (((double) stats.present() / stats.expected()) * 100);
+        int percent = (int) stats.percent();
         return String.format("%d %s", percent, "%");
     }
 
@@ -149,9 +149,34 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         return this.startTime.format(customFormatter);
     }
 
+    private String formatStartTime() {
+        DateTimeFormatter hhmmFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        return this.startTime.format(hhmmFormatter) + " - " + this.endTime.format(hhmmFormatter);
+    }
+
     @Override
     public String[] getChipData() {
-        return new String[]{this.formatModuleSection(), this.formatDate(), this.moduleSection.getStartTime(),
+        return new String[]{this.formatModuleSection(), this.formatDate(), Integer.toString(this.getWeek()), this.formatStartTime(),
                 this.formatAttendance(), this.formatRate()};
+    }
+
+    @Override
+    public long[] getComparatorKeys() {
+        long startDateMilliseconds = this.startTime.with(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long startTimeSeconds = this.startTime.getHour() * 60 + this.startTime.getMinute();
+        AttendanceStats stats = attendanceStats();
+
+        int percent = 0;
+        if (stats.expected() != 0) {
+            percent = (int) stats.percent();
+        }
+        return new long[]{
+                this.formatModuleSection().length(),
+                startDateMilliseconds,
+                this.getWeek(),
+                startTimeSeconds,
+                stats.present(),
+                percent
+        };
     }
 }

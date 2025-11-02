@@ -11,6 +11,7 @@ import g1t1.db.student_face_images.StudentFaceImageRepository;
 import g1t1.db.student_face_images.StudentFaceImageRepositoryJooq;
 import g1t1.db.students.StudentRepository;
 import g1t1.db.students.StudentRepositoryJooq;
+import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.PageController;
 import g1t1.models.users.RegisterStudent;
@@ -109,6 +110,7 @@ public class OnboardViewController extends PageController {
             stepper.next();
         } else {
             boolean success = saveToDb();
+            AuthenticationContext.triggerUserUpdate();
             if (success) {
                 Toast.show("Student added!", Toast.ToastType.SUCCESS);
                 reset();

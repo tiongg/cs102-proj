@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import g1t1.components.Navbar?>
+<?import g1t1.components.table.Table?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.CheckComboBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="900.0"
+            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.IndividualClassViewController">
+    <Navbar/>
+    <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="Infinity" AnchorPane.bottomAnchor="0.0"
+                AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <HBox alignment="CENTER_LEFT" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+              AnchorPane.topAnchor="32.0">
+            <Label fx:id="lblClassHeader" text="My Classes">
+                <font>
+                    <Font name="Inter Semi Bold" size="26.0"/>
+                </font>
+            </Label>
+
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                <Button minWidth="100.0" onAction="#classesBack" styleClass="flat-button" text="Back"/>
+            </HBox>
+        </HBox>
+
+        <VBox spacing="20" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+              AnchorPane.topAnchor="90.0">
+            <HBox alignment="CENTER_LEFT" minHeight="40.0">
+                <Label text="Previous sessions" HBox.hgrow="ALWAYS">
+                    <font>
+                        <Font name="Inter Semi Bold" size="18.0"/>
+                    </font>
+                </Label>
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button">
+                        <FontIcon iconLiteral="gmi-filter-list-alt" iconSize="18"/>
+                        <Label text="Filter"/>
+                        <padding>
+                            <Insets left="12.0" right="12.0"/>
+                        </padding>
+                        <HBox.margin>
+                            <Insets bottom="4.0" top="4.0"/>
+                        </HBox.margin>
+                    </HBox>
+                </HBox>
+            </HBox>
+
+            <Table fx:id="tblSessions" emptyMessage="No past sessions found!"
+                   emptyMessageDescription="Start a new session, or try different filters!" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </AnchorPane>
+
+    <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity"
+               style="-fx-background-color: rgba(0,0,0,0.35);" visible="true" AnchorPane.bottomAnchor="0.0"
+               AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox maxHeight="400" maxWidth="700"
+              style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;">
+            <HBox spacing="12" VBox.vgrow="ALWAYS">
+                <VBox prefHeight="43.0" prefWidth="200">
+                    <Label text="Min attendance rate"/>
+                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" text="All" styleClass="flat-input"/>
+                </VBox>
+
+                <VBox prefHeight="43.0" prefWidth="200">
+                    <Label text="Selected Weeks"/>
+                    <CheckComboBox fx:id="cbSelectedWeeks" styleClass="flat-input"/>
+                </VBox>
+            </HBox>
+
+            <HBox alignment="BOTTOM_RIGHT" spacing="24">
+                <Button minWidth="120" onMouseClicked="#closeFilter" styleClass="flat-button" text="Cancel"/>
+                <Button minWidth="120" onMouseClicked="#filter" styleClass="flat-button" text="Filter!"/>
+            </HBox>
+        </VBox>
+    </StackPane>
+</AnchorPane>
