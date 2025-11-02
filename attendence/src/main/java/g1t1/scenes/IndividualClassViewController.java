@@ -10,7 +10,6 @@ import g1t1.models.sessions.ModuleSection;
 import g1t1.props.IndividualClassViewProps;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -33,7 +32,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
     };
 
     private final DoubleProperty minAttendanceRate = new SimpleDoubleProperty(0);
-    private final ObservableList<Integer> selectedWeeks = FXCollections.observableArrayList();
 
     @FXML
     private Label lblClassHeader;
@@ -58,9 +56,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
             cbSelectedWeeks.getItems().add(i);
         }
 
-        cbSelectedWeeks.getCheckModel().getCheckedItems().addListener((javafx.collections.ListChangeListener<Integer>) change -> {
-            selectedWeeks.setAll(cbSelectedWeeks.getCheckModel().getCheckedItems());
-        });
     }
 
     @Override
@@ -87,13 +82,22 @@ public class IndividualClassViewController extends PageController<IndividualClas
     @FXML
     public void filter() {
         ModuleSection ms = this.props.moduleSection();
+        ObservableList<Integer> checkedWeeks = cbSelectedWeeks.getCheckModel().getCheckedItems();
+
         List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions()
                 .stream()
                 .filter(session -> session.getModuleSection().equals(ms))
                 .filter(session -> session.attendanceStats().percent() >= minAttendanceRate.get())
+                .filter(session -> checkedWeeks.isEmpty() || checkedWeeks.contains(session.getWeek()))
                 .toList();
 
         this.tblSessions.setTableBody(sessions);
+        closeFilter();
+    }
+
+    @FXML
+    public void closeFilter() {
+        stkSearchPane.visibleProperty().set(false);
     }
 
     private void resetSearchFields() {
@@ -109,6 +113,5 @@ public class IndividualClassViewController extends PageController<IndividualClas
             mbMinAttendanceRate.getItems().add(item);
         }
         cbSelectedWeeks.getCheckModel().checkAll();
-
     }
 }

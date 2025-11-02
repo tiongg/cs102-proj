@@ -37,8 +37,8 @@
                 </Label>
                 <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button">
-                        <FontIcon iconLiteral="gmi-search" iconSize="18"/>
-                        <Label text="Search"/>
+                        <FontIcon iconLiteral="gmi-filter-list-alt" iconSize="18"/>
+                        <Label text="Filter"/>
                         <padding>
                             <Insets left="12.0" right="12.0"/>
                         </padding>
@@ -53,7 +53,7 @@
         </VBox>
     </AnchorPane>
 
-    <StackPane fx:id="stkSeachPane" prefHeight="Infinity" prefWidth="Infinity"
+    <StackPane fx:id="stkSearchPane" prefHeight="Infinity" prefWidth="Infinity" visible="false"
                style="-fx-background-color: rgba(0,0,0,0.35);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0"
                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <VBox maxHeight="400" maxWidth="700"
@@ -68,9 +68,9 @@
                     </TextField>
                 </VBox>
 
-                <VBox prefHeight="43.0" prefWidth="150">
+                <VBox prefHeight="43.0" prefWidth="200">
                     <Label text="Min attendance rate"/>
-                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="120" text="All"/>
+                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" text="All"/>
                 </VBox>
 
                 <VBox prefHeight="43.0" prefWidth="150">
@@ -79,8 +79,9 @@
                 </VBox>
             </HBox>
 
-            <HBox alignment="BOTTOM_RIGHT">
-                <Button text="Filter!" onMouseClicked="#filter" styleClass="flat-button"/>
+            <HBox alignment="BOTTOM_RIGHT" spacing="24">
+                <Button text="Cancel" onMouseClicked="#closeFilter" styleClass="flat-button" minWidth="120"/>
+                <Button text="Filter!" onMouseClicked="#filter" styleClass="flat-button" minWidth="120"/>
             </HBox>
         </VBox>
     </StackPane>
