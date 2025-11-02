@@ -55,7 +55,7 @@
     </AnchorPane>
 
     <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity"
-               style="-fx-background-color: rgba(0,0,0,0.35);" visible="true" AnchorPane.bottomAnchor="0.0"
+               style="-fx-background-color: rgba(0,0,0,0.35);" visible="false" AnchorPane.bottomAnchor="0.0"
                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <VBox maxHeight="400" maxWidth="700"
               style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;">
