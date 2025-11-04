@@ -24,6 +24,9 @@ public class SettingsViewController extends PageController {
     private TextField tfDetectionThreshold;
 
     @FXML
+    private TextField tfAutomarkThreshold;
+
+    @FXML
     private TextField tfLateThreshold;
 
     @FXML
@@ -47,7 +50,8 @@ public class SettingsViewController extends PageController {
             System.err.println("Error initializing Settings page: " + e.getMessage());
             e.printStackTrace();
             // Set defaults even if loading fails
-            tfDetectionThreshold.setText("70");
+            tfDetectionThreshold.setText("60");
+            tfAutomarkThreshold.setText("80");
             tfLateThreshold.setText("15");
             cbCameraDevice.setValue(0);
             tfLogPath.setText("logs/");
@@ -128,6 +132,7 @@ public class SettingsViewController extends PageController {
             AppSettings settings = SettingsManager.getInstance().getSettings();
 
             tfDetectionThreshold.setText(String.valueOf(settings.getDetectionThreshold()));
+            tfAutomarkThreshold.setText(String.valueOf(settings.getAutoMarkThreshold()));
             tfLateThreshold.setText(String.valueOf(settings.getLateThresholdMinutes()));
             cbCameraDevice.setValue(settings.getCameraDevice());
             tfLogPath.setText(settings.getLogPath());
@@ -145,6 +150,7 @@ public class SettingsViewController extends PageController {
         try {
             // Validate and parse inputs
             int detectionThreshold = Integer.parseInt(tfDetectionThreshold.getText());
+            int automarkThreshold = Integer.parseInt(tfAutomarkThreshold.getText());
             int lateThreshold = Integer.parseInt(tfLateThreshold.getText());
             Integer cameraDevice = cbCameraDevice.getValue();
             String logPath = tfLogPath.getText();
@@ -152,6 +158,16 @@ public class SettingsViewController extends PageController {
             // Basic validation
             if (detectionThreshold < 0 || detectionThreshold > 100) {
                 Toast.show("Detection threshold must be between 0-100", Toast.ToastType.ERROR);
+                return;
+            }
+
+            if (automarkThreshold < 0 || automarkThreshold > 100) {
+                Toast.show("Automark threshold must be between 0-100", Toast.ToastType.ERROR);
+                return;
+            }
+
+            if (automarkThreshold < detectionThreshold) {
+                Toast.show("Automark threshold must more than detection threshold", Toast.ToastType.ERROR);
                 return;
             }
 
