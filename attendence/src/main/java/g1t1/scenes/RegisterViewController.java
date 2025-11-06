@@ -4,6 +4,8 @@ import g1t1.components.Toast;
 import g1t1.components.register.RegistrationStep;
 import g1t1.components.stepper.StepperControl;
 import g1t1.features.authentication.AuthenticationContext;
+import g1t1.features.logger.AppLogger;
+import g1t1.features.logger.LogLevel;
 import g1t1.models.interfaces.HasProperty;
 import g1t1.models.scenes.PageController;
 import g1t1.models.scenes.PageName;
@@ -69,6 +71,7 @@ public class RegisterViewController extends PageController {
 
     @Override
     public void onMount() {
+        AppLogger.log("Teacher registration started");
         this.registerTeacher = new RegisterTeacher();
     }
 
@@ -85,13 +88,19 @@ public class RegisterViewController extends PageController {
         }
 
         if (!stepper.isLast()) {
+            AppLogger.logf("Registration step advanced: Step %d", stepper.getCurrentIndex() + 1);
             stepper.next();
         } else {
+            AppLogger.logf("Registration form completed, attempting to register teacher: %s",
+                this.registerTeacher.getEmail());
             boolean success = AuthenticationContext.registerTeacher(this.registerTeacher);
             if (success) {
+                AppLogger.log("Registration successful, redirecting to dashboard");
                 Router.changePage(PageName.PastRecords);
                 Toast.show("User created!", Toast.ToastType.SUCCESS);
             } else {
+                AppLogger.logf(LogLevel.Warning, "Registration failed for teacher: %s (ID may already exist)",
+                    this.registerTeacher.getEmail());
                 Toast.show("Error! Teacher ID already exists!", Toast.ToastType.ERROR);
             }
         }

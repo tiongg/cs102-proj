@@ -4,6 +4,8 @@ import g1t1.App;
 import g1t1.components.Toast;
 import g1t1.components.Toast.ToastType;
 import g1t1.config.SettingsManager;
+import g1t1.features.logger.AppLogger;
+import g1t1.features.logger.LogLevel;
 import g1t1.features.onboarding.FaceStepTracker;
 import g1t1.models.interfaces.register.HasFaces;
 import g1t1.models.scenes.Router;
@@ -250,6 +252,7 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
             lblOnboardType.setText("Teacher");
         }
 
+        AppLogger.log("Face capture onboarding started - initializing camera");
         CameraRunnable cameraThread = new CameraRunnable(this.ivCameraView, this.cameraFailure, this.isTakingPictures, this.stepTracker);
         this.cameraDaemon = new ThreadWithRunnable<>(cameraThread);
         this.cameraDaemon.setDaemon(true);
@@ -266,6 +269,7 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
 
     @FXML
     public void startTakingPictures() {
+        AppLogger.log("Face capture started - beginning automated photo capture");
         this.btnStartScan.visibleProperty().set(false);
         this.isTakingPictures.set(true);
     }
@@ -278,7 +282,14 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
         }
         this.photosTaken.add(e.picture());
 
-        if (this.photosTaken.sizeProperty().intValue() >= 100) {
+        // Log progress at milestones
+        int currentCount = this.photosTaken.sizeProperty().intValue();
+        if (currentCount == 25 || currentCount == 50 || currentCount == 75) {
+            AppLogger.logf("Face capture progress: %d/100 images captured", currentCount);
+        }
+
+        if (currentCount >= 100) {
+            AppLogger.log("Face capture completed - all 100 images captured successfully");
             Toast.show("All pictures taken!", ToastType.SUCCESS);
             this.isTakingPictures.set(false);
         }
@@ -286,11 +297,14 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
 
     @FXML
     public void importImages() {
+        AppLogger.log("Manual image import initiated");
         List<File> filesSelected = this.fileChooser.showOpenMultipleDialog(App.getRootStage());
         if (filesSelected == null || filesSelected.size() <= 0) {
+            AppLogger.log(LogLevel.Warning, "Manual image import cancelled - no files selected");
             Toast.show("No files selected!", ToastType.ERROR);
             return;
         }
+        AppLogger.logf("Processing %d imported image(s)", filesSelected.size());
         int imported = 0;
         for (File file : filesSelected) {
             Mat imageMat = null;
@@ -326,6 +340,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
                 }
                 imported++;
             } catch (IOException e) {
+                AppLogger.logf(LogLevel.Error, "Error loading file during import: %s - %s",
+                    file.getName(), e.getMessage());
                 Toast.show(String.format("Error loading file %s", file.getAbsolutePath()), ToastType.ERROR);
             } finally {
                 if (imageMat != null)
@@ -338,6 +354,8 @@ public class FaceDetails extends Tab implements RegistrationStep<HasFaces> {
                     buffer.release();
             }
         }
+        AppLogger.logf("Manual image import completed: %d/%d images successfully imported",
+            imported, filesSelected.size());
         Toast.show(String.format("Successfully imported %d images!", imported), ToastType.SUCCESS);
     }
 }

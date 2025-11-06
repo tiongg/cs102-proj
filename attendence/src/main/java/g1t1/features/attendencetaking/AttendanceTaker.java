@@ -11,6 +11,7 @@ import g1t1.db.sessions.SessionRepository;
 import g1t1.db.sessions.SessionRepositoryJooq;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.features.logger.AppLogger;
+import g1t1.features.logger.LogLevel;
 import g1t1.models.ids.StudentID;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
@@ -41,16 +42,29 @@ public class AttendanceTaker {
     private static ClassSession currentSession;
 
     public static void start(ModuleSection moduleSection, int week, LocalDateTime startTime) {
+        AppLogger.logf("Starting attendance session: %s %s (Week %d) with %d students",
+            moduleSection.getModule(), moduleSection.getSection(), week, moduleSection.getStudents().size());
         initializeRecognitionSystem(moduleSection);
         initializeSession(moduleSection, week, startTime);
         subscribeToDetectionEvents();
     }
 
     public static void stop() {
-        AppLogger.log("Stopped attendance taking");
         FaceRecognitionService.getInstance().stop();
 
         if (currentSession != null) {
+            long studentsMarked = currentSession.getStudentAttendance()
+                .values()
+                .stream()
+                .filter(x -> x.getStatus() == AttendanceStatus.PRESENT || x.getStatus() == AttendanceStatus.LATE)
+                .count();
+
+            AppLogger.logf("Attendance session ended: %s %s - %d/%d students marked present",
+                currentSession.getModuleSection().getModule(),
+                currentSession.getModuleSection().getSection(),
+                studentsMarked,
+                currentSession.getStudentAttendance().size());
+
             currentSession.endSession();
             saveSessionToDb();
         }
@@ -72,6 +86,11 @@ public class AttendanceTaker {
         if (attendance == null) {
             return false;
         }
+
+        AppLogger.logf("Manual confirmation accepted: %s (ID: %s, Confidence: %.2f%%)",
+            attendance.getStudent().getName(),
+            attendance.getStudent().getId(),
+            event.getConfidence());
 
         markAttendance(
                 attendance,
@@ -132,7 +151,11 @@ public class AttendanceTaker {
     }
 
     private static void processAutoMarking(StudentDetectedEvent event, SessionAttendance attendance) {
-        AppLogger.log(String.format("Auto marked %s", attendance.getStudent().getName()));
+        AppLogger.logf("Auto-marked attendance: %s (ID: %s, Confidence: %.2f%%)",
+            attendance.getStudent().getName(),
+            attendance.getStudent().getId(),
+            event.getConfidence());
+
         markAttendance(
                 attendance,
                 currentSession.getCurrentStatus(),
@@ -206,11 +229,15 @@ public class AttendanceTaker {
             String sessionId = sessionRepo.create(currentSession);
             attendanceRepo.createAll(sessionId, currentSession);
 
+            AppLogger.logf("Attendance session saved to database: Session ID %s", sessionId);
+
             AuthenticationContext.getCurrentUser().getPastSessions().add(currentSession);
             AuthenticationContext.triggerUserUpdate();
         } catch (SQLException e) {
+            AppLogger.logf(LogLevel.Error, "Database connection error while saving session: %s", e.getMessage());
             System.out.println("Error connecting to the database: " + e.getMessage());
         } catch (DataAccessException e) {
+            AppLogger.logf(LogLevel.Error, "Database operation error while saving session: %s", e.getMessage());
             System.out.println("Error during database operation: " + e.getMessage());
         }
     }
