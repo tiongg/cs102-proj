@@ -204,3 +204,4 @@ output/*
 logs/**.log
 attendence/logs/**.log
 attendence/src/main/java/g1t1/testing/outputs
+.remember
