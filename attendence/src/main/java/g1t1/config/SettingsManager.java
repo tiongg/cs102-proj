@@ -1,19 +1,23 @@
 package g1t1.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import g1t1.components.Toast;
-import javafx.application.Platform;
-import org.opencv.videoio.VideoCapture;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.opencv.videoio.VideoCapture;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import g1t1.components.Toast;
+import g1t1.features.logger.AppLogger;
+import g1t1.features.logger.LogLevel;
+import javafx.application.Platform;
+
 /**
- * Singleton manager for application settings.
- * Handles loading settings from JSON file and saving changes back.
+ * Singleton manager for application settings. Handles loading settings from
+ * JSON file and saving changes back.
  */
 public class SettingsManager {
     private static final String SETTINGS_FILE = "settings.json";
@@ -69,8 +73,10 @@ public class SettingsManager {
     public void saveSettings() {
         try (FileWriter writer = new FileWriter(SETTINGS_FILE)) {
             gson.toJson(this.settings, writer);
+            AppLogger.logf("Settings saved to: %s", new File(SETTINGS_FILE).getAbsolutePath());
             System.out.println("Settings saved to: " + SETTINGS_FILE);
         } catch (IOException e) {
+            AppLogger.logf(LogLevel.Error, "Error saving settings: %s", e.getMessage());
             System.err.println("Error saving settings: " + e.getMessage());
         }
     }
@@ -89,7 +95,9 @@ public class SettingsManager {
 
     // Convenience setters that auto-save
     public void setDetectionThreshold(int threshold) {
+        int oldValue = settings.getDetectionThreshold();
         settings.setDetectionThreshold(threshold);
+        AppLogger.logf("Detection threshold changed: %d -> %d", oldValue, threshold);
         saveSettings();
     }
 
@@ -98,7 +106,9 @@ public class SettingsManager {
     }
 
     public void setLateThresholdMinutes(int minutes) {
+        int oldValue = settings.getLateThresholdMinutes();
         settings.setLateThresholdMinutes(minutes);
+        AppLogger.logf("Late threshold changed: %d -> %d minutes", oldValue, minutes);
         saveSettings();
     }
 
@@ -107,7 +117,9 @@ public class SettingsManager {
     }
 
     public void setCameraDevice(int device) {
+        int oldValue = settings.getCameraDevice();
         settings.setCameraDevice(device);
+        AppLogger.logf("Camera device changed: %d -> %d", oldValue, device);
         saveSettings();
     }
 
@@ -116,31 +128,40 @@ public class SettingsManager {
     }
 
     public void setLogPath(String path) {
+        String oldValue = settings.getLogPath();
         settings.setLogPath(path);
+        AppLogger.logf("Log path changed: %s -> %s", oldValue, path);
         saveSettings();
     }
 
     public VideoCapture getConfiguredCamera() {
-        VideoCapture camera = new VideoCapture(getCameraDevice());
+        int configuredDevice = getCameraDevice();
+        AppLogger.logf("Attempting to open camera device: %d", configuredDevice);
+        VideoCapture camera = new VideoCapture(configuredDevice);
 
         // Check if configured camera opened successfully
         if (!camera.isOpened()) {
-            System.err.println("Camera " + getCameraDevice() + " failed to open. Trying camera 0...");
+            AppLogger.logf(LogLevel.Warning, "Camera %d failed to open, trying camera 0...", configuredDevice);
+            System.err.println("Camera " + configuredDevice + " failed to open. Trying camera 0...");
             camera.release();
             camera = new VideoCapture(0);
 
             // If camera 0 also fails, notify user
             if (!camera.isOpened()) {
+                AppLogger.log(LogLevel.Error, "No cameras available!");
                 System.err.println("No cameras available!");
                 Platform.runLater(() -> {
                     Toast.show("No camera detected!", Toast.ToastType.ERROR);
                 });
             } else {
+                AppLogger.logf("Successfully opened default camera 0 (Camera %d was unavailable)", configuredDevice);
                 Platform.runLater(() -> {
-                    Toast.show("Using default camera (Camera " + getCameraDevice() + " unavailable)",
+                    Toast.show("Using default camera (Camera " + configuredDevice + " unavailable)",
                             Toast.ToastType.WARNING);
                 });
             }
+        } else {
+            AppLogger.logf("Camera device %d opened successfully", configuredDevice);
         }
         return camera;
     }

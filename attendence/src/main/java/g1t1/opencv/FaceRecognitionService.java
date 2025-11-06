@@ -87,7 +87,7 @@ public class FaceRecognitionService {
         this.lastMaskCheckTime = new HashMap<>();
 
         if (FaceConfig.getInstance().isLoggingEnabled()) {
-            AppLogger.log("Face recognition started with " + recognisableObjects.size() + " recognisable objects");
+            AppLogger.logf("Face recognition started with %d recognisable objects", recognisableObjects.size());
         }
 
         histogramRecognizer.precomputeEnrollmentData(recognisableObjects);
@@ -113,6 +113,11 @@ public class FaceRecognitionService {
         if (currentSession != null) {
             currentSession.endSession();
             eventEmitter.emit(new AttendanceSessionEvent(currentSession, AttendanceSessionEvent.SESSION_ENDED));
+
+            if (FaceConfig.getInstance().isLoggingEnabled()) {
+                AppLogger.logf("Face recognition stopped - Session summary: %d unique faces detected",
+                    loggedUsers != null ? loggedUsers.size() : 0);
+            }
         }
 
         histogramRecognizer.cleanup();
@@ -121,10 +126,6 @@ public class FaceRecognitionService {
         recognitionCache.clear();
         recognitionCacheTime.clear();
         frameSkipCounter = 0;
-
-        if (FaceConfig.getInstance().isLoggingEnabled()) {
-            AppLogger.log("Face recognition stopped");
-        }
     }
 
     /**
@@ -231,7 +232,8 @@ public class FaceRecognitionService {
         if (confidence >= FaceConfig.getInstance().getRecognitionThreshold() && !loggedUsers.contains(recognitionId)) {
             loggedUsers.add(recognitionId);
             if (FaceConfig.getInstance().isLoggingEnabled()) {
-                AppLogger.log("Person detected: " + recognisedObject.getName() + " (ID: " + recognitionId + ")");
+                AppLogger.logf("Face detected: %s (ID: %s, Confidence: %.2f%%)",
+                    recognisedObject.getName(), recognitionId, confidence);
             }
         }
 

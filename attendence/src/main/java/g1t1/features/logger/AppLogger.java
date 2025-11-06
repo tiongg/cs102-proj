@@ -42,7 +42,7 @@ public class AppLogger {
 
     /**
      * Logs message with the given log level.
-     * 
+     *
      * @param level   - Log level
      * @param message - Message to log
      */
@@ -53,5 +53,26 @@ public class AppLogger {
         } catch (Exception e) {
             consoleLogger.log(LogLevel.Error, e.getMessage());
         }
+    }
+
+    /**
+     * Logs a formatted message. Defaults to LogLevel.Info.
+     *
+     * @param format - Format string (e.g., "User %s logged in at %s")
+     * @param args   - Arguments referenced by format specifiers
+     */
+    public static void logf(String format, Object... args) {
+        log(String.format(format, args));
+    }
+
+    /**
+     * Logs a formatted message with the given log level.
+     *
+     * @param level  - Log level
+     * @param format - Format string (e.g., "User %s logged in at %s")
+     * @param args   - Arguments referenced by format specifiers
+     */
+    public static void logf(LogLevel level, String format, Object... args) {
+        log(level, String.format(format, args));
     }
 }

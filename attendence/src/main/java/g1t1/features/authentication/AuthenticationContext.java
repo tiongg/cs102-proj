@@ -20,6 +20,8 @@ import g1t1.db.user_face_images.UserFaceImageRepositoryJooq;
 import g1t1.db.users.User;
 import g1t1.db.users.UserRepository;
 import g1t1.db.users.UserRepositoryJooq;
+import g1t1.features.logger.AppLogger;
+import g1t1.features.logger.LogLevel;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.RegisterTeacher;
@@ -53,11 +55,16 @@ public class AuthenticationContext {
                 userFaceImageRepo.create(userId, faceImage);
             }
 
+            AppLogger.logf("Teacher registered successfully: %s (ID: %s)",
+                registrationInfo.getFullName(), registrationInfo.getTeacherID());
+
             // Login the user
             return loginTeacher(registrationInfo.getEmail(), registrationInfo.getPassword());
         } catch (SQLException e) {
+            AppLogger.logf(LogLevel.Error, "Database connection error during registration: %s", e.getMessage());
             System.out.println("Error connecting to the database: " + e.getMessage());
         } catch (DataAccessException e) {
+            AppLogger.logf(LogLevel.Error, "Database operation error during registration: %s", e.getMessage());
             System.out.println("Error during database operation: " + e.getMessage());
         }
         return false;
@@ -74,9 +81,12 @@ public class AuthenticationContext {
 
             User dbUser = userRepo.fetchUserByEmail(email).orElse(userRepo.fetchUserById(email).orElse(null));
             if (dbUser == null) {
+                AppLogger.logf(LogLevel.Warning, "Login attempt failed: User not found (email/ID: %s)", email);
                 return false;
             }
             if (!BCrypt.checkpw(password, dbUser.passwordHash())) {
+                AppLogger.logf(LogLevel.Warning, "Login attempt failed: Invalid password for user %s (%s)",
+                    dbUser.fullName(), dbUser.userId());
                 return false;
             }
             String currentTerm = ModuleSection.getCurrentAYTerm();
@@ -116,14 +126,19 @@ public class AuthenticationContext {
 
             return setCurrentTeacher(teacher);
         } catch (SQLException e) {
+            AppLogger.logf(LogLevel.Error, "Database connection error during login: %s", e.getMessage());
             System.out.println("Error connecting to the database: " + e.getMessage());
         } catch (DataAccessException e) {
+            AppLogger.logf(LogLevel.Error, "Database operation error during login: %s", e.getMessage());
             System.out.println("Error during database operation: " + e.getMessage());
         }
         return false;
     }
 
     public static void logout() {
+        if (currentUser != null) {
+            AppLogger.logf("User logged out: %s (%s)", currentUser.getName(), currentUser.getID());
+        }
         currentUser = null;
         emitter.emit(new OnLogoutEvent());
     }
@@ -143,6 +158,7 @@ public class AuthenticationContext {
         }
 
         currentUser = teacher;
+        AppLogger.logf("User logged in successfully: %s (%s)", teacher.getName(), teacher.getID());
         emitter.emit(new OnLoginEvent(teacher));
         triggerUserUpdate();
         return true;
