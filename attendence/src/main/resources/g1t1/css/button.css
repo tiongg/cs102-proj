@@ -1,5 +1,28 @@
+/* ============================================================================
+   BUTTON - Button Component Styles
+   ============================================================================ */
+
+/* Flat Button - Standard button with gray background and pill shape */
 .flat-button {
-    -fx-background-color: "#d7d7d7";
-    -fx-background-radius: 999px;
+    -fx-background-color: #d9d9d9;
+    -fx-background-radius: 999;
     -fx-cursor: hand;
+    -fx-padding: 8 16;
+    -fx-font-size: 14;
+}
+
+/* State: Hover - Visual feedback when hovering over button */
+.flat-button:hover {
+    -fx-opacity: 0.8;
+}
+
+/* State: Pressed - Visual feedback when clicking button */
+.flat-button:pressed {
+    -fx-opacity: 0.7;
+}
+
+/* State: Disabled - Reduced opacity for disabled buttons */
+.flat-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
 }

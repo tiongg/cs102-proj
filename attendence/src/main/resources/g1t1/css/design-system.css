@@ -1,0 +1,58 @@
+/* ============================================================================
+   DESIGN SYSTEM - Global Design Tokens and Variables
+   ============================================================================
+   This file defines all design tokens used across the application including
+   spacing, colors, typography, shadows, and transitions. Update these values
+   to maintain consistency across all components.
+   ============================================================================ */
+
+.root {
+    /* ========== SPACING SCALE ========== */
+    /* Use these values for padding, margin, and spacing */
+    -fx-space-xs: 4;
+    -fx-space-sm: 8;
+    -fx-space-md: 12;
+    -fx-space-lg: 16;
+    -fx-space-xl: 20;
+    -fx-space-2xl: 24;
+    -fx-space-3xl: 32;
+
+    /* ========== BORDER RADIUS ========== */
+    /* Use these values for all border radius */
+    -fx-radius-sm: 4;
+    -fx-radius-md: 8;
+    -fx-radius-lg: 12;
+    -fx-radius-pill: 999;
+
+    /* ========== COLOR PALETTE - SEMANTIC ========== */
+    /* Primary Colors */
+    -fx-color-primary: #667eea;
+    -fx-color-primary-dark: #764ba2;
+
+    /* Status Colors */
+    -fx-color-success: #2ecc71;
+    -fx-color-warning: #f1c40f;
+    -fx-color-error: #e74c3c;
+    -fx-color-info: #3498db;
+
+    /* Neutral Grayscale */
+    -fx-color-neutral-bg-light: #f8f9fa;
+    -fx-color-neutral-bg: #f0f0f0;
+    -fx-color-neutral-200: #e0e0e0;
+    -fx-color-neutral-300: #d9d9d9;
+    -fx-color-neutral-500: #999999;
+    -fx-color-neutral-600: #666666;
+    -fx-color-neutral-800: #212121;
+
+    /* ========== TYPOGRAPHY ========== */
+    -fx-font-family: "Inter";
+    -fx-font-size-sm: 12;
+    -fx-font-size-base: 14;
+    -fx-font-size-md: 16;
+    -fx-font-size-lg: 20;
+
+    /* ========== EFFECTS ========== */
+    /* Opacity for component states */
+    -fx-opacity-disabled: 0.5;
+    -fx-opacity-hover: 0.8;
+}

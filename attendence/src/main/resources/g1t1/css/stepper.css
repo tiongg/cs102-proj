@@ -1,4 +1,10 @@
+/* ============================================================================
+   STEPPER - Stepper Control Component Styles
+   ============================================================================ */
+
+/* Stepper Control - Multi-step form indicator */
 .stepper-control {
     -fx-font-family: "Inter";
-    -fx-font-size: 14px;
+    -fx-font-size: 14;
+    -fx-spacing: 16;
 }

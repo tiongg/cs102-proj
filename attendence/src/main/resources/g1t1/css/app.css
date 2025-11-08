@@ -1,19 +1,32 @@
+/* ============================================================================
+   APP - Global Application Styles
+   ============================================================================ */
+
 .root {
     -fx-font-family: "Inter";
-    -fx-font-size: 14px;
+    -fx-font-size: 14;
 }
 
+/* State: Disabled - Applied to disabled components */
 .disabled {
-    -fx-opacity: 0.6;
+    -fx-opacity: 0.5;
 }
 
+/* Input Fields - Standard flat styling for text inputs */
 .flat-input {
     -fx-background-color: white;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
     -fx-border-color: #A6A6A6;
+    -fx-border-width: 1;
 }
 
-.menu-button{
-    -fx-padding: 4px 8px;
+.flat-input:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+/* Menu Button - Standard padding for menu buttons */
+.menu-button {
+    -fx-padding: 4 8;
 }

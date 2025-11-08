@@ -96,7 +96,7 @@ public class App extends Application {
 
     private void loadCss(Scene scene) {
         String[] cssFiles = {
-                "app.css", "button.css", "date-picker.css", "stepper.css",
+                "design-system.css", "app.css", "button.css", "date-picker.css", "stepper.css",
                 "tabs.css", "toast.css", "table.css", "student-list.css"
         };
 
