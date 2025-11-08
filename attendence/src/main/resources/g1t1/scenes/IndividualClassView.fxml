@@ -34,7 +34,7 @@
         <VBox spacing="8" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
               AnchorPane.topAnchor="90.0">
             <HBox alignment="CENTER_LEFT" minHeight="40.0" spacing="8">
-                <TabSelector alignment="CENTER_LEFT" fx:id="tsSelector">
+                <TabSelector fx:id="tsSelector" alignment="CENTER_LEFT">
                     <labels>
                         <FXCollections fx:factory="observableArrayList">
                             <String fx:value="Past sessions"/>
@@ -64,8 +64,15 @@
                            VBox.vgrow="ALWAYS"/>
                 </Tab>
                 <Tab>
-                    <VBox fx:id="vbxStudentList" alignment="TOP_CENTER" styleClass="student-list">
-                    </VBox>
+                    <ScrollPane
+                            fitToWidth="true"
+                            hbarPolicy="NEVER" vbarPolicy="NEVER"
+                            style="-fx-background-color: transparent; -fx-background: transparent;"
+                            VBox.vgrow="ALWAYS" minHeight="130" maxWidth="Infinity"
+                    >
+                        <VBox fx:id="vbxStudentList" alignment="TOP_CENTER" styleClass="student-list">
+                        </VBox>
+                    </ScrollPane>
                 </Tab>
             </TabPane>
         </VBox>

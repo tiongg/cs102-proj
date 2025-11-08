@@ -76,7 +76,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
                     updateWeekSelectionTitle();
                 }
         );
-        
+
         updateWeekSelectionTitle();
         this.tsSelector.currentTabIndexProperty().subscribe((newIndex) -> {
             this.tabs.getSelectionModel().select(newIndex.intValue());
@@ -129,7 +129,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
     public void closeFilter() {
         stkFilterPane.visibleProperty().set(false);
     }
-
 
     private void resetSearchFields() {
         mbMinAttendanceRate.setText(ATTENDANCE_RATE_OPTIONS[0].label());
