@@ -11,11 +11,13 @@
     -fx-border-width: 1;
     -fx-padding: 8;
     -fx-font-size: 14;
+    -fx-focus-color: #667eea;
+    -fx-faint-focus-color: transparent;
 }
 
 .date-picker .text-field:focused {
     -fx-border-color: #667eea;
-    -fx-border-width: 2;
+    -fx-border-width: 1;
 }
 
 /* Date Picker Arrow Button - Calendar icon button */
