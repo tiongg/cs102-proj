@@ -1,23 +1,42 @@
+/* ============================================================================
+   TOAST - Notification/Toast Component Styles
+   ============================================================================ */
+
+/* Toast - Base notification container */
 .toast {
-    -fx-background-color: rgba(0,0,0,0.75);
-    -fx-padding: 8px 24px;
-    -fx-background-radius: 8px;
+    -fx-background-color: rgba(33, 33, 33, 0.9);
+    -fx-background-radius: 8;
+    -fx-padding: 12 16;
+    -fx-cursor: default;
 }
 
+/* Toast Label - Text content of notification */
 .toast-label {
     -fx-text-fill: white;
-    -fx-font-size: 14px;
+    -fx-font-size: 14;
 }
 
+/* Toast States - Different toast types with semantic colors */
+
+/* Success State - Green background for success messages */
 .toast.success {
-    -fx-background-color: rgba(46, 204, 113, 0.9);   /* green */
+    -fx-background-color: rgba(46, 204, 113, 0.95);
 }
+
+/* Info State - Blue background for informational messages */
 .toast.info {
-    -fx-background-color: rgba(52, 152, 219, 0.9);   /* blue */
+    -fx-background-color: rgba(52, 152, 219, 0.95);
 }
+
+/* Warning State - Yellow background for warning messages */
 .toast.warning {
-    -fx-background-color: rgba(241, 196, 15, 0.9);   /* yellow */
+    -fx-background-color: rgba(241, 196, 15, 0.95);
 }
+.toast.warning .toast-label {
+    -fx-text-fill: #212121;
+}
+
+/* Error State - Red background for error messages */
 .toast.error {
-    -fx-background-color: rgba(231, 76, 60, 0.9);   /* red */
+    -fx-background-color: rgba(231, 76, 60, 0.95);
 }

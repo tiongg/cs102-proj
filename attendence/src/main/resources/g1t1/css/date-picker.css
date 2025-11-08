@@ -1,12 +1,30 @@
+/* ============================================================================
+   DATE PICKER - Date Picker Component Styles
+   ============================================================================ */
+
+/* Date Picker Text Field - Input field for date selection */
 .date-picker .text-field {
     -fx-background-color: white;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #A6A6A6;
+    -fx-border-width: 1;
+    -fx-padding: 8;
+    -fx-font-size: 14;
+    -fx-focus-color: #667eea;
+    -fx-faint-focus-color: transparent;
 }
 
+.date-picker .text-field:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 1;
+}
+
+/* Date Picker Arrow Button - Calendar icon button */
 .date-picker .arrow-button {
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
     -fx-border-color: transparent;
     -fx-background-color: -fx-text-box-border, -fx-control-inner-background;
+    -fx-cursor: hand;
 }

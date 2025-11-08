@@ -16,8 +16,7 @@
         <ImageView fx:id="ivCameraView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="350.0" AnchorPane.topAnchor="0.0"/>
         <!-- Error label overlaid at bottom -->
-        <Label fx:id="lblCameraError"
-               style="-fx-background-color: rgba(139, 0, 0, 0.85); -fx-padding: 4 8 4 8; -fx-background-radius: 4;"
+        <Label fx:id="lblCameraError" styleClass="bg-error-danger"
                text="Camera Error!" textFill="white" translateZ="-99.0" viewOrder="-10" visible="false"
                StackPane.alignment="BOTTOM_CENTER">
             <StackPane.margin>
@@ -26,8 +25,7 @@
         </Label>
 
         <HBox fx:id="hbxConfirmStudent" alignment="CENTER" maxHeight="48.0" maxWidth="400.0" prefHeight="48.0"
-              prefWidth="400.0" spacing="24.0"
-              style="-fx-background-color: rgb(190,3,252); -fx-padding: 4 8 4 8; -fx-background-radius: 4;"
+              prefWidth="400.0" spacing="24.0" styleClass="status-button-confirm"
               StackPane.alignment="BOTTOM_CENTER">
             <Label fx:id="lblConfirmStudentName" text="Needs confirmation: J" textFill="WHITE">
                 <font>
@@ -36,14 +34,12 @@
             </Label>
 
             <HBox alignment="CENTER" fillHeight="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                  minWidth="-Infinity" prefHeight="30.0" prefWidth="30.0"
-                  style="-fx-background-radius: 999px; -fx-background-color: rgb(46, 204, 113); -fx-padding: 8px;"
+                  minWidth="-Infinity" prefHeight="30.0" prefWidth="30.0" styleClass="status-button-accept"
                   HBox.hgrow="NEVER" onMouseClicked="#acceptStudentAttendance">
                 <FontIcon iconLiteral="ion4-ios-checkmark" iconSize="18" iconColor="white"/>
             </HBox>
             <HBox alignment="CENTER" fillHeight="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                  minWidth="-Infinity" prefHeight="30.0" prefWidth="30.0"
-                  style="-fx-background-radius: 999px; -fx-background-color: rgb(231, 76, 60); -fx-padding: 8px;"
+                  minWidth="-Infinity" prefHeight="30.0" prefWidth="30.0" styleClass="status-button-reject"
                   HBox.hgrow="NEVER" onMouseClicked="#rejectStudentAttendance">
                 <FontIcon iconLiteral="ion4-ios-close" iconSize="18" iconColor="white"/>
             </HBox>
@@ -54,7 +50,7 @@
     </StackPane>
 
     <VBox fx:id="vbxDefaultPanel" alignment="TOP_CENTER" prefWidth="350" spacing="8"
-          style="-fx-background-color: #d7d7d7;" styleClass="" AnchorPane.bottomAnchor="0.0"
+          styleClass="panel" AnchorPane.bottomAnchor="0.0"
           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <Label alignment="CENTER" prefHeight="64.0" prefWidth="350.0" text="Currently Marking" textAlignment="CENTER">
             <font>
@@ -109,7 +105,7 @@
     </VBox>
 
     <VBox fx:id="vbxAdminPanel" alignment="TOP_CENTER" prefWidth="350" spacing="8"
-          style="-fx-background-color: #d7d7d7;" styleClass="" AnchorPane.bottomAnchor="0.0"
+          styleClass="panel" AnchorPane.bottomAnchor="0.0"
           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <VBox alignment="TOP_CENTER" prefHeight="50.0" spacing="4" VBox.vgrow="ALWAYS">
             <AttendanceStateList fx:id="aslMarkableStudents" alignment="TOP_CENTER" editable="true" title="Students"

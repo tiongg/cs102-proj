@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <fx:root xmlns:fx="http://javafx.com/fxml" type="VBox"
          xmlns="http://javafx.com/javafx"
-         style="-fx-background-color: #F0F0F0; -fx-background-radius: 16px;"
+         styleClass="panel-light-rounded"
          spacing="8">
     <padding>
         <Insets top="8" right="8" bottom="8" left="8"/>
@@ -21,10 +21,10 @@
 
     <ScrollPane fitToWidth="true"
                 hbarPolicy="NEVER" vbarPolicy="NEVER"
-                style="-fx-background-color: transparent; -fx-background: transparent;"
+                styleClass="transparent-background"
                 VBox.vgrow="ALWAYS" minHeight="130" maxWidth="Infinity">
         <VBox spacing="8" fx:id="vbChips"
-              style="-fx-background-color: transparent;"
+              styleClass="transparent"
               maxWidth="Infinity"/>
     </ScrollPane>
 </fx:root>

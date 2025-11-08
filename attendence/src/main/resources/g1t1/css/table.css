@@ -1,28 +1,41 @@
+/* ============================================================================
+   TABLE - Custom Table Component Styles
+   ============================================================================ */
+
+/* Table Header - Top section with rounded corners */
 .table-header {
     -fx-background-color: #d9d9d9;
     -fx-background-radius: 20 20 0 0;
-    -fx-padding: 8px 16px;
+    -fx-padding: 8 16;
     -fx-font-weight: bold;
 }
 
 .table-header-label {
-    -fx-font-size: 14px;
-    -fx-font-family: Inter;
+    -fx-font-size: 14;
+    -fx-font-family: "Inter";
 }
 
+/* Table Body - Container for table items with rounded bottom corners */
 .table-body {
     -fx-background-color: #f0f0f0;
     -fx-background-radius: 0 0 20 20;
-    -fx-padding: 8px;
+    -fx-padding: 8;
+    -fx-spacing: 8;
 }
 
+/* Table Item - Individual row styling */
 .table-item {
     -fx-background-color: #d9d9d9;
-    -fx-background-radius: 20px;
-    -fx-padding: 8px;
+    -fx-background-radius: 12;
+    -fx-padding: 8;
+}
+
+/* State: Hover - Visual feedback for table items */
+.table-item:hover {
+    -fx-background-color: #cccccc;
 }
 
 .table-item-label {
-    -fx-font-size: 14px;
-    -fx-font-family: Inter;
+    -fx-font-size: 14;
+    -fx-font-family: "Inter";
 }

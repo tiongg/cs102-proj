@@ -1,6 +1,41 @@
+/* ============================================================================
+   TABS - Tab Selector Component Styles
+   ============================================================================ */
+
+/* Hidden Tabs - Hides standard tab header while preserving tab content */
 .hidden-tabs {
-    -fx-tab-max-height: 0 ;
+    -fx-tab-max-height: 0;
 }
+
 .hidden-tabs .tab-header-area {
-    visibility: hidden ;
+    visibility: hidden;
+}
+
+/* Labeled Tab Selector - Custom tab selector container with pill-shaped buttons */
+.labeled-tab-selector {
+    -fx-background-color: #f0f0f0;
+    -fx-padding: 8;
+    -fx-background-radius: 999;
+    -fx-spacing: 8;
+}
+
+/* Labeled Tab Selector Label - Individual tab button */
+.labeled-tab-selector-label {
+    -fx-padding: 8 16;
+    -fx-background-radius: 999;
+    -fx-cursor: hand;
+    -fx-text-fill: #666666;
+    -fx-font-size: 14;
+}
+
+/* State: Hover - Visual feedback when hovering over tab label */
+.labeled-tab-selector-label:hover {
+    -fx-opacity: 0.8;
+}
+
+/* State: Selected - Active tab styling with white background */
+.labeled-tab-selector-label:selected {
+    -fx-background-color: white;
+    -fx-text-fill: #212121;
+    -fx-font-weight: bold;
 }

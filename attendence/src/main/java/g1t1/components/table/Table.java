@@ -131,7 +131,7 @@ public class Table extends StackPane {
 
             Label lblEmpty = new Label(getEmptyMessage());
             Label lblSecondary = new Label(getEmptyMessageDescription());
-            lblSecondary.setStyle("-fx-font-size: 12px; -fx-text-fill: #999999;");
+            lblSecondary.getStyleClass().add("empty-state-text");
 
             emptyContainer.getChildren().addAll(icon, lblEmpty, lblSecondary);
             emptyStack.getChildren().add(emptyContainer);

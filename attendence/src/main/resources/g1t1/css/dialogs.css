@@ -1,0 +1,111 @@
+/* ============================================================================
+   DIALOGS - Dialog and Modal Component Styles
+   ============================================================================
+   Styling for dialog boxes, modals, and overlay components
+   ============================================================================ */
+
+/* ========== DIALOG OVERLAY ========== */
+/* Semi-transparent overlay behind dialogs */
+.dialog-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.35);
+}
+
+/* ========== DIALOG CONTAINER ========== */
+/* Main dialog box styling */
+.dialog-container {
+    -fx-background-color: #dddddd;
+    -fx-background-radius: 20;
+    -fx-padding: 24;
+}
+
+.dialog-content {
+    -fx-background-color: #dddddd;
+    -fx-background-radius: 20;
+    -fx-padding: 24;
+}
+
+/* ========== DIALOG BUTTONS ========== */
+/* Cancel/Close button in dialogs */
+.dialog-button-cancel {
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+    -fx-cursor: hand;
+}
+
+.dialog-button-cancel:hover {
+    -fx-opacity: 0.8;
+}
+
+/* Confirm/Create button in dialogs */
+.dialog-button-create {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+.dialog-button-create:hover {
+    -fx-opacity: 0.8;
+}
+
+/* ========== FILTER DIALOG ========== */
+.filter-dialog {
+    -fx-background-color: #dddddd;
+    -fx-background-radius: 20;
+    -fx-padding: 24;
+}
+
+/* Filter Dialog Title */
+.filter-dialog-title {
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+/* Filter Dialog Section Labels */
+.filter-section-label {
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+/* Filter Dialog Helper Text */
+.filter-helper-text {
+    -fx-font-size: 12;
+    -fx-text-fill: #999999;
+}
+
+/* ========== ADD CLASS DIALOG ========== */
+.add-class-dialog {
+    -fx-background-color: #dddddd;
+    -fx-background-radius: 20;
+    -fx-padding: 24;
+}
+
+/* ========== FOOTER BAR ========== */
+/* Bottom bar styling used in reports and other views */
+.footer-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-padding: 10 14;
+    -fx-border-color: #c6c5c5;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+}
+
+/* ========== PANEL STYLING ========== */
+/* Generic panel/container styling */
+.panel {
+    -fx-background-color: #d7d7d7;
+    -fx-background-radius: 12;
+}
+
+.panel-light {
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 12;
+}
+
+.panel-light-rounded {
+    -fx-background-color: #F0F0F0;
+    -fx-background-radius: 16;
+}

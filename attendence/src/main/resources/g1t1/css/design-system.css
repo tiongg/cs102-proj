@@ -1,0 +1,89 @@
+/* ============================================================================
+   DESIGN SYSTEM - Global Design Tokens and Variables
+   ============================================================================
+   This file defines all design tokens used across the application including
+   spacing, colors, typography, shadows, and transitions. Update these values
+   to maintain consistency across all components.
+   ============================================================================ */
+
+.root {
+    /* ========== SPACING SCALE ========== */
+    /* Use these values for padding, margin, and spacing */
+    -fx-space-xs: 4;
+    -fx-space-sm: 8;
+    -fx-space-md: 12;
+    -fx-space-lg: 16;
+    -fx-space-xl: 20;
+    -fx-space-2xl: 24;
+    -fx-space-3xl: 32;
+
+    /* ========== BORDER RADIUS ========== */
+    /* Use these values for all border radius */
+    -fx-radius-xs: 4;
+    -fx-radius-sm: 8;
+    -fx-radius-md: 12;
+    -fx-radius-lg: 20;
+    -fx-radius-xl: 24;
+    -fx-radius-pill: 999;
+
+    /* ========== COLOR PALETTE - SEMANTIC ========== */
+    /* Primary Colors */
+    -fx-color-primary: #667eea;
+    -fx-color-primary-dark: #764ba2;
+
+    /* Status Colors - Success */
+    -fx-color-success: #4CAF50;
+    -fx-color-success-dark: #2ecc71;
+
+    /* Status Colors - Error */
+    -fx-color-error: #FF0000;
+    -fx-color-error-dark: rgba(139, 0, 0, 0.85);
+    -fx-color-error-light: #FF6B6B;
+    -fx-color-error-alt: #f44336;
+
+    /* Status Colors - Warning */
+    -fx-color-warning: #f1c40f;
+    -fx-color-warning-light: #FF6B6B;
+
+    /* Status Colors - Info/Pending */
+    -fx-color-info: #3498db;
+    -fx-color-info-light: #64B5F6;
+    -fx-color-pending: rgb(190, 3, 252);
+    -fx-color-pending-alt: #FFA726;
+
+    /* Neutral Grayscale */
+    -fx-color-neutral-bg-white: #FFFFFF;
+    -fx-color-neutral-bg-light: #f8f9fa;
+    -fx-color-neutral-bg: #f0f0f0;
+    -fx-color-neutral-bg-light-gray: #dddddd;
+    -fx-color-neutral-bg-medium-gray: #d7d7d7;
+    -fx-color-neutral-200: #e0e0e0;
+    -fx-color-neutral-300: #d9d9d9;
+    -fx-color-neutral-400: #c6c5c5;
+    -fx-color-neutral-500: #999999;
+    -fx-color-neutral-600: #666666;
+    -fx-color-neutral-700: #2C2C2C;
+    -fx-color-neutral-800: #212121;
+    -fx-color-neutral-black: #000000;
+
+    /* Overlay Colors */
+    -fx-color-overlay-dark: rgba(0, 0, 0, 0.35);
+    -fx-color-overlay-dark-85: rgba(0, 0, 0, 0.85);
+
+    /* ========== TYPOGRAPHY ========== */
+    -fx-font-family: "Inter";
+    -fx-font-size-caption: 12;
+    -fx-font-size-base: 14;
+    -fx-font-size-body: 16;
+    -fx-font-size-subheading: 18;
+    -fx-font-size-heading: 20;
+
+    /* ========== SIZING ========== */
+    /* Component sizes */
+    -fx-size-menu-item-width: 385;
+
+    /* ========== EFFECTS ========== */
+    /* Opacity for component states */
+    -fx-opacity-disabled: 0.5;
+    -fx-opacity-hover: 0.8;
+}

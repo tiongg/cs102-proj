@@ -235,10 +235,10 @@ public class DuringSessionViewController extends PageController {
 
         if (minutesRemaining <= 0) {
             lblRemainingTime.setText("Late!");
-            lblRemainingTime.setStyle("-fx-text-fill: #FF0000; -fx-font-weight: bold;");
+            lblRemainingTime.getStyleClass().add("late-warning");
         } else {
             lblRemainingTime.setText(String.format("%d min%s", minutesRemaining, minutesRemaining == 1 ? "" : "s"));
-            lblRemainingTime.setStyle(""); // Reset style
+            lblRemainingTime.getStyleClass().remove("late-warning");
         }
     }
 

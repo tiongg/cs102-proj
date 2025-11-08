@@ -13,7 +13,8 @@
     <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-        <HBox alignment="CENTER_LEFT" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+        <!-- Header Section -->
+        <HBox alignment="CENTER_LEFT" spacing="16" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
               AnchorPane.topAnchor="32.0">
             <Label fx:id="pastReports" text="Past Reports">
                 <font>
@@ -22,17 +23,19 @@
             </Label>
 
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                <Button fx:id="reportsBackBtn" minWidth="100.0" onAction="#reportsBack" styleClass="flat-button"
+                <Button fx:id="reportsBackBtn" minWidth="100.0" onAction="#reportsBack" styleClass="button-cancel"
                         text="Back"/>
             </HBox>
         </HBox>
 
-        <VBox spacing="20" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+        <!-- Reports Table Section -->
+        <VBox spacing="16" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
               AnchorPane.topAnchor="90.0">
-            <HBox alignment="CENTER_LEFT" minHeight="40.0">
+            <!-- Table Header -->
+            <HBox alignment="CENTER_LEFT" minHeight="40.0" spacing="12">
                 <Label fx:id="allPastReports" text="All Past Reports">
                     <font>
-                        <Font name="Inter" size="16.0"/>
+                        <Font name="Inter Semi Bold" size="16.0"/>
                     </font>
                 </Label>
                 <HBox alignment="CENTER_RIGHT" maxHeight="40" HBox.hgrow="ALWAYS">
@@ -49,50 +52,51 @@
                 </HBox>
             </HBox>
 
+            <!-- Reports Table -->
             <Table fx:id="reportsTable" VBox.vgrow="ALWAYS" emptyMessage="No reports!"
                    emptyMessageDescription="Start a session, and access the past reports here!"/>
         </VBox>
 
-        <!-- TO-DO: make footer width same as table and change color? and clean up the look -->
-        <HBox fx:id="footerBar" alignment="CENTER_LEFT" prefHeight="56.0" spacing="20"
-              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 10 14; -fx-border-color: #c6c5c5ff; -fx-border-radius: 14;"
+        <!-- Export Options Footer -->
+        <HBox fx:id="footerBar" alignment="CENTER_LEFT" prefHeight="80.0" spacing="20" styleClass="footer-bar"
               visible="false" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0">
-            <!-- Export as -->
-            <HBox alignment="CENTER_LEFT" spacing="8">
-                <Label fx:id="exportText" text="Export as"/>
-                <MenuButton fx:id="formatBtn" text="PDF" visible="false">
+
+            <!-- Format Selection -->
+            <VBox spacing="4" alignment="CENTER_LEFT">
+                <Label text="Export Format" styleClass="filter-section-label"/>
+                <MenuButton fx:id="formatBtn" minWidth="150" styleClass="flat-input" text="PDF" visible="false">
                     <items>
                         <MenuItem onAction="#choosePdf" text="PDF"/>
                         <MenuItem onAction="#chooseCsv" text="CSV"/>
                         <MenuItem onAction="#chooseXlsx" text="XLSX"/>
                     </items>
                 </MenuButton>
-            </HBox>
-
-            <!-- Include: -->
-            <HBox alignment="CENTER_LEFT" spacing="8">
-                <Label fx:id="includeText" text="Include:"/>
-                <CheckBox fx:id="cbTimestamp" text="Timestamp" visible="false"/>
-                <CheckBox fx:id="cbConfidence" text="Confidence" visible="false"/>
-                <CheckBox fx:id="cbMethod" text="Method" visible="false"/>
-            </HBox>
-
-            <!-- Directory picker -->
-            <VBox alignment="CENTER_LEFT" spacing="8">
-                <padding>
-                    <Insets bottom="20" left="20" right="20" top="20"/>
-                </padding>
-
-                <children>
-                    <Label fx:id="statusLabel" text="no directory selected"/>
-                    <Button onAction="#onChoose" text="Choose directory"/>
-                </children>
             </VBox>
 
+            <!-- Export Options -->
+            <VBox spacing="4" alignment="CENTER_LEFT" fx:id="vbExportOptions">
+                <Label text="Include Additional Fields" styleClass="filter-section-label"/>
+                <HBox spacing="12">
+                    <CheckBox fx:id="cbTimestamp" text="Timestamp"/>
+                    <CheckBox fx:id="cbConfidence" text="Confidence"/>
+                    <CheckBox fx:id="cbMethod" text="Method"/>
+                </HBox>
+            </VBox>
 
-            <Pane HBox.hgrow="ALWAYS"/> <!-- pushes Export button to the right -->
+            <!-- Directory picker -->
+            <VBox spacing="4" alignment="CENTER_LEFT">
+                <Label text="Save Location" styleClass="filter-section-label"/>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label fx:id="statusLabel" text="no directory selected" HBox.hgrow="ALWAYS"/>
+                    <Button onAction="#onChoose" styleClass="button-cancel" text="Choose..."/>
+                </HBox>
+            </VBox>
 
-            <Button fx:id="exportBtn" onAction="#export" text="Export" visible="false"/>
+            <!-- Spacer to push Export button to the right -->
+            <Pane HBox.hgrow="ALWAYS"/>
+
+            <!-- Export Button -->
+            <Button fx:id="exportBtn" minWidth="100" onAction="#export" styleClass="button-primary" text="Export" visible="false"/>
         </HBox>
 
 

@@ -52,13 +52,13 @@ public class NavItem extends HBox {
     }
 
     private void selected() {
-        this.lblNavTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 20px;");
+        this.lblNavTitle.getStyleClass().add("nav-item-active");
         this.lblNavTitle.setUnderline(true);
     }
 
     private void unselected() {
-        // Reset style
-        this.lblNavTitle.setStyle("");
+        // Remove active style
+        this.lblNavTitle.getStyleClass().remove("nav-item-active");
         this.lblNavTitle.setUnderline(false);
     }
 

@@ -5,12 +5,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import g1t1.models.sessions.*;
-
-
+import g1t1.features.logger.AppLogger;
+import g1t1.models.sessions.ClassSession;
+import g1t1.models.sessions.ModuleSection;
+import g1t1.models.sessions.SessionAttendance;
 
 public class XLSXReport extends ReportGenerator {
 
@@ -31,7 +38,6 @@ public class XLSXReport extends ReportGenerator {
 
     }
 
-
     @Override
     public void generate(Report report) {
         ClassSession session = report.getClassSession();
@@ -49,7 +55,7 @@ public class XLSXReport extends ReportGenerator {
         try (Workbook wb = new XSSFWorkbook(); FileOutputStream out = new FileOutputStream(getFilepath())) {
             Sheet sheet = wb.createSheet("Report");
 
-            //Basic styles -- add in later
+            // Basic styles -- add in later
             CellStyle boldStyle = wb.createCellStyle();
             Font bold = wb.createFont();
             bold.setBold(true);
@@ -57,11 +63,11 @@ public class XLSXReport extends ReportGenerator {
 
             int rowIndex = 0;
 
-            //Module Section
+            // Module Section
             String[] sectionLine = buildClassSection(session);
             rowIndex = writeRow(sheet, rowIndex, sectionLine, boldStyle);
 
-            //Teacher
+            // Teacher
             String teacher = "Teacher: Cannot fetch teacher";
             if (report.getTeacher() != null) {
                 teacher = "Teacher: " + report.getTeacher().getName();
@@ -69,17 +75,17 @@ public class XLSXReport extends ReportGenerator {
             String[] teacherRow = { teacher };
             rowIndex = writeRow(sheet, rowIndex, teacherRow, boldStyle);
 
-            //Timestamp
+            // Timestamp
             if (report.isIncludeTimeStamp()) {
                 LocalDateTime now = LocalDateTime.now();
                 DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                 rowIndex = writeRow(sheet, rowIndex, new String[] { "Report Generated on: " + now.format(fmt) }, null);
             }
 
-            //break
+            // break
             rowIndex++;
 
-            //Header
+            // Header
             String[] header = buildHeader(report);
             rowIndex = writeRow(sheet, rowIndex, header, boldStyle);
 
@@ -87,22 +93,16 @@ public class XLSXReport extends ReportGenerator {
                 String[] row = buildRow(sa, report);
                 rowIndex = writeRow(sheet, rowIndex, row, null);
             }
-            
-            //Auto-size columns based on header length
-            
 
+            // Auto-size columns based on header length
 
             wb.write(out);
-            System.out.println("File successfully written to " + getFilepath());
+            AppLogger.logf("XLSX successfully written to %s", getFilepath());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
-   
-        
-    
 
 }

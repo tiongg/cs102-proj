@@ -65,7 +65,7 @@ public class MyClassesViewController extends PageController {
         for (int i = 0; i < DateUtils.daysOfWeek.length; i++) {
             MenuItem item = new MenuItem(String.format("%s", DateUtils.daysOfWeek[i]));
             mbDay.getItems().add(item);
-            item.setStyle("-fx-pref-width: 385px");
+            item.getStyleClass().add("menu-item-wide");
             // Needed else index won't stick
             int dayOfWeek = i;
             item.setOnAction(e -> {

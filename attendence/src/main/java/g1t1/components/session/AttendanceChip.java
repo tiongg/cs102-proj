@@ -24,7 +24,7 @@ public class AttendanceChip extends HBox {
         // Configure the HBox container with better contrast
         this.setAlignment(Pos.CENTER_LEFT);
         this.setSpacing(8);
-        this.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 8px;"); // White background
+        this.getStyleClass().add("attendance-chip");
         this.setPadding(new Insets(8, 12, 8, 12));
         this.setMaxWidth(Double.MAX_VALUE);
         this.setPrefWidth(Double.MAX_VALUE);
@@ -33,7 +33,7 @@ public class AttendanceChip extends HBox {
         Label lblStudentName = new Label(attendance.getStudent().getName());
         lblStudentName.setAlignment(Pos.CENTER);
         lblStudentName.setMaxWidth(Double.MAX_VALUE);
-        lblStudentName.setStyle("-fx-font-size: 14px; -fx-text-fill: #2C2C2C;"); // Dark gray text
+        lblStudentName.getStyleClass().add("attendance-chip-name");
         HBox.setHgrow(lblStudentName, Priority.ALWAYS);
         this.getChildren().add(lblStudentName);
 
@@ -43,12 +43,13 @@ public class AttendanceChip extends HBox {
             lblStatus.textProperty().bind(attendance.getAttendanceProperty().map(this::getStatusText));
             lblStatus.setAlignment(Pos.CENTER);
             lblStatus.setPadding(new Insets(4, 12, 4, 12));
+            lblStatus.getStyleClass().add("status-badge");
 
-            // Bind style based on status
+            // Bind style class based on status
             attendance.getAttendanceProperty().addListener((obs, oldVal, newVal) -> {
-                lblStatus.setStyle(getStatusStyle(newVal));
+                updateStatusBadgeClass(lblStatus, newVal);
             });
-            lblStatus.setStyle(getStatusStyle(attendance.getAttendanceProperty().get()));
+            updateStatusBadgeClass(lblStatus, attendance.getAttendanceProperty().get());
 
             this.getChildren().add(lblStatus);
         } else {
@@ -80,14 +81,18 @@ public class AttendanceChip extends HBox {
         };
     }
 
-    private String getStatusStyle(AttendanceStatus status) {
-        String baseStyle = "-fx-background-radius: 12px; -fx-font-size: 12px; -fx-font-weight: bold;";
-        return switch (status) {
-            case PRESENT -> baseStyle + " -fx-background-color: #4CAF50; -fx-text-fill: white;";
-            case LATE -> baseStyle + " -fx-background-color: #FF6B6B; -fx-text-fill: white;";
-            case ABSENT -> baseStyle + " -fx-background-color: #FF6B6B; -fx-text-fill: white;";
-            case EXCUSED -> baseStyle + " -fx-background-color: #64B5F6; -fx-text-fill: white;";
-            case PENDING -> baseStyle + " -fx-background-color: #FFA726; -fx-text-fill: white;";
+    private void updateStatusBadgeClass(Label label, AttendanceStatus status) {
+        // Remove all status badge classes
+        label.getStyleClass().removeAll("status-badge-present", "status-badge-late", "status-badge-absent", "status-badge-excused", "status-badge-pending");
+
+        // Add the appropriate status class
+        String statusClass = switch (status) {
+            case PRESENT -> "status-badge-present";
+            case LATE -> "status-badge-late";
+            case ABSENT -> "status-badge-absent";
+            case EXCUSED -> "status-badge-excused";
+            case PENDING -> "status-badge-pending";
         };
+        label.getStyleClass().add(statusClass);
     }
 }

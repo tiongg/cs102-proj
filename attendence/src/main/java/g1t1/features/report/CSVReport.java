@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.opencsv.CSVWriter;
 
+import g1t1.features.logger.AppLogger;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.sessions.SessionAttendance;
@@ -64,7 +65,7 @@ public class CSVReport extends ReportGenerator {
             for (SessionAttendance sessionAttendance : sessAttendances) {
                 writer.writeNext(buildRow(sessionAttendance, report));
             }
-            System.out.println("File successfully written to " + getFilepath());
+            AppLogger.logf("CSV successfully written to %s", getFilepath());
         } catch (Exception e) {
             e.printStackTrace();
         }

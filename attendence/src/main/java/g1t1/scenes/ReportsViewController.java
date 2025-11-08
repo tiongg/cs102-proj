@@ -1,9 +1,22 @@
 package g1t1.scenes;
 
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import g1t1.components.Toast;
 import g1t1.components.table.Table;
 import g1t1.features.authentication.AuthenticationContext;
-import g1t1.features.report.*;
+import g1t1.features.report.CSVReport;
+import g1t1.features.report.PDFReport;
+import g1t1.features.report.Report;
+import g1t1.features.report.ReportBuilder;
+import g1t1.features.report.StudentChip;
+import g1t1.features.report.XLSXReport;
 import g1t1.models.ids.StudentID;
 import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
@@ -18,16 +31,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public class ReportsViewController extends PageController {
     private final ObjectProperty<ClassSession> selectedSession = new SimpleObjectProperty<>(null);
@@ -47,13 +53,8 @@ public class ReportsViewController extends PageController {
     private Button reportsBackBtn;
 
     @FXML
-    private Label exportText;
-
-    @FXML
     private MenuButton formatBtn;
 
-    @FXML
-    private Label includeText;
     @FXML
     private CheckBox cbTimestamp, cbConfidence, cbMethod;
 
@@ -62,6 +63,10 @@ public class ReportsViewController extends PageController {
 
     @FXML
     private HBox footerBar;
+
+    @FXML
+    private VBox vbExportOptions;
+
     @FXML
     private Label statusLabel;
 
@@ -94,9 +99,8 @@ public class ReportsViewController extends PageController {
         pastReports.setText("Past Reports");
         allPastReports.setText("All Past Reports");
         reportsBackBtn.setVisible(false);
-        exportText.setText(null);
         formatBtn.setVisible(false);
-        includeText.setText(null);
+        vbExportOptions.setVisible(false);
         cbTimestamp.setVisible(false);
         cbConfidence.setVisible(false);
         cbMethod.setVisible(false);
@@ -114,16 +118,16 @@ public class ReportsViewController extends PageController {
 
     private void showIndivReport(ClassSession cs) {
         selectedSession.set(cs);
-        exportText.setText("Export as");
         formatBtn.setVisible(true);
-        includeText.setText("Include:");
+        vbExportOptions.setVisible(true);
         cbTimestamp.setVisible(true);
+        cbTimestamp.setSelected(true);
         cbConfidence.setVisible(true);
+        cbConfidence.setSelected(true);
         cbMethod.setVisible(true);
+        cbMethod.setSelected(true);
         exportBtn.setVisible(true);
         footerBar.setVisible(true);
-        ReportBuilder builder = new ReportBuilder().includeReport(cs).withTimeStamp().withConfidence().withMethod();
-        Report report = new Report(builder);
         pastReports.setText("Past Report");
         LocalDateTime currDateTime = LocalDateTime.now();
         DateTimeFormatter formattedDateObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");

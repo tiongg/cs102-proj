@@ -45,12 +45,12 @@
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Date"/>
                     <DatePicker fx:id="dpClassDate" editable="false" prefHeight="34.0" prefWidth="Infinity"
-                                style="-fx-font-size: 16px" styleClass="flat-input">
+                                styleClass="flat-input">
                     </DatePicker>
                 </VBox>
                 <VBox prefHeight="43.0" prefWidth="400">
                     <Label text="Start Time"/>
-                    <TimePicker fx:id="tpStartTime" prefHeight="40.0" prefWidth="Infinity" style="-fx-font-size: 16px"/>
+                    <TimePicker fx:id="tpStartTime" prefHeight="40.0" prefWidth="Infinity"/>
                 </VBox>
             </HBox>
             <HBox alignment="TOP_CENTER" spacing="32.0">
