@@ -1,0 +1,113 @@
+/* ============================================================================
+   STATUS BADGES - Attendance Status Badge Component Styles
+   ============================================================================
+   Styling for attendance status indicators and badges
+   ============================================================================ */
+
+/* Base Status Badge - Common styling for all status badges */
+.status-badge {
+    -fx-background-radius: 12;
+    -fx-padding: 4 8;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* Status: Present - Green badge for present attendance */
+.status-badge-present {
+    -fx-background-color: #4CAF50;
+}
+
+.status-badge-present:hover {
+    -fx-opacity: 0.8;
+}
+
+/* Status: Late - Light red badge for late arrival */
+.status-badge-late {
+    -fx-background-color: #FF6B6B;
+}
+
+.status-badge-late:hover {
+    -fx-opacity: 0.8;
+}
+
+/* Status: Absent - Light red badge for absence */
+.status-badge-absent {
+    -fx-background-color: #FF6B6B;
+}
+
+.status-badge-absent:hover {
+    -fx-opacity: 0.8;
+}
+
+/* Status: Excused - Light blue badge for excused absence */
+.status-badge-excused {
+    -fx-background-color: #64B5F6;
+}
+
+.status-badge-excused:hover {
+    -fx-opacity: 0.8;
+}
+
+/* Status: Pending - Orange badge for pending status */
+.status-badge-pending {
+    -fx-background-color: #FFA726;
+}
+
+.status-badge-pending:hover {
+    -fx-opacity: 0.8;
+}
+
+/* ========== STATUS BUTTON STYLES ========== */
+/* Large status buttons used in session confirmation */
+
+.status-button {
+    -fx-padding: 4 8 4 8;
+    -fx-background-radius: 4;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.status-button-confirm {
+    -fx-background-color: rgb(190, 3, 252);
+}
+
+.status-button-confirm:hover {
+    -fx-opacity: 0.8;
+}
+
+.status-button-accept {
+    -fx-background-color: rgb(46, 204, 113);
+    -fx-background-radius: 999;
+    -fx-padding: 8;
+}
+
+.status-button-accept:hover {
+    -fx-opacity: 0.8;
+}
+
+.status-button-reject {
+    -fx-background-color: rgb(231, 76, 60);
+    -fx-background-radius: 999;
+    -fx-padding: 8;
+}
+
+.status-button-reject:hover {
+    -fx-opacity: 0.8;
+}
+
+/* ========== ATTENDANCE CHIP STYLES ========== */
+.attendance-chip {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+}
+
+.attendance-chip:hover {
+    -fx-opacity: 0.95;
+}
+
+.attendance-chip-name {
+    -fx-font-size: 14;
+    -fx-text-fill: #2C2C2C;
+}

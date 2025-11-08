@@ -67,7 +67,7 @@
                     <ScrollPane
                             fitToWidth="true"
                             hbarPolicy="NEVER" vbarPolicy="NEVER"
-                            style="-fx-background-color: transparent; -fx-background: transparent;"
+                            styleClass="transparent-background"
                             VBox.vgrow="ALWAYS" minHeight="130" maxWidth="Infinity"
                     >
                         <VBox fx:id="vbxStudentList" alignment="TOP_CENTER" styleClass="student-list">
@@ -79,10 +79,9 @@
     </AnchorPane>
 
     <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity"
-               style="-fx-background-color: rgba(0,0,0,0.35);" visible="false" AnchorPane.bottomAnchor="0.0"
+               styleClass="dialog-overlay" visible="false" AnchorPane.bottomAnchor="0.0"
                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <VBox maxHeight="400" maxWidth="700"
-              style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;">
+        <VBox maxHeight="400" maxWidth="700" styleClass="dialog-content">
             <HBox spacing="12" VBox.vgrow="ALWAYS">
                 <VBox prefHeight="43.0" prefWidth="200">
                     <Label text="Min attendance rate"/>

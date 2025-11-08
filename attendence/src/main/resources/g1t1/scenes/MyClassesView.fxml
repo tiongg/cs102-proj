@@ -54,9 +54,9 @@
         </AnchorPane>
     </AnchorPane>
 
-    <StackPane fx:id="addClassOverlay" style="-fx-background-color: rgba(0,0,0,0.35);" visible="false">
+    <StackPane fx:id="addClassOverlay" styleClass="dialog-overlay" visible="false">
         <VBox alignment="CENTER_LEFT" maxHeight="400" maxWidth="700" spacing="12"
-              style="-fx-background-color: #dddddd; -fx-background-radius: 20; -fx-padding: 24;">
+              styleClass="dialog-content">
             <Label text="Create new class">
                 <font>
                     <Font name="Inter Semi Bold" size="20"/>
@@ -101,11 +101,8 @@
             </GridPane>
 
             <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button onAction="#closeAddClass" style="-fx-background-color: transparent; -fx-text-fill: black;"
-                        text="Cancel"/>
-                <Button onAction="#createClass"
-                        style="-fx-background-color: black; -fx-text-fill: white; -fx-background-radius: 20;"
-                        text="Create"/>
+                <Button onAction="#closeAddClass" styleClass="button-cancel" text="Cancel"/>
+                <Button onAction="#createClass" styleClass="button-primary" text="Create"/>
             </HBox>
         </VBox>
     </StackPane>

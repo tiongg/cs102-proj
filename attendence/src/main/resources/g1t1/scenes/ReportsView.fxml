@@ -54,8 +54,7 @@
         </VBox>
 
         <!-- TO-DO: make footer width same as table and change color? and clean up the look -->
-        <HBox fx:id="footerBar" alignment="CENTER_LEFT" prefHeight="56.0" spacing="20"
-              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 10 14; -fx-border-color: #c6c5c5ff; -fx-border-radius: 14;"
+        <HBox fx:id="footerBar" alignment="CENTER_LEFT" prefHeight="56.0" spacing="20" styleClass="footer-bar"
               visible="false" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0">
             <!-- Export as -->
             <HBox alignment="CENTER_LEFT" spacing="8">

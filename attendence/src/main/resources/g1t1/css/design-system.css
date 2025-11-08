@@ -19,9 +19,11 @@
 
     /* ========== BORDER RADIUS ========== */
     /* Use these values for all border radius */
-    -fx-radius-sm: 4;
-    -fx-radius-md: 8;
-    -fx-radius-lg: 12;
+    -fx-radius-xs: 4;
+    -fx-radius-sm: 8;
+    -fx-radius-md: 12;
+    -fx-radius-lg: 20;
+    -fx-radius-xl: 24;
     -fx-radius-pill: 999;
 
     /* ========== COLOR PALETTE - SEMANTIC ========== */
@@ -29,27 +31,56 @@
     -fx-color-primary: #667eea;
     -fx-color-primary-dark: #764ba2;
 
-    /* Status Colors */
-    -fx-color-success: #2ecc71;
+    /* Status Colors - Success */
+    -fx-color-success: #4CAF50;
+    -fx-color-success-dark: #2ecc71;
+
+    /* Status Colors - Error */
+    -fx-color-error: #FF0000;
+    -fx-color-error-dark: rgba(139, 0, 0, 0.85);
+    -fx-color-error-light: #FF6B6B;
+    -fx-color-error-alt: #f44336;
+
+    /* Status Colors - Warning */
     -fx-color-warning: #f1c40f;
-    -fx-color-error: #e74c3c;
+    -fx-color-warning-light: #FF6B6B;
+
+    /* Status Colors - Info/Pending */
     -fx-color-info: #3498db;
+    -fx-color-info-light: #64B5F6;
+    -fx-color-pending: rgb(190, 3, 252);
+    -fx-color-pending-alt: #FFA726;
 
     /* Neutral Grayscale */
+    -fx-color-neutral-bg-white: #FFFFFF;
     -fx-color-neutral-bg-light: #f8f9fa;
     -fx-color-neutral-bg: #f0f0f0;
+    -fx-color-neutral-bg-light-gray: #dddddd;
+    -fx-color-neutral-bg-medium-gray: #d7d7d7;
     -fx-color-neutral-200: #e0e0e0;
     -fx-color-neutral-300: #d9d9d9;
+    -fx-color-neutral-400: #c6c5c5;
     -fx-color-neutral-500: #999999;
     -fx-color-neutral-600: #666666;
+    -fx-color-neutral-700: #2C2C2C;
     -fx-color-neutral-800: #212121;
+    -fx-color-neutral-black: #000000;
+
+    /* Overlay Colors */
+    -fx-color-overlay-dark: rgba(0, 0, 0, 0.35);
+    -fx-color-overlay-dark-85: rgba(0, 0, 0, 0.85);
 
     /* ========== TYPOGRAPHY ========== */
     -fx-font-family: "Inter";
-    -fx-font-size-sm: 12;
+    -fx-font-size-caption: 12;
     -fx-font-size-base: 14;
-    -fx-font-size-md: 16;
-    -fx-font-size-lg: 20;
+    -fx-font-size-body: 16;
+    -fx-font-size-subheading: 18;
+    -fx-font-size-heading: 20;
+
+    /* ========== SIZING ========== */
+    /* Component sizes */
+    -fx-size-menu-item-width: 385;
 
     /* ========== EFFECTS ========== */
     /* Opacity for component states */

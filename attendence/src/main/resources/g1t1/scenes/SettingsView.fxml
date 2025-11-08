@@ -113,8 +113,7 @@
                 <ComboBox fx:id="cbCameraDevice" maxWidth="Infinity" promptText="Select camera..."
                           styleClass="flat-input" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Button fx:id="btnDetectCameras" maxWidth="Infinity" onAction="#detectCameras" prefHeight="30.0"
-                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5;"
-                        text="Detect Cameras" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                        styleClass="button-camera" text="Detect Cameras" GridPane.columnIndex="2" GridPane.rowIndex="0">
                     <font>
                         <Font name="Inter" size="12.0"/>
                     </font>
