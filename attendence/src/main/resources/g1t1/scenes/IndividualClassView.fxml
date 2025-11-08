@@ -87,22 +87,35 @@
     <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity"
                styleClass="dialog-overlay" visible="false" AnchorPane.bottomAnchor="0.0"
                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <VBox maxHeight="400" maxWidth="700" styleClass="dialog-content">
-            <HBox spacing="12" VBox.vgrow="ALWAYS">
-                <VBox prefHeight="43.0" prefWidth="200">
-                    <Label text="Min attendance rate"/>
-                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" styleClass="flat-input" text="All"/>
+        <VBox maxHeight="500" maxWidth="700" spacing="20" styleClass="dialog-content">
+            <!-- Dialog Title -->
+            <Label text="Filter Past Sessions" textAlignment="CENTER" styleClass="filter-dialog-title"/>
+
+            <!-- Filter Controls Container -->
+            <VBox spacing="16" VBox.vgrow="ALWAYS">
+                <!-- Attendance Rate Filter -->
+                <VBox spacing="8">
+                    <Label text="Minimum Attendance Rate" styleClass="filter-section-label"/>
+                    <Label text="Filter sessions by student attendance percentage" styleClass="filter-helper-text"/>
+                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" styleClass="flat-input" text="All">
+                        <padding>
+                            <Insets top="8" bottom="8" left="12" right="12"/>
+                        </padding>
+                    </MenuButton>
                 </VBox>
 
-                <VBox prefHeight="43.0" prefWidth="200">
-                    <Label text="Selected Weeks"/>
-                    <CheckComboBox fx:id="cbSelectedWeeks" styleClass="flat-input"/>
+                <!-- Weeks Filter -->
+                <VBox spacing="8">
+                    <Label text="Select Weeks" styleClass="filter-section-label"/>
+                    <Label text="Choose which weeks to include in results" styleClass="filter-helper-text"/>
+                    <CheckComboBox fx:id="cbSelectedWeeks" styleClass="flat-input" prefHeight="40"/>
                 </VBox>
-            </HBox>
+            </VBox>
 
-            <HBox alignment="BOTTOM_RIGHT" spacing="24">
-                <Button minWidth="120" onMouseClicked="#closeFilter" styleClass="flat-button" text="Cancel"/>
-                <Button minWidth="120" onMouseClicked="#filter" styleClass="flat-button" text="Filter!"/>
+            <!-- Action Buttons -->
+            <HBox alignment="CENTER_RIGHT" spacing="12">
+                <Button minWidth="100" onMouseClicked="#closeFilter" styleClass="button-cancel" text="Cancel"/>
+                <Button minWidth="100" onMouseClicked="#filter" styleClass="button-primary" text="Apply Filter"/>
             </HBox>
         </VBox>
     </StackPane>

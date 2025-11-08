@@ -55,6 +55,26 @@
     -fx-padding: 24;
 }
 
+/* Filter Dialog Title */
+.filter-dialog-title {
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+/* Filter Dialog Section Labels */
+.filter-section-label {
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+/* Filter Dialog Helper Text */
+.filter-helper-text {
+    -fx-font-size: 12;
+    -fx-text-fill: #999999;
+}
+
 /* ========== ADD CLASS DIALOG ========== */
 .add-class-dialog {
     -fx-background-color: #dddddd;
