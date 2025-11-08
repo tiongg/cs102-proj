@@ -187,3 +187,14 @@
 .menu-item-wide {
     -fx-pref-width: 385;
 }
+
+/* ========== SEARCH INPUT ========== */
+.search-input {
+    -fx-padding: 8 12;
+    -fx-font-size: 14;
+}
+
+.search-input:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}

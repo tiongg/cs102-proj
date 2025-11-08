@@ -42,7 +42,13 @@
                         </FXCollections>
                     </labels>
                 </TabSelector>
-                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                <TextField fx:id="tfStudentSearch" promptText="Search students by name, ID, or email"
+                           styleClass="flat-input" HBox.hgrow="ALWAYS" visible="false" managed="false">
+                    <HBox.margin>
+                        <Insets left="8.0" right="8.0"/>
+                    </HBox.margin>
+                </TextField>
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="SOMETIMES">
                     <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button">
                         <FontIcon iconLiteral="gmi-filter-list-alt" iconSize="18"/>
                         <Label text="Filter"/>

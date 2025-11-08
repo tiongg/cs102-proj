@@ -9,6 +9,7 @@ import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
+import g1t1.models.users.Student;
 import g1t1.props.IndividualClassViewProps;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -19,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.CheckComboBox;
@@ -64,6 +66,12 @@ public class IndividualClassViewController extends PageController<IndividualClas
     private TabPane tabs;
 
     @FXML
+    private TextField tfStudentSearch;
+
+    private List<Student> originalStudentList;
+    private ModuleSection currentModuleSection;
+
+    @FXML
     public void initialize() {
         tblSessions.setTableHeaders("Class", "Date", "Week", "Time", "Attendance", "Rate");
 
@@ -77,15 +85,28 @@ public class IndividualClassViewController extends PageController<IndividualClas
                 }
         );
 
-        updateWeekSelectionTitle();
-        this.tsSelector.currentTabIndexProperty().subscribe((newIndex) -> {
-            this.tabs.getSelectionModel().select(newIndex.intValue());
+        // Add listener for student search
+        tfStudentSearch.textProperty().addListener((obs, oldVal, newVal) -> {
+            filterStudents(newVal);
         });
+
+        // Show/hide search field based on selected tab
+        this.tsSelector.currentTabIndexProperty().subscribe((newIndex) -> {
+            int tabIndex = newIndex.intValue();
+            this.tabs.getSelectionModel().select(tabIndex);
+
+            // Show search field only on student list tab (index 1)
+            tfStudentSearch.setVisible(tabIndex == 1);
+            tfStudentSearch.setManaged(tabIndex == 1);
+        });
+
+        updateWeekSelectionTitle();
     }
 
     @Override
     public void onMount() {
         ModuleSection ms = this.props.moduleSection();
+        this.currentModuleSection = ms;
         List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions()
                 .stream()
                 .filter(session -> session.getModuleSection().equals(ms))
@@ -93,9 +114,13 @@ public class IndividualClassViewController extends PageController<IndividualClas
         this.tblSessions.setTableBody(sessions);
         this.lblClassHeader.setText(String.format("My classes - %s - %s", ms.getModule(), ms.getSection()));
 
+        // Store original student list for search/filtering
+        this.originalStudentList = ms.getStudents();
         this.vbxStudentList.getChildren().clear();
-        this.vbxStudentList.getChildren().addAll(ms.getStudents().stream().map(StudentListItem::new).toList());
+        this.vbxStudentList.getChildren().addAll(this.originalStudentList.stream().map(StudentListItem::new).toList());
 
+        // Clear search field when switching classes
+        tfStudentSearch.clear();
         resetSearchFields();
     }
 
@@ -161,6 +186,47 @@ public class IndividualClassViewController extends PageController<IndividualClas
             cbSelectedWeeks.setTitle("Week " + weeks);
         } else {
             cbSelectedWeeks.setTitle(checked.size() + " weeks selected");
+        }
+    }
+
+    /**
+     * Filters the student list based on the search query.
+     * Searches by student name, ID, or email (case-insensitive).
+     *
+     * @param query the search query string
+     */
+    private void filterStudents(String query) {
+        if (originalStudentList == null) {
+            return;
+        }
+
+        vbxStudentList.getChildren().clear();
+
+        if (query == null || query.isBlank()) {
+            // Show all students
+            vbxStudentList.getChildren().addAll(
+                    originalStudentList.stream().map(StudentListItem::new).toList()
+            );
+        } else {
+            // Filter students by name, ID, or email
+            String lowerQuery = query.toLowerCase().trim();
+            List<StudentListItem> filteredStudents = originalStudentList.stream()
+                    .filter(student ->
+                            student.getName().toLowerCase().contains(lowerQuery)
+                                    || student.getId().toString().contains(lowerQuery)
+                                    || student.getEmail().toLowerCase().contains(lowerQuery)
+                    )
+                    .map(StudentListItem::new)
+                    .toList();
+
+            vbxStudentList.getChildren().addAll(filteredStudents);
+
+            // Show empty state if no results
+            if (filteredStudents.isEmpty()) {
+                Label noResultsLabel = new Label("No students found matching \"" + query + "\"");
+                noResultsLabel.setStyle("-fx-text-fill: #999999; -fx-font-size: 14;");
+                vbxStudentList.getChildren().add(noResultsLabel);
+            }
         }
     }
 
