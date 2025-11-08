@@ -3,65 +3,63 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
-    xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.LoginViewController">
-    <VBox alignment="TOP_CENTER" layoutX="670.0" layoutY="331.0" maxHeight="300.0" maxWidth="465.0"
-        prefHeight="300.0"
-        prefWidth="465.0" spacing="16.0"
-        style="-fx-background-color: #D7D7D7; -fx-border-radius: 24; -fx-background-radius: 24;">
+           xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.LoginViewController">
+    <VBox alignment="TOP_CENTER" layoutX="670.0" layoutY="331.0" maxHeight="300.0" maxWidth="465.0" prefHeight="300.0"
+          prefWidth="465.0" spacing="16.0"
+          style="-fx-background-color: #D7D7D7; -fx-border-radius: 24; -fx-background-radius: 24;">
         <padding>
-            <Insets bottom="48.0" left="48.0" right="48.0" top="48.0" />
+            <Insets bottom="48.0" left="48.0" right="48.0" top="48.0"/>
         </padding>
         <Label text="Face Entry">
             <font>
-                <Font name="Inter Semi Bold" size="32.0" />
+                <Font name="Inter Semi Bold" size="32.0"/>
             </font>
         </Label>
         <VBox>
             <Label text="Email">
                 <font>
-                    <Font name="Inter Semi Bold" size="16" />
+                    <Font name="Inter Semi Bold" size="16"/>
                 </font>
             </Label>
-            <TextField fx:id="emailInput" styleClass="flat-input" />
+            <TextField fx:id="emailInput" styleClass="flat-input"/>
         </VBox>
         <VBox layoutX="58.0" layoutY="114.0">
             <Label text="Password">
                 <font>
-                    <Font name="Inter Semi Bold" size="16" />
+                    <Font name="Inter Semi Bold" size="16"/>
                 </font>
             </Label>
-            <PasswordField fx:id="passwordInput" styleClass="flat-input" />
-            <Label alignment="CENTER" prefWidth="Infinity" text="Invalid credentials!"
-                textFill="darkred"
-                visible="false" fx:id="lblInvalidCredentials">
+            <PasswordField fx:id="passwordInput" styleClass="flat-input"/>
+            <Label fx:id="lblInvalidCredentials" alignment="CENTER" prefWidth="Infinity" text="Invalid credentials!"
+                   textFill="darkred" visible="false">
                 <font>
-                    <Font name="Inter Regular" size="10.0" />
+                    <Font name="Inter Regular" size="10.0"/>
                 </font>
             </Label>
-            <CheckBox fx:id="cbxRememberMe" text="Remember Me" alignment="CENTER_RIGHT">
-                <font>
-                    <Font name="Inter Regular" size="12.0" />
-                </font>
-            </CheckBox>
+            <HBox alignment="CENTER_RIGHT">
+                <CheckBox fx:id="cbxRememberMe" alignment="CENTER_RIGHT" text="Remember Me">
+                    <font>
+                        <Font name="Inter Regular" size="12.0"/>
+                    </font>
+                </CheckBox>
+            </HBox>
         </VBox>
 
 
-        <Button onMouseClicked="#login" prefHeight="26.0" prefWidth="130.0"
-            style="-fx-background-color: white;"
-            styleClass="flat-button" text="Login">
+        <Button onMouseClicked="#login" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: white;"
+                styleClass="flat-button" text="Login">
             <cursor>
-                <Cursor fx:constant="HAND" />
+                <Cursor fx:constant="HAND"/>
             </cursor>
         </Button>
 
         <Label alignment="CENTER_RIGHT" onMouseClicked="#goToRegister" prefWidth="Infinity"
-            text="I don't have an account" textAlignment="RIGHT" underline="true">
+               text="I don't have an account" textAlignment="RIGHT" underline="true">
             <cursor>
-                <Cursor fx:constant="HAND" />
+                <Cursor fx:constant="HAND"/>
             </cursor>
         </Label>
     </VBox>
