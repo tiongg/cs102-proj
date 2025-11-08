@@ -14,6 +14,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
+import g1t1.features.logger.AppLogger;
 import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.sessions.SessionAttendance;
@@ -249,18 +250,18 @@ public class PDFReport extends ReportGenerator {
                     doc.addPage(page);
                     cs = new PDPageContentStream(doc, page);
                     y = pageSize.getHeight() - margin;
-                    
-                    //redraw header on new page
-                    float newHeaderHeight = drawRow(cs,y,margin,colWidth,header,fontHeader,fontSize,true);
-                    y-= newHeaderHeight;
+
+                    // redraw header on new page
+                    float newHeaderHeight = drawRow(cs, y, margin, colWidth, header, fontHeader, fontSize, true);
+                    y -= newHeaderHeight;
                 }
                 float actualheight = drawRow(cs, y, margin, colWidth, row, fontText, fontSize, false);
-                y-= actualheight;
+                y -= actualheight;
             }
 
             cs.close();
             doc.save(getFilepath());
-            System.out.println("PDF successfully written to " + getFilepath());
+            AppLogger.logf("PDF successfully written to %s", getFilepath());
         } catch (Exception e) {
             e.printStackTrace();
         }
