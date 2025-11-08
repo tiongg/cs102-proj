@@ -1,6 +1,8 @@
 package g1t1.scenes;
 
+import g1t1.components.individualclass.StudentListItem;
 import g1t1.components.table.Table;
+import g1t1.components.tabs.TabSelector;
 import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.scenes.PageController;
 import g1t1.models.scenes.PageName;
@@ -10,12 +12,15 @@ import g1t1.models.sessions.ModuleSection;
 import g1t1.props.IndividualClassViewProps;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import org.controlsfx.control.CheckComboBox;
 
 import java.util.List;
@@ -38,6 +43,9 @@ public class IndividualClassViewController extends PageController<IndividualClas
     private Label lblClassHeader;
 
     @FXML
+    private TabSelector tsSelector;
+
+    @FXML
     private Table tblSessions;
 
     @FXML
@@ -50,6 +58,12 @@ public class IndividualClassViewController extends PageController<IndividualClas
     private CheckComboBox<Integer> cbSelectedWeeks;
 
     @FXML
+    private VBox vbxStudentList;
+
+    @FXML
+    private TabPane tabs;
+
+    @FXML
     public void initialize() {
         tblSessions.setTableHeaders("Class", "Date", "Week", "Time", "Attendance", "Rate");
 
@@ -58,21 +72,29 @@ public class IndividualClassViewController extends PageController<IndividualClas
         }
 
         cbSelectedWeeks.getCheckModel().getCheckedItems().addListener(
-                (javafx.collections.ListChangeListener<Integer>) change -> {
+                (ListChangeListener<Integer>) change -> {
                     updateWeekSelectionTitle();
                 }
         );
+        
         updateWeekSelectionTitle();
-
+        this.tsSelector.currentTabIndexProperty().subscribe((newIndex) -> {
+            this.tabs.getSelectionModel().select(newIndex.intValue());
+        });
     }
 
     @Override
     public void onMount() {
         ModuleSection ms = this.props.moduleSection();
-        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
-                .filter(session -> session.getModuleSection().equals(ms)).toList();
+        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions()
+                .stream()
+                .filter(session -> session.getModuleSection().equals(ms))
+                .toList();
         this.tblSessions.setTableBody(sessions);
         this.lblClassHeader.setText(String.format("My classes - %s - %s", ms.getModule(), ms.getSection()));
+
+        this.vbxStudentList.getChildren().clear();
+        this.vbxStudentList.getChildren().addAll(ms.getStudents().stream().map(StudentListItem::new).toList());
 
         resetSearchFields();
     }
@@ -107,6 +129,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
     public void closeFilter() {
         stkFilterPane.visibleProperty().set(false);
     }
+
 
     private void resetSearchFields() {
         mbMinAttendanceRate.setText(ATTENDANCE_RATE_OPTIONS[0].label());

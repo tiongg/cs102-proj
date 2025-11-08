@@ -1,6 +1,22 @@
 .hidden-tabs {
-    -fx-tab-max-height: 0 ;
+    -fx-tab-max-height: 0;
 }
+
 .hidden-tabs .tab-header-area {
-    visibility: hidden ;
+    visibility: hidden;
+}
+
+.labeled-tab-selector {
+    -fx-background-color: #f0f0f0;
+    -fx-padding: 0 8;
+    -fx-background-radius: 999;
+}
+
+.labeled-tab-selector-label {
+    -fx-padding: 0 8;
+    -fx-background-radius: 999;
+}
+
+.labeled-tab-selector-label:selected {
+    -fx-background-color: #d7d7d7;
 }

@@ -2,12 +2,15 @@
 
 <?import g1t1.components.Navbar?>
 <?import g1t1.components.table.Table?>
+<?import g1t1.components.tabs.TabSelector?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.CheckComboBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.lang.String?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="900.0"
             xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.IndividualClassViewController">
     <Navbar/>
@@ -27,14 +30,18 @@
             </HBox>
         </HBox>
 
-        <VBox spacing="20" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+
+        <VBox spacing="8" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
               AnchorPane.topAnchor="90.0">
-            <HBox alignment="CENTER_LEFT" minHeight="40.0">
-                <Label text="Previous sessions" HBox.hgrow="ALWAYS">
-                    <font>
-                        <Font name="Inter Semi Bold" size="18.0"/>
-                    </font>
-                </Label>
+            <HBox alignment="CENTER_LEFT" minHeight="40.0" spacing="8">
+                <TabSelector alignment="CENTER_LEFT" fx:id="tsSelector">
+                    <labels>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Past sessions"/>
+                            <String fx:value="Student list"/>
+                        </FXCollections>
+                    </labels>
+                </TabSelector>
                 <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button">
                         <FontIcon iconLiteral="gmi-filter-list-alt" iconSize="18"/>
@@ -49,8 +56,18 @@
                 </HBox>
             </HBox>
 
-            <Table fx:id="tblSessions" emptyMessage="No past sessions found!"
-                   emptyMessageDescription="Start a new session, or try different filters!" VBox.vgrow="ALWAYS"/>
+            <TabPane fx:id="tabs" styleClass="hidden-tabs" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="50.0"
+                     tabMaxWidth="150.0" VBox.vgrow="ALWAYS">
+                <Tab>
+                    <Table fx:id="tblSessions" emptyMessage="No past sessions found!"
+                           emptyMessageDescription="Start a new session, or try different filters!"
+                           VBox.vgrow="ALWAYS"/>
+                </Tab>
+                <Tab>
+                    <VBox fx:id="vbxStudentList" alignment="TOP_CENTER" styleClass="student-list">
+                    </VBox>
+                </Tab>
+            </TabPane>
         </VBox>
     </AnchorPane>
 
@@ -62,7 +79,7 @@
             <HBox spacing="12" VBox.vgrow="ALWAYS">
                 <VBox prefHeight="43.0" prefWidth="200">
                     <Label text="Min attendance rate"/>
-                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" text="All" styleClass="flat-input"/>
+                    <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" styleClass="flat-input" text="All"/>
                 </VBox>
 
                 <VBox prefHeight="43.0" prefWidth="200">
