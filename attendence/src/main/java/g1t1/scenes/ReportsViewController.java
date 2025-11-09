@@ -15,6 +15,7 @@ import org.controlsfx.control.CheckComboBox;
 import g1t1.components.Toast;
 import g1t1.components.table.Table;
 import g1t1.features.authentication.AuthenticationContext;
+import g1t1.features.filtering.AttendanceRateOption;
 import g1t1.features.report.CSVReport;
 import g1t1.features.report.PDFReport;
 import g1t1.features.report.Report;
@@ -50,9 +51,6 @@ import javafx.stage.Window;
 
 record ClassOption(String userClass, String label) {
 }
-
-record AttendanceRateOption(double minRate, String label) {
-};
 
 public class ReportsViewController extends PageController {
     private static final AttendanceRateOption[] ATTENDANCE_RATE_OPTIONS = new AttendanceRateOption[] {

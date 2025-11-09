@@ -10,6 +10,7 @@ import g1t1.components.individualclass.StudentListItem;
 import g1t1.components.table.Table;
 import g1t1.components.tabs.TabSelector;
 import g1t1.features.authentication.AuthenticationContext;
+import g1t1.features.filtering.AttendanceRateOption;
 import g1t1.models.scenes.PageController;
 import g1t1.models.scenes.PageName;
 import g1t1.models.scenes.Router;
@@ -29,9 +30,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
-record AttendanceRateOption(double minRate, String label) {
-};
 
 public class IndividualClassViewController extends PageController<IndividualClassViewProps> {
     private static final AttendanceRateOption[] ATTENDANCE_RATE_OPTIONS = new AttendanceRateOption[] {
@@ -68,7 +66,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
     private TextField tfStudentSearch;
 
     private List<Student> originalStudentList;
-    private ModuleSection currentModuleSection;
 
     @FXML
     public void initialize() {
@@ -103,7 +100,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
     @Override
     public void onMount() {
         ModuleSection ms = this.props.moduleSection();
-        this.currentModuleSection = ms;
         List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
                 .filter(session -> session.getModuleSection().equals(ms))
                 .sorted(Comparator.comparing(ClassSession::getEndTime).reversed()).toList();
