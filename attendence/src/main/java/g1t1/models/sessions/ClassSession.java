@@ -122,7 +122,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
                 continue;
             }
             expected++;
-            if (attendance.getStatus() != AttendanceStatus.LATE) {
+            if (attendance.getStatus() == AttendanceStatus.PRESENT) {
                 present++;
             }
         }
