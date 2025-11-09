@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -52,10 +53,29 @@ public class XLSXReport extends ReportGenerator {
             throw new IllegalArgumentException("SessionAttendance cannot be null");
         }
 
+        //attendence calculations
+        Map<String, Integer> counts = computeAttendanceCounts(sessAttendances);
+        int total = sessAttendances.size();
+        int attended = 0;
+
+        for (String key : counts.keySet()) {
+            String status = key;
+            int count = counts.get(key);
+
+            if (status.equals("PRESENT") || status.equals("LATE")) {
+                attended += count;
+            }
+        }
+
+        double overallPercentage = 0.0;
+        if (total != 0){
+            overallPercentage = attended * 100 / total;
+        }
+
         try (Workbook wb = new XSSFWorkbook(); FileOutputStream out = new FileOutputStream(getFilepath())) {
             Sheet sheet = wb.createSheet("Report");
 
-            // Basic styles -- add in later
+            // Basic styles
             CellStyle boldStyle = wb.createCellStyle();
             Font bold = wb.createFont();
             bold.setBold(true);
@@ -85,6 +105,26 @@ public class XLSXReport extends ReportGenerator {
             // break
             rowIndex++;
 
+            // Attendance summary 
+            rowIndex = writeRow(sheet, rowIndex, new String[] { "Attendance Summary" }, boldStyle);
+            int summaryHeaderRow = rowIndex;
+            rowIndex = writeRow(sheet, rowIndex, new String[] { "Status", "Count", "Percentage" }, boldStyle);
+            
+            for (String key : counts.keySet()) {
+                int count = counts.get(key);
+                double percentage = count * 100 / total ;
+                String[] cells = new String[] { key, Integer.toString(count), String.format("%.1f%%", percentage) };
+                rowIndex = writeRow(sheet, rowIndex, cells, null);
+            }
+            rowIndex++;
+
+            //overall attendance rate 
+            String ratioText =  + attended + " / " + total;
+            String[] overallPercentageRow = new String[] { "Overall attendance rate:", ratioText, String.format("%.1f%%", overallPercentage) };
+            rowIndex = writeRow(sheet, rowIndex, overallPercentageRow, null);
+            
+            rowIndex++;
+
             // Header
             String[] header = buildHeader(report);
             rowIndex = writeRow(sheet, rowIndex, header, boldStyle);
@@ -93,8 +133,6 @@ public class XLSXReport extends ReportGenerator {
                 String[] row = buildRow(sa, report);
                 rowIndex = writeRow(sheet, rowIndex, row, null);
             }
-
-            // Auto-size columns based on header length
 
             wb.write(out);
             AppLogger.logf("XLSX successfully written to %s", getFilepath());

@@ -4,8 +4,19 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.awt.geom.Rectangle2D;
+import java.awt.Color;
+import java.awt.Font;
+
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -22,6 +33,79 @@ import g1t1.models.sessions.SessionAttendance;
 public class PDFReport extends ReportGenerator {
     public PDFReport(String filepath) {
         super(filepath);
+    }
+
+    // helper function to build pie chart
+    private BufferedImage buildAttendancePieImage(Map<String, Integer> counts, int width, int height) {
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(new Color(0,0,0,0));
+        g.fillRect(0, 0, width, height);
+
+        // piechart on left, legend on right
+        int pad = 16;
+        int pieSize = Math.min(width, height) - pad * 2;
+        pieSize = Math.min(pieSize, height - pad * 2);
+        int pieDiameter = Math.min(pieSize, width - 220); 
+        int pieX = pad;
+        int pieY = (height - pieDiameter) / 2;
+
+        // colors 
+        Color[] palette = new Color[]{
+            new Color(0x4CAF50), // green
+            new Color(0xFFC107), // amber
+            new Color(0x03A9F4), // blue
+            new Color(0xF44336), // red
+            new Color(0x9C27B0), // purple
+        };
+
+        int total = counts.values().stream().mapToInt(Integer::intValue).sum();
+        if (total == 0) {
+            g.dispose();
+            return null;
+        }
+
+        // draw slices
+        double start = 90.0; 
+        int i = 0;
+
+        for (String key : counts.keySet()) {
+            int count = counts.get(key);
+            if (count <= 0) continue;
+            double angle = 360.0 * count / total;
+
+            g.setColor(palette[i]);
+            g.fillArc(pieX, pieY, pieDiameter, pieDiameter, (int)-start, (int)-Math.round(angle));
+            start += angle;
+            i++;
+        }
+
+        // Legend
+        int legendX = pieX + pieDiameter + 24;
+        int legendY = pad + 6;
+        g.setFont(new Font("Helvetica", Font.PLAIN, 12));
+
+        i = 0;
+        for (Map.Entry<String,Integer> e : counts.entrySet()) {
+            int count = e.getValue();
+            if (count <= 0) continue;
+
+            double pct = count * 100.0 / total;
+            String label = String.format("%s — %d (%.1f%%)", e.getKey(), count, pct);
+
+            g.setColor(palette[i % palette.length]);
+            g.fillRect(legendX, legendY - 10, 12, 12);
+
+            g.setColor(Color.DARK_GRAY);
+            g.drawString(label, legendX + 18, legendY);
+
+            legendY += 18;
+            i++;
+        }
+
+        g.dispose();
+        return img;
     }
 
     // helper function to write text
@@ -236,6 +320,29 @@ public class PDFReport extends ReportGenerator {
 
             y -= tableTopMargin;
 
+            //Piechart
+            Map<String, Integer> counts = computeAttendanceCounts(sessAttendances);
+            BufferedImage pie = buildAttendancePieImage(counts, /*img px*/ 900, /*img px*/ 320);
+            if (pie != null) {
+                PDImageXObject pdImage = LosslessFactory.createFromImage(doc, pie);
+
+                float imgTargetW = usableWidth;                  
+                float imgTargetH = (float) pie.getHeight() * (imgTargetW / (float) pie.getWidth());
+
+                // New page if not enough room
+                if (y - imgTargetH < margin) {
+                    cs.close();
+                    page = new PDPage(pageSize);
+                    doc.addPage(page);
+                    cs = new PDPageContentStream(doc, page);
+                    y = pageSize.getHeight() - margin;
+                }
+
+                float imgY = y - imgTargetH;
+                cs.drawImage(pdImage, margin, imgY, imgTargetW, imgTargetH);
+                y = imgY - tableTopMargin; 
+            }
+            
             // Table
             float headerHeight = drawRow(cs, y, margin, colWidth, header, fontHeader, fontSize, true);
             y -= headerHeight;
@@ -251,7 +358,7 @@ public class PDFReport extends ReportGenerator {
                     cs = new PDPageContentStream(doc, page);
                     y = pageSize.getHeight() - margin;
 
-                    // redraw header on new page
+                    // Re-draw header on new page
                     float newHeaderHeight = drawRow(cs, y, margin, colWidth, header, fontHeader, fontSize, true);
                     y -= newHeaderHeight;
                 }
