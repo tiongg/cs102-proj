@@ -39,7 +39,8 @@
                     </font>
                 </Label>
                 <HBox alignment="CENTER_RIGHT" maxHeight="40" HBox.hgrow="ALWAYS">
-                    <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button">
+                    <HBox alignment="CENTER" onMouseClicked="#search" spacing="8.0" styleClass="flat-button"
+                          visible="false">
                         <FontIcon iconLiteral="gmi-search" iconSize="18"/>
                         <Label text="Search"/>
                         <padding>
