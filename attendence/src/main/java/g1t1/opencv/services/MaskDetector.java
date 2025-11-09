@@ -29,6 +29,7 @@ public class MaskDetector {
         lowerFace.release();
         hsvFace.release();
 
+        // Require BOTH: uniform color AND edge patterns for reliable mask detection
         return hasUniformColor && hasMaskEdges;
     }
 
@@ -50,7 +51,8 @@ public class MaskDetector {
         double hueVariation = stddev.get(0, 0)[0];
         hueChannel.release();
 
-        return hueVariation < 15.0;
+        // Balanced threshold: masks are more uniform than skin
+        return hueVariation < 20.0;
     }
 
     private boolean checkMaskEdges(Mat lowerFace) {
@@ -62,7 +64,8 @@ public class MaskDetector {
         }
 
         Mat edges = new Mat();
-        Imgproc.Canny(grayFace, edges, 50, 150);
+        // Balanced edge detection for mask boundaries
+        Imgproc.Canny(grayFace, edges, 35, 110);
 
         int totalPixels = edges.rows() * edges.cols();
         int edgePixels = Core.countNonZero(edges);
@@ -71,6 +74,7 @@ public class MaskDetector {
         grayFace.release();
         edges.release();
 
-        return edgeRatio > 0.1;
+        // Balanced range: mask edges typically 8-18% of lower face
+        return edgeRatio > 0.08 && edgeRatio < 0.18;
     }
 }

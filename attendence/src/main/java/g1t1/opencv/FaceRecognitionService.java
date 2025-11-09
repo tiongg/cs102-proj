@@ -196,6 +196,11 @@ public class FaceRecognitionService {
                     }
 
                     if (isLive) {
+                        // Check for mask detection
+                        String faceIdForRecognizer = "face_" + String.valueOf(detectedFace.getFaceId());
+                        boolean hasMask = checkMaskStatus(faceRegion, faceIdForRecognizer);
+                        String maskInfo = hasMask ? " [MASK]" : "";
+
                         RecognitionResult result = getCachedOrNewRecognition(faceRegion, recognisableObjects,
                                 String.valueOf(detectedFace.getFaceId()));
 
@@ -204,7 +209,7 @@ public class FaceRecognitionService {
                             double confidence = result.getConfidence();
 
                             if (confidence >= SettingsManager.getInstance().getDetectionThreshold()) {
-                                boundingBox.setRecognised(recognisedObject, livenessInfo, confidence);
+                                boundingBox.setRecognised(recognisedObject, livenessInfo + maskInfo, confidence);
 
                                 handleRecognitionResult(recognisedObject, confidence);
                             }
@@ -244,9 +249,9 @@ public class FaceRecognitionService {
         }
     }
 
-    private Recognizer selectRecognizer(Mat faceRegion, String recognitionId) {
+    private boolean checkMaskStatus(Mat faceRegion, String recognitionId) {
         if (!FaceConfig.getInstance().isMaskDetectionEnabled()) {
-            return histogramRecognizer;
+            return false;
         }
 
         long currentTime = System.currentTimeMillis();
@@ -270,6 +275,11 @@ public class FaceRecognitionService {
             hasMask = maskCache.get(recognitionId);
         }
 
+        return hasMask;
+    }
+
+    private Recognizer selectRecognizer(Mat faceRegion, String recognitionId) {
+        boolean hasMask = checkMaskStatus(faceRegion, recognitionId);
         return hasMask ? maskAwareRecognizer : histogramRecognizer;
     }
 

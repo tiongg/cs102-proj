@@ -38,24 +38,25 @@ public class DetectionBoundingBox {
 
     public void setPicture() {
         this.isPicture = true;
-        this.color = new Scalar(255, 0, 0);
+        this.color = new Scalar(255, 0, 0); // BGR format: Blue
     }
 
     public void drawOnFrame(Mat frame) {
         Imgproc.rectangle(frame, this.p1, this.p2, this.color, this.thickness);
 
-        // Its a picture
+        // Its a picture - show warning
         if (this.isPicture) {
-            Imgproc.putText(frame, "PHOTO DETECTED", new Point(p1.x, p1.y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
-                    this.color, 2);
+            // Position text higher to avoid clipping
+            int textY = (int) Math.max(p1.y - 10, 20);
+            Imgproc.putText(frame, "PHOTO DETECTED", new Point(p1.x, textY),
+                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.7, this.color, 2);
         }
-
-        // If name data, display it too
-        if (this.name != null) {
+        // If name data, display it (for recognized faces)
+        else if (this.name != null) {
             String nameLabel = this.name + " (" + String.format("%.1f%%", confidence) + ")" + livenessInfo;
-
-            Imgproc.putText(frame, nameLabel, new Point(p1.x, p1.y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
-                    this.color, 2);
+            int textY = (int) Math.max(p1.y - 10, 20);
+            Imgproc.putText(frame, nameLabel, new Point(p1.x, textY),
+                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, this.color, 2);
         }
     }
 
