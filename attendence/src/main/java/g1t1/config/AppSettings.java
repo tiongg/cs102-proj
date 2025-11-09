@@ -15,7 +15,7 @@ public class AppSettings {
      * Constructor with default values
      */
     public AppSettings() {
-        this.detectionThreshold = 20;
+        this.detectionThreshold = 50;
         this.autoMarkThreshold = 80;
         this.lateThresholdMinutes = 15;
         this.cameraDevice = 0;
