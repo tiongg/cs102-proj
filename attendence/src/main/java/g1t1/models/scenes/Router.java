@@ -1,12 +1,12 @@
 package g1t1.models.scenes;
 
-import g1t1.utils.EventEmitter;
-import g1t1.utils.events.routing.OnNavigateEvent;
+import static java.util.Map.entry;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Map.entry;
+import g1t1.utils.EventEmitter;
+import g1t1.utils.events.routing.OnNavigateEvent;
 
 public class Router {
     public static final HashMap<PageName, Page> scenes = new HashMap<>();
@@ -14,8 +14,7 @@ public class Router {
     private static Page currentPage;
 
     public static void initialize() {
-        Map<PageName, String> scenePaths = Map.ofEntries(
-                entry(PageName.Login, "scenes/LoginView.fxml"),
+        Map<PageName, String> scenePaths = Map.ofEntries(entry(PageName.Login, "scenes/LoginView.fxml"),
                 entry(PageName.Register, "scenes/RegisterView.fxml"),
                 entry(PageName.PastRecords, "scenes/ReportsView.fxml"),
                 entry(PageName.MyClasses, "scenes/MyClassesView.fxml"),
@@ -23,8 +22,7 @@ public class Router {
                 entry(PageName.Onboard, "scenes/OnboardView.fxml"),
                 entry(PageName.StartSession, "scenes/StartSessionView.fxml"),
                 entry(PageName.DuringSession, "scenes/DuringSessionView.fxml"),
-                entry(PageName.Settings, "scenes/SettingsView.fxml")
-        );
+                entry(PageName.Settings, "scenes/SettingsView.fxml"));
 
         scenePaths.forEach((key, value) -> {
             try {
@@ -40,6 +38,8 @@ public class Router {
     public static void changePage(PageName newPageName) {
         if (getCurrentPage() != null) {
             getCurrentPage().getController().onUnmount();
+            // Reset props
+            getCurrentPage().getController().props = null;
         }
         Page page = scenes.get(newPageName);
         currentPage = page;

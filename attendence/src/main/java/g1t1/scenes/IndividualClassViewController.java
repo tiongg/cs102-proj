@@ -95,6 +95,10 @@ public class IndividualClassViewController extends PageController<IndividualClas
         });
 
         updateWeekSelectionTitle();
+
+        tblSessions.setOnChipClick((item) -> {
+            Router.changePage(PageName.PastRecords, item);
+        });
     }
 
     @Override

@@ -52,7 +52,7 @@ import javafx.stage.Window;
 record ClassOption(String userClass, String label) {
 }
 
-public class ReportsViewController extends PageController {
+public class ReportsViewController extends PageController<ClassSession> {
     private static final AttendanceRateOption[] ATTENDANCE_RATE_OPTIONS = new AttendanceRateOption[] {
             new AttendanceRateOption(0, "All"), new AttendanceRateOption(50, ">50%"),
             new AttendanceRateOption(75, ">75%"), new AttendanceRateOption(100, "Full attendance"), };
@@ -151,7 +151,6 @@ public class ReportsViewController extends PageController {
         classOptions.add(new ClassOption(null, "All Classes"));
 
         for (ClassSession cs : pastSessions) {
-
             String ms = cs.formatModuleSection();
             boolean exists = classOptions.contains(new ClassOption(ms, ms));
             if (!exists) {
@@ -176,6 +175,14 @@ public class ReportsViewController extends PageController {
 
         // Clear search fields
         resetSearchFields();
+        if (props != null) {
+            showIndivReport(props);
+        }
+    }
+
+    @Override
+    public void onUnmount() {
+        selectedSession.set(null);
     }
 
     private void switchToAllReportsView() {
