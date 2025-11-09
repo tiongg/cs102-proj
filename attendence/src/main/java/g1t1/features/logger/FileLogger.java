@@ -17,21 +17,46 @@ public class FileLogger extends BaseLogger {
     public FileLogger(String folderPath) {
         LocalDateTime now = LocalDateTime.now();
         try {
+            // Ensure folder path ends with separator
+            String normalizedPath = folderPath;
+            if (!normalizedPath.endsWith(File.separator)) {
+                normalizedPath += File.separator;
+            }
+
+            // Create logs directory if it doesn't exist
+            File logsDir = new File(folderPath);
+            if (!logsDir.exists()) {
+                logsDir.mkdirs();
+            }
+
             String fileName = now.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-            String fullFilePath = folderPath + fileName + ".log";
+            String fullFilePath = normalizedPath + fileName + ".log";
             File newFile = new File(fullFilePath);
             if (newFile.createNewFile()) {
                 this.currentLogPath = fullFilePath;
             } else {
-                System.out.println("File already exists at " + fullFilePath + "!");
+                // File already exists, use it
+                this.currentLogPath = fullFilePath;
             }
         } catch (Exception e) {
             System.out.println("Error creating file at " + folderPath + "! Exception: " + e.getMessage());
+            // Fallback: Use a temporary logs file if all else fails
+            try {
+                File tempDir = new File(System.getProperty("java.io.tmpdir"));
+                this.currentLogPath = tempDir.getAbsolutePath() + File.separator + "app_logs.txt";
+            } catch (Exception fallbackException) {
+                System.out.println("Critical error: Cannot create any log file!");
+            }
         }
     }
 
     @Override
     public void log(LogLevel level, String message) throws Exception {
+        // Safety check: if currentLogPath is null, we cannot log to file
+        if (this.currentLogPath == null) {
+            throw new IllegalStateException("Log file path is not initialized. Cannot write logs to file.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
         String currentDateTime = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
