@@ -1,5 +1,14 @@
 package g1t1.scenes;
 
+import java.io.File;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.controlsfx.control.ToggleSwitch;
+import org.opencv.videoio.VideoCapture;
+
+import g1t1.App;
 import g1t1.components.Toast;
 import g1t1.config.AppSettings;
 import g1t1.config.SettingsManager;
@@ -12,12 +21,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import org.controlsfx.control.ToggleSwitch;
-import org.opencv.videoio.VideoCapture;
-
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import javafx.stage.DirectoryChooser;
 
 public class SettingsViewController extends PageController {
 
@@ -38,6 +42,9 @@ public class SettingsViewController extends PageController {
 
     @FXML
     private Button btnDetectCameras;
+
+    @FXML
+    private Button btnChooseLogPath;
 
     @FXML
     private ToggleSwitch tsLivenessEnabled;
@@ -64,8 +71,8 @@ public class SettingsViewController extends PageController {
     }
 
     /**
-     * Detects which camera indices are actually available
-     * Runs in background to avoid blocking UI
+     * Detects which camera indices are actually available Runs in background to
+     * avoid blocking UI
      */
     @FXML
     private void detectCameras() {
@@ -212,7 +219,40 @@ public class SettingsViewController extends PageController {
             Toast.show("Error saving settings: " + e.getMessage(), Toast.ToastType.ERROR);
         }
     }
-    
+
+    @FXML
+    private void chooseLogPath() {
+        try {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle("Choose Log Directory");
+
+            // Set initial directory to current log path if valid
+            String currentPath = tfLogPath.getText();
+            if (currentPath != null && !currentPath.trim().isEmpty()) {
+                File currentDir = new File(currentPath);
+                if (currentDir.exists() && currentDir.isDirectory()) {
+                    dirChooser.setInitialDirectory(currentDir);
+                } else {
+                    // Fall back to user home directory
+                    dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+                }
+            } else {
+                // Fall back to user home directory
+                dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            }
+
+            File selectedDir = dirChooser.showDialog(App.getRootStage());
+
+            if (selectedDir != null) {
+                tfLogPath.setText(selectedDir.getAbsolutePath());
+            }
+        } catch (Exception e) {
+            System.err.println("Error opening directory chooser: " + e.getMessage());
+            e.printStackTrace();
+            Toast.show("Error opening directory chooser: " + e.getMessage(), Toast.ToastType.ERROR);
+        }
+    }
+
     @FXML
     public void logout() {
         AuthenticationContext.logout();
