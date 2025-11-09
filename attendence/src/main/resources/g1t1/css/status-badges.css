@@ -69,11 +69,8 @@
 }
 
 .status-button-confirm {
-    -fx-background-color: rgb(190, 3, 252);
-}
-
-.status-button-confirm:hover {
-    -fx-opacity: 0.8;
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 999;
 }
 
 .status-button-accept {
