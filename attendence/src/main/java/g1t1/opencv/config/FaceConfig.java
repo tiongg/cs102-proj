@@ -1,6 +1,7 @@
 package g1t1.opencv.config;
 
 import g1t1.config.SettingsManager;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -40,8 +41,17 @@ public class FaceConfig {
         return SettingsManager.getInstance().getDetectionThreshold();
     }
 
+    // Runtime configuration updates
+    public void setRecognitionThreshold(double threshold) {
+        properties.setProperty("recognition.threshold", String.valueOf(threshold));
+    }
+
     public double getDisplayThreshold() {
         return Double.parseDouble(properties.getProperty("recognition.display.threshold", "40.0"));
+    }
+
+    public void setDisplayThreshold(double threshold) {
+        properties.setProperty("recognition.display.threshold", String.valueOf(threshold));
     }
 
     // Detection Settings
@@ -76,7 +86,7 @@ public class FaceConfig {
 
     // Advanced Features
     public boolean isLivenessEnabled() {
-        return Boolean.parseBoolean(properties.getProperty("liveness.enabled", "true"));
+        return SettingsManager.getInstance().getSettings().getLivenessEnabled();
     }
 
     public int getBlinkThreshold() {
@@ -89,14 +99,5 @@ public class FaceConfig {
 
     public boolean isLoggingEnabled() {
         return Boolean.parseBoolean(properties.getProperty("logging.enabled", "true"));
-    }
-
-    // Runtime configuration updates
-    public void setRecognitionThreshold(double threshold) {
-        properties.setProperty("recognition.threshold", String.valueOf(threshold));
-    }
-
-    public void setDisplayThreshold(double threshold) {
-        properties.setProperty("recognition.display.threshold", String.valueOf(threshold));
     }
 }

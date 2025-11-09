@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import org.controlsfx.control.ToggleSwitch;
 import org.opencv.videoio.VideoCapture;
 
 import java.io.PrintStream;
@@ -39,6 +40,9 @@ public class SettingsViewController extends PageController {
     private Button btnDetectCameras;
 
     @FXML
+    private ToggleSwitch tsLivenessEnabled;
+
+    @FXML
     private void initialize() {
         try {
             // Populate with default camera indices 0-5
@@ -55,6 +59,7 @@ public class SettingsViewController extends PageController {
             tfLateThreshold.setText("15");
             cbCameraDevice.setValue(0);
             tfLogPath.setText("logs/");
+            tsLivenessEnabled.setSelected(true);
         }
     }
 
@@ -136,6 +141,7 @@ public class SettingsViewController extends PageController {
             tfLateThreshold.setText(String.valueOf(settings.getLateThresholdMinutes()));
             cbCameraDevice.setValue(settings.getCameraDevice());
             tfLogPath.setText(settings.getLogPath());
+            tsLivenessEnabled.setSelected(settings.getLivenessEnabled());
         } catch (Exception e) {
             System.err.println("Error loading settings: " + e.getMessage());
             throw e;
@@ -192,6 +198,7 @@ public class SettingsViewController extends PageController {
             settings.setLateThresholdMinutes(lateThreshold);
             settings.setCameraDevice(cameraDevice);
             settings.setLogPath(logPath);
+            settings.setLivenessEnabled(tsLivenessEnabled.isSelected());
 
             SettingsManager.getInstance().saveSettings();
 
@@ -205,8 +212,7 @@ public class SettingsViewController extends PageController {
             Toast.show("Error saving settings: " + e.getMessage(), Toast.ToastType.ERROR);
         }
     }
-
-
+    
     @FXML
     public void logout() {
         AuthenticationContext.logout();

@@ -27,7 +27,7 @@
         <HBox fx:id="hbxConfirmStudent" alignment="CENTER" maxHeight="48.0" maxWidth="400.0" prefHeight="48.0"
               prefWidth="400.0" spacing="24.0" styleClass="status-button-confirm"
               StackPane.alignment="BOTTOM_CENTER">
-            <Label fx:id="lblConfirmStudentName" text="Needs confirmation: J" textFill="WHITE">
+            <Label fx:id="lblConfirmStudentName" text="Needs confirmation: ">
                 <font>
                     <Font name="Inter Semi Bold" size="18.0"/>
                 </font>

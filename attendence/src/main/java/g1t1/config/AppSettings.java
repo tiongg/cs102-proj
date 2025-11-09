@@ -10,6 +10,7 @@ public class AppSettings {
     private int lateThresholdMinutes;
     private int cameraDevice;
     private String logPath;
+    private boolean livenessEnabled;
 
     /**
      * Constructor with default values
@@ -20,6 +21,7 @@ public class AppSettings {
         this.lateThresholdMinutes = 15;
         this.cameraDevice = 0;
         this.logPath = "logs/";
+        this.livenessEnabled = true;
     }
 
     public int getDetectionThreshold() {
@@ -60,5 +62,13 @@ public class AppSettings {
 
     public void setLogPath(String logPath) {
         this.logPath = logPath;
+    }
+
+    public Boolean getLivenessEnabled() {
+        return this.livenessEnabled;
+    }
+
+    public void setLivenessEnabled(boolean newVal) {
+        this.livenessEnabled = newVal;
     }
 }

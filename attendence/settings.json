@@ -3,5 +3,6 @@
   "autoMarkThreshold": 80,
   "lateThresholdMinutes": 15,
   "cameraDevice": 0,
-  "logPath": "logs/"
+  "logPath": "logs/",
+  "livenessEnabled": true
 }

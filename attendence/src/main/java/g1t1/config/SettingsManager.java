@@ -1,19 +1,17 @@
 package g1t1.config;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import org.opencv.videoio.VideoCapture;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import g1t1.components.Toast;
 import g1t1.features.logger.AppLogger;
 import g1t1.features.logger.LogLevel;
 import javafx.application.Platform;
+import org.opencv.videoio.VideoCapture;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Singleton manager for application settings. Handles loading settings from

@@ -5,6 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import org.controlsfx.control.ToggleSwitch?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
             xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.SettingsViewController">
@@ -138,6 +139,26 @@
                 </Label>
                 <TextField fx:id="tfLogPath" promptText="logs/" styleClass="flat-input" GridPane.columnIndex="1"
                            GridPane.rowIndex="0"/>
+                <Region GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <rowConstraints>
+                    <RowConstraints/>
+                </rowConstraints>
+            </GridPane>
+
+            <!-- Liveness Enabled -->
+            <GridPane hgap="20.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="180.0" prefWidth="180.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="50.0"/>
+                </columnConstraints>
+
+                <Label text="Liveness enabled" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+                <ToggleSwitch fx:id="tsLivenessEnabled" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Region GridPane.columnIndex="2" GridPane.rowIndex="0"/>
                 <rowConstraints>
                     <RowConstraints/>
