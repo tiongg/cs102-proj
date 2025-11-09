@@ -33,7 +33,11 @@ public class StudentChip implements TableChipItem {
     @Override
     public long[] getComparatorKeys() {
         return new long[]{
-                0, 0, 0, (long) attendance.getConfidence(), 0
+                attendance.getStudent().getId().toString().hashCode(),
+                attendance.getStudent().getName().hashCode(),
+                attendance.getStatus().toString().hashCode(),
+                (long) attendance.getConfidence(),
+                attendance.getMethod().toString().hashCode()
         };
     }
 }

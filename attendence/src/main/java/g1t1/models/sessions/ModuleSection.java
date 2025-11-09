@@ -168,8 +168,8 @@ public class ModuleSection implements TableChipItem {
         int minutes = Integer.parseInt(startTimeRaw[1]);
         int totalMinutes = hours * 60 + minutes;
         return new long[]{
-                this.module.length(),
-                this.section.length(),
+                this.module.hashCode(),
+                this.section.hashCode(),
                 this.getDay(),
                 totalMinutes,
                 this.students.size()
