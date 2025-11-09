@@ -1,22 +1,9 @@
 package g1t1.scenes;
 
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import g1t1.components.Toast;
 import g1t1.components.table.Table;
 import g1t1.features.authentication.AuthenticationContext;
-import g1t1.features.report.CSVReport;
-import g1t1.features.report.PDFReport;
-import g1t1.features.report.Report;
-import g1t1.features.report.ReportBuilder;
-import g1t1.features.report.StudentChip;
-import g1t1.features.report.XLSXReport;
+import g1t1.features.report.*;
 import g1t1.models.ids.StudentID;
 import g1t1.models.scenes.PageController;
 import g1t1.models.sessions.ClassSession;
@@ -34,6 +21,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
+
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class ReportsViewController extends PageController {
     private final ObjectProperty<ClassSession> selectedSession = new SimpleObjectProperty<>(null);
@@ -107,7 +99,13 @@ public class ReportsViewController extends PageController {
         exportBtn.setVisible(false);
         footerBar.setVisible(false);
         reportsTable.setTableHeaders("Class", "Date", "Week", "Time", "Attendance", "Rate");
-        reportsTable.setTableBody(AuthenticationContext.getCurrentUser().getPastSessions());
+        reportsTable.setTableBody(
+                AuthenticationContext.getCurrentUser()
+                        .getPastSessions()
+                        .stream()
+                        .sorted(Comparator.comparing(ClassSession::getEndTime).reversed())
+                        .toList()
+        );
 
         reportsTable.setOnChipClick(item -> {
             if (item instanceof ClassSession cs) {

@@ -16,15 +16,12 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.CheckComboBox;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,6 +107,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
         List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions()
                 .stream()
                 .filter(session -> session.getModuleSection().equals(ms))
+                .sorted(Comparator.comparing(ClassSession::getEndTime).reversed())
                 .toList();
         this.tblSessions.setTableBody(sessions);
         this.lblClassHeader.setText(String.format("My classes - %s - %s", ms.getModule(), ms.getSection()));
