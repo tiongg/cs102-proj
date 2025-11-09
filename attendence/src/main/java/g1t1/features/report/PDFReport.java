@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,11 +66,12 @@ public class PDFReport extends ReportGenerator {
             return null;
         }
 
-        // Draw slices
+        // draw slices
         double start = 90.0; 
         int i = 0;
-        for (Map.Entry<String,Integer> entry : counts.entrySet()) {
-            int count = entry.getValue();
+
+        for (String key : counts.keySet()) {
+            int count = counts.get(key);
             if (count <= 0) continue;
             double angle = 360.0 * count / total;
 
@@ -104,16 +106,6 @@ public class PDFReport extends ReportGenerator {
 
         g.dispose();
         return img;
-    }
-
-    // helper function to build counts map from the session
-    private Map<String, Integer> computeAttendanceCounts(List<SessionAttendance> sessAttendances) {
-        Map<String, Integer> m = new java.util.LinkedHashMap<>();
-        for (SessionAttendance sa : sessAttendances) {
-            String key = String.valueOf(sa.getStatus());
-            m.merge(key, 1, Integer::sum);
-        }
-        return m;
     }
 
     // helper function to write text

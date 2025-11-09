@@ -3,7 +3,6 @@ package g1t1.features.report;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +23,6 @@ public class CSVReport extends ReportGenerator {
     public CSVReport(String filepath) {
         super(filepath);
     }
-
-    //helper function to count attendance status
-    private Map<AttendanceStatus, Integer> countByStatus(List<SessionAttendance> sessAttendances) {
-        Map<AttendanceStatus, Integer> m = new EnumMap<>(AttendanceStatus.class);
-        for (SessionAttendance sa : sessAttendances) {
-            AttendanceStatus st = sa.getStatus();
-            m.merge(st, 1, Integer::sum);
-        }
-        return m;
-    }
     
     @Override
     public void generate(Report report) {
@@ -50,18 +39,19 @@ public class CSVReport extends ReportGenerator {
         }
 
         // attendance summary
-        Map<AttendanceStatus, Integer> counts = countByStatus(sessAttendances);
+        Map<String, Integer> counts = computeAttendanceCounts(sessAttendances);
         int total = sessAttendances.size();
+        
+        int attended = 0;
 
-        Set<AttendanceStatus> ATTENDED_STATUSES = EnumSet.of(
-                AttendanceStatus.PRESENT,
-                AttendanceStatus.LATE
-        );
+        for (String key : counts.keySet()) {
+            String status = key;
+            int count = counts.get(key);
 
-        int attended = counts.entrySet().stream()
-                .filter(e -> ATTENDED_STATUSES.contains(e.getKey()))
-                .mapToInt(Map.Entry::getValue)
-                .sum();
+            if (status.equals("PRESENT") || status.equals("LATE")) {
+                attended += count;
+            }
+        }
 
         double overallPercentage = 0.0;
         if (total != 0) {
@@ -96,14 +86,14 @@ public class CSVReport extends ReportGenerator {
 
             // per-status table
             writer.writeNext(new String[] { "Status", "Count", "Percent" });
-            for (AttendanceStatus st : AttendanceStatus.values()) {
-                int c = counts.getOrDefault(st, 0);
+            for (String key : counts.keySet()) {
+                int c = counts.getOrDefault(key, 0);
                 double percentage = 0.0;
                 if (total != 0) {
                     percentage = (c * 100) / total;
                 }
                 writer.writeNext(new String[] {
-                        st.toString(),
+                        key.toString(),
                         String.valueOf(c),
                         String.format("%.1f%%", percentage)
                 });
