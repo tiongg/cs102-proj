@@ -1,5 +1,13 @@
 package g1t1.components.table;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,13 +22,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class Table extends StackPane {
     private static final int LABEL_WIDTH = 100;
@@ -101,6 +102,8 @@ public class Table extends StackPane {
     }
 
     public void setTableBody(List<? extends TableChipItem> chips) {
+        // Clear sort orders
+        Collections.fill(sortOrders, 0);
         chipItems.setAll(chips);
         updateTableBody();
     }
