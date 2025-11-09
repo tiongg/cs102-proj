@@ -196,5 +196,4 @@
 
 .search-input:focused {
     -fx-border-color: #667eea;
-    -fx-border-width: 2;
 }

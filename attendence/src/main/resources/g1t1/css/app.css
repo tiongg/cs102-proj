@@ -18,12 +18,10 @@
     -fx-background-radius: 8;
     -fx-border-radius: 8;
     -fx-border-color: #A6A6A6;
-    -fx-border-width: 1;
 }
 
 .flat-input:focused {
     -fx-border-color: #667eea;
-    -fx-border-width: 2;
 }
 
 /* Menu Button - Standard padding for menu buttons */
