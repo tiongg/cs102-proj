@@ -64,8 +64,8 @@ public class CSVReport extends ReportGenerator {
                 .sum();
 
         double overallPercentage = 0.0;
-        if (attended != 0) {
-            overallPercentage = attended / total * 100;
+        if (total != 0) {
+            overallPercentage = attended * 100 / total;
         }
 
         try (CSVWriter writer = new CSVWriter(new FileWriter(getFilepath()))) {
@@ -100,7 +100,7 @@ public class CSVReport extends ReportGenerator {
                 int c = counts.getOrDefault(st, 0);
                 double percentage = 0.0;
                 if (total != 0) {
-                    percentage = c / total * 100.0;
+                    percentage = (c * 100) / total;
                 }
                 writer.writeNext(new String[] {
                         st.toString(),
@@ -110,8 +110,9 @@ public class CSVReport extends ReportGenerator {
             }
 
             // overall attendance rate counts present and late ppl
-            writer.writeNext(new String[] { });
-            writer.writeNext(new String[] {"Overall attendance rate", attended + " / " + total, String.format("%.1f%%", overallPercentage)});
+            writer.writeNext(new String[] {});
+            String ratioText = "=\"" + attended + " / " + total + "\"";
+            writer.writeNext(new String[] {"Overall attendance rate", ratioText, String.format("%.1f%%", overallPercentage)});
 
             // break
             writer.writeNext(new String[] { });
