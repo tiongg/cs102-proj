@@ -56,8 +56,8 @@ record AttendanceRateOption(double minRate, String label) {
 
 public class ReportsViewController extends PageController {
     private static final AttendanceRateOption[] ATTENDANCE_RATE_OPTIONS = new AttendanceRateOption[] {
-            new AttendanceRateOption(0, "All"), new AttendanceRateOption(0.5, ">50%"),
-            new AttendanceRateOption(0.75, ">75%"), new AttendanceRateOption(1, "Full attendance"), };
+            new AttendanceRateOption(0, "All"), new AttendanceRateOption(50, ">50%"),
+            new AttendanceRateOption(75, ">75%"), new AttendanceRateOption(100, "Full attendance"), };
 
     private List<ClassOption> classOptions = new ArrayList<>();
 
@@ -178,7 +178,6 @@ public class ReportsViewController extends PageController {
 
         // Clear search fields
         resetSearchFields();
-
     }
 
     private void switchToAllReportsView() {

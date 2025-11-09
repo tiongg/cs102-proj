@@ -1,5 +1,11 @@
 package g1t1.scenes;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.controlsfx.control.CheckComboBox;
+
 import g1t1.components.individualclass.StudentListItem;
 import g1t1.components.table.Table;
 import g1t1.components.tabs.TabSelector;
@@ -16,25 +22,21 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.controlsfx.control.CheckComboBox;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 record AttendanceRateOption(double minRate, String label) {
 };
 
 public class IndividualClassViewController extends PageController<IndividualClassViewProps> {
-    private static final AttendanceRateOption[] ATTENDANCE_RATE_OPTIONS = new AttendanceRateOption[]{
-            new AttendanceRateOption(0, "All"),
-            new AttendanceRateOption(0.5, ">50%"),
-            new AttendanceRateOption(0.75, ">75%"),
-            new AttendanceRateOption(1, "Full attendance"),
-    };
+    private static final AttendanceRateOption[] ATTENDANCE_RATE_OPTIONS = new AttendanceRateOption[] {
+            new AttendanceRateOption(0, "All"), new AttendanceRateOption(50, ">50%"),
+            new AttendanceRateOption(75, ">75%"), new AttendanceRateOption(1, "Full attendance"), };
 
     private final DoubleProperty minAttendanceRate = new SimpleDoubleProperty(0);
 
@@ -76,11 +78,9 @@ public class IndividualClassViewController extends PageController<IndividualClas
             cbSelectedWeeks.getItems().add(i);
         }
 
-        cbSelectedWeeks.getCheckModel().getCheckedItems().addListener(
-                (ListChangeListener<Integer>) change -> {
-                    updateWeekSelectionTitle();
-                }
-        );
+        cbSelectedWeeks.getCheckModel().getCheckedItems().addListener((ListChangeListener<Integer>) change -> {
+            updateWeekSelectionTitle();
+        });
 
         // Add listener for student search
         tfStudentSearch.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -104,11 +104,9 @@ public class IndividualClassViewController extends PageController<IndividualClas
     public void onMount() {
         ModuleSection ms = this.props.moduleSection();
         this.currentModuleSection = ms;
-        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions()
-                .stream()
+        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
                 .filter(session -> session.getModuleSection().equals(ms))
-                .sorted(Comparator.comparing(ClassSession::getEndTime).reversed())
-                .toList();
+                .sorted(Comparator.comparing(ClassSession::getEndTime).reversed()).toList();
         this.tblSessions.setTableBody(sessions);
         this.lblClassHeader.setText(String.format("My classes - %s - %s", ms.getModule(), ms.getSection()));
 
@@ -137,12 +135,10 @@ public class IndividualClassViewController extends PageController<IndividualClas
         ModuleSection ms = this.props.moduleSection();
         ObservableList<Integer> checkedWeeks = cbSelectedWeeks.getCheckModel().getCheckedItems();
 
-        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions()
-                .stream()
+        List<ClassSession> sessions = AuthenticationContext.getCurrentUser().getPastSessions().stream()
                 .filter(session -> session.getModuleSection().equals(ms))
                 .filter(session -> session.attendanceStats().percent() >= minAttendanceRate.get())
-                .filter(session -> checkedWeeks.isEmpty() || checkedWeeks.contains(session.getWeek()))
-                .toList();
+                .filter(session -> checkedWeeks.isEmpty() || checkedWeeks.contains(session.getWeek())).toList();
 
         this.tblSessions.setTableBody(sessions);
         closeFilter();
@@ -178,9 +174,7 @@ public class IndividualClassViewController extends PageController<IndividualClas
             cbSelectedWeeks.setTitle("All weeks");
         } else if (checked.size() <= 3) {
             // Show specific weeks if 3 or fewer selected
-            String weeks = checked.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(", "));
+            String weeks = checked.stream().map(String::valueOf).collect(Collectors.joining(", "));
             cbSelectedWeeks.setTitle("Week " + weeks);
         } else {
             cbSelectedWeeks.setTitle(checked.size() + " weeks selected");
@@ -188,8 +182,8 @@ public class IndividualClassViewController extends PageController<IndividualClas
     }
 
     /**
-     * Filters the student list based on the search query.
-     * Searches by student name, ID, or email (case-insensitive).
+     * Filters the student list based on the search query. Searches by student name,
+     * ID, or email (case-insensitive).
      *
      * @param query the search query string
      */
@@ -202,20 +196,15 @@ public class IndividualClassViewController extends PageController<IndividualClas
 
         if (query == null || query.isBlank()) {
             // Show all students
-            vbxStudentList.getChildren().addAll(
-                    originalStudentList.stream().map(StudentListItem::new).toList()
-            );
+            vbxStudentList.getChildren().addAll(originalStudentList.stream().map(StudentListItem::new).toList());
         } else {
             // Filter students by name, ID, or email
             String lowerQuery = query.toLowerCase().trim();
             List<StudentListItem> filteredStudents = originalStudentList.stream()
-                    .filter(student ->
-                            student.getName().toLowerCase().contains(lowerQuery)
-                                    || student.getId().toString().contains(lowerQuery)
-                                    || student.getEmail().toLowerCase().contains(lowerQuery)
-                    )
-                    .map(StudentListItem::new)
-                    .toList();
+                    .filter(student -> student.getName().toLowerCase().contains(lowerQuery)
+                            || student.getId().toString().contains(lowerQuery)
+                            || student.getEmail().toLowerCase().contains(lowerQuery))
+                    .map(StudentListItem::new).toList();
 
             vbxStudentList.getChildren().addAll(filteredStudents);
 
