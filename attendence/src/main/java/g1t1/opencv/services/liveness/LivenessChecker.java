@@ -1,8 +1,14 @@
 package g1t1.opencv.services.liveness;
 
-import g1t1.opencv.models.*;
-import org.opencv.core.*;
-import org.opencv.imgproc.*;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import g1t1.opencv.models.LivenessResult;
 
 /**
  * Basic liveness detection to prevent photo spoofing.
@@ -10,8 +16,7 @@ import org.opencv.imgproc.*;
 public class LivenessChecker {
 
     /**
-     * Simple liveness check based on face texture analysis.
-     * Real faces have more texture variation than photos.
+     * Multi-metric liveness check combining texture and edge analysis.
      */
     public LivenessResult checkLiveness(Mat faceRegion) {
         if (faceRegion == null || faceRegion.empty()) {
@@ -26,27 +31,48 @@ public class LivenessChecker {
             faceRegion.copyTo(grayFace);
         }
 
-        // Calculate texture variation using Laplacian
+        // Method 1: Laplacian variance (actual variance, not stddev)
         Mat laplacian = new Mat();
         Imgproc.Laplacian(grayFace, laplacian, CvType.CV_64F);
 
-        // Calculate variance of Laplacian
         MatOfDouble mean = new MatOfDouble();
         MatOfDouble stddev = new MatOfDouble();
         Core.meanStdDev(laplacian, mean, stddev);
 
-        double textureVariance = stddev.get(0, 0)[0] * stddev.get(0, 0)[0];
+        double laplacianStdDev = stddev.get(0, 0)[0];
+        double laplacianVariance = laplacianStdDev * laplacianStdDev;
+
+        // Method 2: Texture complexity ratio (high-frequency / low-frequency)
+        Mat blurred = new Mat();
+        Imgproc.GaussianBlur(grayFace, blurred, new Size(9, 9), 0);
+
+        Mat highFreq = new Mat();
+        Core.absdiff(grayFace, blurred, highFreq);
+
+        Scalar highFreqMean = Core.mean(highFreq);
+        Scalar lowFreqMean = Core.mean(blurred);
+
+        double textureRatio = highFreqMean.val[0] / (lowFreqMean.val[0] + 1.0);
 
         // Cleanup
         grayFace.release();
         laplacian.release();
+        blurred.release();
+        highFreq.release();
 
-        // Simple threshold: real faces typically have higher texture variance
-        double threshold = 100.0; // Adjust based on testing
-        boolean isLive = textureVariance > threshold;
-        double confidence = Math.min(textureVariance / threshold, 1.0) * 100.0;
+        // Combined scoring - calibrated thresholds
+        // Photos: low variance (< 250), low texture ratio (< 0.06)
+        // Real faces: high variance (> 350), high texture ratio (> 0.08)
 
-        String reason = isLive ? "Sufficient texture variation detected" : "Low texture variation (possible photo)";
+        double varianceScore = laplacianVariance > 250.0 ? 1.0 : 0.0;
+        double textureScore = textureRatio > 0.06 ? 1.0 : 0.0;
+
+        // BOTH metrics MUST pass for live detection
+        boolean isLive = (varianceScore + textureScore) >= 2.0;
+        double confidence = ((varianceScore + textureScore) / 2.0) * 100.0;
+
+        String reason = String.format("Var=%.0f Ratio=%.3f -> %s",
+            laplacianVariance, textureRatio, isLive ? "LIVE" : "PHOTO");
 
         return new LivenessResult(isLive, confidence, reason);
     }

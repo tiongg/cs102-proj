@@ -75,13 +75,20 @@ public abstract class Recognizer {
 
     /**
      * Preprocess detected face using enhanced pipeline.
-     * Pipeline: Grayscale -> Bilateral Filter -> Normalize -> CLAHE -> Resize
+     * Pipeline: Grayscale -> CLAHE -> Bilateral Filter -> Normalize -> Resize
+     *
+     * Order rationale:
+     * 1. Grayscale: Convert to single channel
+     * 2. CLAHE: Enhance local contrast to bring out facial features
+     * 3. Bilateral Filter: Denoise while preserving edges created by CLAHE
+     * 4. Normalize: Standardize intensity range for feature extraction
+     * 5. Resize: Final standardization of dimensions
      */
     protected final Mat preprocessFace(Mat face) {
         Mat step1 = grayscale.process(face);
-        Mat step2 = bilateralFilter.process(step1);
-        Mat step3 = normalizer.process(step2);
-        Mat step4 = clahe.process(step3);
+        Mat step2 = clahe.process(step1);
+        Mat step3 = bilateralFilter.process(step2);
+        Mat step4 = normalizer.process(step3);
         Mat result = resizer.process(step4);
 
         step1.release();
