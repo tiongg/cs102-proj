@@ -57,7 +57,7 @@
             <HBox fx:id="backButton" alignment="CENTER" onMouseClicked="#prev" spacing="8.0" styleClass="flat-button"
                   AnchorPane.leftAnchor="128.0">
                 <FontIcon iconLiteral="fas-chevron-left" iconSize="16"/>
-                <Label fx:id="backText" text="Login">
+                <Label fx:id="backText" text="Back">
                     <font>
                         <Font name="Inter Regular" size="16.0"/>
                     </font>

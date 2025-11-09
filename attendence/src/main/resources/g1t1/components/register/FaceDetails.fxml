@@ -21,13 +21,21 @@
 
             <HBox spacing="24" style="-fx-border-color: #d7d7d7; -fx-border-radius: 24px;">
                 <VBox alignment="CENTER">
-                    <VBox alignment="TOP_CENTER" style="-fx-border-color: #d9d9d9; -fx-border-radius: 8px;">
+                    <VBox alignment="TOP_CENTER" styleClass="face-registration-img" fx:id="vbxCameraContainer">
                         <StackPane prefHeight="256" prefWidth="256">
                             <ImageView pickOnBounds="true" preserveRatio="true"
                                        fitHeight="256" fitWidth="256"
                                        cache="true" fx:id="ivCameraView">
                                 <Image url="@/g1t1/images/empty-avatar.png"/>
                             </ImageView>
+                            <AnchorPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+                                        AnchorPane.topAnchor="0">
+                                <ImageView pickOnBounds="true" preserveRatio="true"
+                                           fitHeight="160" fitWidth="160"
+                                           cache="true" fx:id="ivPositionOverlay">
+                                    <Image url="@/g1t1/images/face-outline.png"/>
+                                </ImageView>
+                            </AnchorPane>
 
                             <!-- Error label overlaid at bottom -->
                             <Label text="Camera Error!" textFill="white"

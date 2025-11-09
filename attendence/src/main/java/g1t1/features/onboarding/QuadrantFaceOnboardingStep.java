@@ -1,16 +1,25 @@
 package g1t1.features.onboarding;
 
 import g1t1.opencv.models.FaceInFrame;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import org.opencv.core.Rect;
 
 public class QuadrantFaceOnboardingStep implements FaceOnboardingStep {
+    private static final int CAMERA_SIZE = 256;
+    private static final int REGION_SIZE = CAMERA_SIZE / 2;
+
     private final Quadrant targetQuad;
     private final StringProperty instruction;
+    private final BooleanProperty isValid = new SimpleBooleanProperty();
+    private final ObjectProperty<Rect> checkingRegionProperty;
 
     public QuadrantFaceOnboardingStep(Quadrant targetQuad) {
         this.targetQuad = targetQuad;
         this.instruction = new SimpleStringProperty(String.format("Now in the %s quadrant!", this.targetQuad.label));
+
+        int xOffset = (CAMERA_SIZE / 2) * Math.min(targetQuad.mask & (1 << 0), 1);
+        int yOffset = (CAMERA_SIZE / 2) * Math.min(targetQuad.mask & (1 << 1), 1);
+        this.checkingRegionProperty = new SimpleObjectProperty<>(new Rect(xOffset, yOffset, REGION_SIZE, REGION_SIZE));
     }
 
     @Override
@@ -26,7 +35,18 @@ public class QuadrantFaceOnboardingStep implements FaceOnboardingStep {
         int isBottom = centerY > (faceRegion.maxHeight() / 2) ? 1 : 0;
         int mask = (isBottom << 1) | (isRight << 0);
 
-        return this.targetQuad.mask == mask;
+        isValid.set(this.targetQuad.mask == mask);
+        return isValid.get();
+    }
+
+    @Override
+    public BooleanProperty isValid() {
+        return isValid;
+    }
+
+    @Override
+    public ObjectProperty<Rect> checkingRegion() {
+        return checkingRegionProperty;
     }
 
     public enum Quadrant {

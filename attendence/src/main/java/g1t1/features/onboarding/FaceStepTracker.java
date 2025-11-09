@@ -1,6 +1,7 @@
 package g1t1.features.onboarding;
 
 import javafx.beans.property.*;
+import org.opencv.core.Rect;
 
 record PictureRequirement(FaceOnboardingStep step, int numberOfPictures) {
 }
@@ -19,6 +20,7 @@ public class FaceStepTracker {
     };
 
     public final ObjectProperty<FaceOnboardingStep> currentStep = new SimpleObjectProperty<>();
+    public final ObjectProperty<Rect> currentRegion = new SimpleObjectProperty<>();
     private final StringProperty instruction = new SimpleStringProperty();
     private final IntegerProperty faceStepIndex = new SimpleIntegerProperty(0);
     private final ObjectProperty<PictureRequirement> currentRequirement = new SimpleObjectProperty<>();
@@ -28,6 +30,11 @@ public class FaceStepTracker {
         currentRequirement.bind(faceStepIndex.map(i -> PICTURE_REQUIREMENTS[i.intValue() % PICTURE_REQUIREMENTS.length]));
         currentStep.bind(currentRequirement.map(PictureRequirement::step));
         instruction.bind(currentStep.flatMap(FaceOnboardingStep::instructionProperty));
+
+        currentStep.subscribe(step -> {
+            currentRegion.unbind();
+            currentRegion.bind(step.checkingRegion());
+        });
 
         photosTaken.subscribe((e) -> {
             if (picturesInStep < currentRequirement.get().numberOfPictures()) {

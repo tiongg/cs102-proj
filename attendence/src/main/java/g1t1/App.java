@@ -98,7 +98,7 @@ public class App extends Application {
         String[] cssFiles = {
                 "design-system.css", "utilities.css", "dialogs.css", "status-badges.css",
                 "app.css", "button.css", "date-picker.css", "stepper.css",
-                "tabs.css", "toast.css", "table.css", "student-list.css"
+                "tabs.css", "toast.css", "table.css", "student-list.css", "face-onboarding.css"
         };
 
         int loadedCount = 0;
