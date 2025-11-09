@@ -57,7 +57,7 @@ public class AttendancePiechart {
         if (total > 0) {
             for (Data d : pieChartData) {
                 double percentage = d.getPieValue() * 100.0 / total;
-                d.setName(d.getName() + String.format("(%.1f%%)", percentage));
+                d.setName(d.getName() + " - " + (int) d.getPieValue() + " " + String.format("(%.1f%%)", percentage));
             }
         }
 

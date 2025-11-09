@@ -329,9 +329,7 @@ public class ReportsViewController extends PageController {
 
     @FXML
     public void filter() {
-        ObservableList<Integer> checkedWeeks = cbSelectedWeeks.getCheckModel().getCheckedItems(); // need to understand
-                                                                                                  // how this stuff
-                                                                                                  // works!
+        ObservableList<Integer> checkedWeeks = cbSelectedWeeks.getCheckModel().getCheckedItems();
 
         ClassOption chosen = userClass.get();
         boolean filterByClass = chosen != null && chosen.userClass() != null;
