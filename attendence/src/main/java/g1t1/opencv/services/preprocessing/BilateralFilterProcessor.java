@@ -21,10 +21,11 @@ public class BilateralFilterProcessor implements FacePreprocessor {
         Mat filteredFace = new Mat();
 
         // Apply bilateral filter with optimized parameters for faces
-        // d=5: neighborhood diameter (small for performance)
-        // sigmaColor=50: filter sigma in color space (controls color similarity)
-        // sigmaSpace=50: filter sigma in coordinate space (controls spatial distance)
-        Imgproc.bilateralFilter(face, filteredFace, 5, 50, 50);
+        // d=5: neighborhood diameter (balanced for performance and quality)
+        // sigmaColor=30: filter sigma in color space (controls color similarity)
+        // sigmaSpace=30: filter sigma in coordinate space (controls spatial distance)
+        // Lower sigma values preserve more facial detail while still reducing noise
+        Imgproc.bilateralFilter(face, filteredFace, 5, 30, 30);
 
         return filteredFace;
     }
