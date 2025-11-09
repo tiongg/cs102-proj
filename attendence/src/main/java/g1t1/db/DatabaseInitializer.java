@@ -13,6 +13,10 @@ public class DatabaseInitializer {
     private static final String URL = "jdbc:sqlite:database.db";
 
     public void init() {
+        // Disable big fat tip
+        System.setProperty("org.jooq.no-tips", "true");
+        System.setProperty("org.jooq.no-logo", "true");
+
         try (Connection connection = connect()) {
             try (var stmt = connection.createStatement()) {
                 stmt.execute("PRAGMA foreign_keys = ON");
