@@ -103,7 +103,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         }
     }
 
-    private String formatModuleSection() {
+    public String formatModuleSection() {
         String module = moduleSection.getModule();
         String section = moduleSection.getSection();
         return String.format("%s - %s", module, section);

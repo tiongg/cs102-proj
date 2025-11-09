@@ -11,6 +11,7 @@ import g1t1.models.sessions.SessionAttendance;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
+import javafx.scene.chart.PieChart.Data;
 
 /**
  * Create Piechart based on attendance
@@ -18,8 +19,7 @@ import javafx.scene.chart.PieChart;
  * @param report
  */
 public class AttendancePiechart {
-    public AttendancePiechart() {
-    }
+    public AttendancePiechart() {}
 
     public static PieChart create(Report report) {
         ClassSession session = report.getClassSession();
@@ -39,18 +39,27 @@ public class AttendancePiechart {
 
         // configuring piechart data
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        int total = 0;
         for (AttendanceStatus status : attendenceCounts.keySet()) {
             int count = attendenceCounts.get(status);
 
             if (count > 0) {
                 String pieslicename = status.toString();
                 pieChartData.add(new PieChart.Data(pieslicename, count));
+                total += count;
             }
         }
 
         final PieChart piechart = new PieChart(pieChartData);
         piechart.setTitle("Session Attendance Breakdown");
         piechart.setLabelsVisible(true);
+        
+        if (total > 0) {
+            for (Data d : pieChartData) {
+                double percentage = d.getPieValue() * 100.0 / total;
+                d.setName(d.getName() + String.format("(%.1f%%)", percentage));
+            }
+        }
 
         return piechart;
     }
