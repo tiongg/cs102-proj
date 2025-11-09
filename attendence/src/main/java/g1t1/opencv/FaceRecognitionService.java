@@ -261,7 +261,7 @@ public class FaceRecognitionService {
             needsCheck = true;
         } else {
             Long lastCheck = lastMaskCheckTime.get(recognitionId);
-            if (lastCheck == null || (currentTime - lastCheck) > 3000) { // 3 seconds
+            if (lastCheck == null || (currentTime - lastCheck) > 500) { // 500ms - more responsive
                 needsCheck = true;
             }
         }

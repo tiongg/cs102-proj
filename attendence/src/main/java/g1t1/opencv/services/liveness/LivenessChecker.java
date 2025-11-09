@@ -8,8 +8,6 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import g1t1.features.logger.AppLogger;
-import g1t1.opencv.config.FaceConfig;
 import g1t1.opencv.models.LivenessResult;
 
 /**
@@ -66,8 +64,8 @@ public class LivenessChecker {
         // Photos: low variance (< 250), low texture ratio (< 0.06)
         // Real faces: high variance (> 350), high texture ratio (> 0.08)
 
-        double varianceScore = laplacianVariance > 320.0 ? 1.0 : 0.0;
-        double textureScore = textureRatio > 0.08 ? 1.0 : 0.0;
+        double varianceScore = laplacianVariance > 250.0 ? 1.0 : 0.0;
+        double textureScore = textureRatio > 0.06 ? 1.0 : 0.0;
 
         // BOTH metrics MUST pass for live detection
         boolean isLive = (varianceScore + textureScore) >= 2.0;
@@ -75,10 +73,6 @@ public class LivenessChecker {
 
         String reason = String.format("Var=%.0f Ratio=%.3f -> %s",
             laplacianVariance, textureRatio, isLive ? "LIVE" : "PHOTO");
-
-        if (FaceConfig.getInstance().isLoggingEnabled()) {
-            AppLogger.log(String.format("[Liveness] %s", reason));
-        }
 
         return new LivenessResult(isLive, confidence, reason);
     }
