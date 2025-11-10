@@ -1,16 +1,17 @@
 package g1t1.features.onboarding;
 
 import g1t1.opencv.models.FaceInFrame;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import g1t1.utils.ImageUtils;
+import javafx.beans.property.*;
+import org.opencv.core.Rect;
 
 // Close up pictures
 public class CloseFaceOnboardingStep implements FaceOnboardingStep {
-    private static final int MAX_SIZE = 150;
+    // Face should be at least 1 / 2 the camera
+    private static final double MAX_PROPORTION = (double) 1 / 2;
     private final BooleanProperty isCloseEnough = new SimpleBooleanProperty();
     private final StringProperty instruction = new SimpleStringProperty();
+    private final ObjectProperty<Rect> checkingRegionProperty = new SimpleObjectProperty<>(ImageUtils.centerRect(192, 192, 256, 256));
 
     public CloseFaceOnboardingStep() {
         instruction.bind(isCloseEnough.map(x -> {
@@ -28,7 +29,18 @@ public class CloseFaceOnboardingStep implements FaceOnboardingStep {
 
     @Override
     public boolean isRegionValid(FaceInFrame faceRegion) {
-        isCloseEnough.set(faceRegion.faceBounds().width() > MAX_SIZE && faceRegion.faceBounds().height() > MAX_SIZE);
+        int maxSize = (int) Math.min(faceRegion.maxHeight() * MAX_PROPORTION, faceRegion.maxWidth() * MAX_PROPORTION);
+        isCloseEnough.set(faceRegion.faceBounds().width() > maxSize && faceRegion.faceBounds().height() > maxSize);
         return isCloseEnough.get();
+    }
+
+    @Override
+    public BooleanProperty isValid() {
+        return isCloseEnough;
+    }
+
+    @Override
+    public ObjectProperty<Rect> checkingRegion() {
+        return checkingRegionProperty;
     }
 }

@@ -57,4 +57,8 @@ public class ImageUtils {
 
         return result;
     }
+
+    public static Rect centerRect(int width, int height, int parentWidth, int parentHeight) {
+        return new Rect(parentWidth / 2 - width / 2, parentHeight / 2 - height / 2, width, height);
+    }
 }

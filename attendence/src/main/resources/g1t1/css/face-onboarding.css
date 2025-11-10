@@ -1,0 +1,18 @@
+/* ============================================================================
+   FACE ONBOARDING
+   ============================================================================
+   Styling for face onboarding related stuff
+   ============================================================================ */
+
+.face-registration-img {
+    -fx-border-color: #d9d9d9;
+    -fx-border-radius: 8px;
+}
+
+.face-registration-img:invalid {
+    -fx-border-color: rgb(231, 76, 60);
+}
+
+.face-registration-img:valid {
+    -fx-border-color: rgb(46, 204, 113);
+}
