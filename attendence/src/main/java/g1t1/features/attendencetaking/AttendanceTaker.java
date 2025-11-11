@@ -1,5 +1,12 @@
 package g1t1.features.attendencetaking;
 
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jooq.exception.DataAccessException;
+
 import g1t1.components.Toast;
 import g1t1.config.SettingsManager;
 import g1t1.db.DSLInstance;
@@ -21,20 +28,18 @@ import g1t1.opencv.FaceRecognitionService;
 import g1t1.opencv.models.Recognisable;
 import g1t1.utils.events.opencv.StudentDetectedEvent;
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import org.jooq.exception.DataAccessException;
-
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AttendanceTaker {
-    public static final ListProperty<SessionAttendance> recentlyMarked =
-            new SimpleListProperty<>(FXCollections.observableArrayList());
-    public static final ObjectProperty<StudentDetectedEvent> needsConfirmation =
-            new SimpleObjectProperty<>();
+    public static final ListProperty<SessionAttendance> recentlyMarked = new SimpleListProperty<>(
+            FXCollections.observableArrayList());
+    public static final ObjectProperty<StudentDetectedEvent> needsConfirmation = new SimpleObjectProperty<>();
     public static final IntegerProperty studentsPresent = new SimpleIntegerProperty();
 
     private static final int MAX_RECENTLY_DISPLAYED = 3;
@@ -42,8 +47,8 @@ public class AttendanceTaker {
     private static ClassSession currentSession;
 
     public static void start(ModuleSection moduleSection, int week, LocalDateTime startTime) {
-        AppLogger.logf("Starting attendance session: %s %s (Week %d) with %d students",
-            moduleSection.getModule(), moduleSection.getSection(), week, moduleSection.getStudents().size());
+        AppLogger.logf("Starting attendance session: %s %s (Week %d) with %d students", moduleSection.getModule(),
+                moduleSection.getSection(), week, moduleSection.getActiveStudents().size());
         initializeRecognitionSystem(moduleSection);
         initializeSession(moduleSection, week, startTime);
         subscribeToDetectionEvents();
@@ -53,17 +58,13 @@ public class AttendanceTaker {
         FaceRecognitionService.getInstance().stop();
 
         if (currentSession != null) {
-            long studentsMarked = currentSession.getStudentAttendance()
-                .values()
-                .stream()
-                .filter(x -> x.getStatus() == AttendanceStatus.PRESENT || x.getStatus() == AttendanceStatus.LATE)
-                .count();
+            long studentsMarked = currentSession.getStudentAttendance().values().stream()
+                    .filter(x -> x.getStatus() == AttendanceStatus.PRESENT || x.getStatus() == AttendanceStatus.LATE)
+                    .count();
 
             AppLogger.logf("Attendance session ended: %s %s - %d/%d students marked present",
-                currentSession.getModuleSection().getModule(),
-                currentSession.getModuleSection().getSection(),
-                studentsMarked,
-                currentSession.getStudentAttendance().size());
+                    currentSession.getModuleSection().getModule(), currentSession.getModuleSection().getSection(),
+                    studentsMarked, currentSession.getStudentAttendance().size());
 
             currentSession.endSession();
             saveSessionToDb();
@@ -88,16 +89,10 @@ public class AttendanceTaker {
         }
 
         AppLogger.logf("Manual confirmation accepted: %s (ID: %s, Confidence: %.2f%%)",
-            attendance.getStudent().getName(),
-            attendance.getStudent().getId(),
-            event.getConfidence());
+                attendance.getStudent().getName(), attendance.getStudent().getId(), event.getConfidence());
 
-        markAttendance(
-                attendance,
-                currentSession.getCurrentStatus(),
-                event.getConfidence(),
-                MarkingMethod.AFTER_CONFIRMATION
-        );
+        markAttendance(attendance, currentSession.getCurrentStatus(), event.getConfidence(),
+                MarkingMethod.AFTER_CONFIRMATION);
 
         needsConfirmation.set(null);
         return true;
@@ -108,7 +103,7 @@ public class AttendanceTaker {
     }
 
     private static void initializeRecognitionSystem(ModuleSection moduleSection) {
-        List<Recognisable> recognisableList = new ArrayList<>(moduleSection.getStudents());
+        List<Recognisable> recognisableList = new ArrayList<>(moduleSection.getActiveStudents());
         recognisableList.add(AuthenticationContext.getCurrentUser());
 
         FaceRecognitionService.getInstance().start(recognisableList);
@@ -120,9 +115,8 @@ public class AttendanceTaker {
     }
 
     private static void subscribeToDetectionEvents() {
-        FaceRecognitionService.getInstance()
-                .getEventEmitter()
-                .subscribe(StudentDetectedEvent.class, AttendanceTaker::handleDetectionEvent);
+        FaceRecognitionService.getInstance().getEventEmitter().subscribe(StudentDetectedEvent.class,
+                AttendanceTaker::handleDetectionEvent);
     }
 
     private static void handleDetectionEvent(StudentDetectedEvent event) {
@@ -151,39 +145,23 @@ public class AttendanceTaker {
     }
 
     private static void processAutoMarking(StudentDetectedEvent event, SessionAttendance attendance) {
-        AppLogger.logf("Auto-marked attendance: %s (ID: %s, Confidence: %.2f%%)",
-            attendance.getStudent().getName(),
-            attendance.getStudent().getId(),
-            event.getConfidence());
+        AppLogger.logf("Auto-marked attendance: %s (ID: %s, Confidence: %.2f%%)", attendance.getStudent().getName(),
+                attendance.getStudent().getId(), event.getConfidence());
 
-        markAttendance(
-                attendance,
-                currentSession.getCurrentStatus(),
-                event.getConfidence(),
-                MarkingMethod.AUTOMATIC
-        );
+        markAttendance(attendance, currentSession.getCurrentStatus(), event.getConfidence(), MarkingMethod.AUTOMATIC);
 
         clearConfirmationIfMatches(event.getStudent().getId());
 
         showSuccessToast(event.getStudent().getName());
     }
 
-    private static void markAttendance(
-            SessionAttendance attendance,
-            AttendanceStatus status,
-            double confidence,
-            MarkingMethod method
-    ) {
+    private static void markAttendance(SessionAttendance attendance, AttendanceStatus status, double confidence,
+            MarkingMethod method) {
         attendance.setStatus(status, confidence, method);
         addToRecentlyMarked(attendance);
-        studentsPresent.set(currentSession
-                .getStudentAttendance()
-                .values()
-                .stream()
+        studentsPresent.set(currentSession.getStudentAttendance().values().stream()
                 .filter(x -> x.getStatus() == AttendanceStatus.PRESENT || x.getStatus() == AttendanceStatus.LATE)
-                .toList()
-                .size()
-        );
+                .toList().size());
     }
 
     private static void addToRecentlyMarked(SessionAttendance attendance) {

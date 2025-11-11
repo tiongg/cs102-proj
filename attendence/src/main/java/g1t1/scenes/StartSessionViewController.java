@@ -1,5 +1,8 @@
 package g1t1.scenes;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import g1t1.components.TimePicker;
 import g1t1.components.Toast;
 import g1t1.features.attendencetaking.AttendanceTaker;
@@ -16,10 +19,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 
 public class StartSessionViewController extends PageController {
     private final int TOTAL_WEEKS = 13;
@@ -49,7 +53,6 @@ public class StartSessionViewController extends PageController {
         LocalDate localDate = dpClassDate.getValue();
         LocalDateTime sessionStartTime = tpStartTime.addToDate(localDate);
 
-        // MockDb.getUserModuleSections(null).getFirst()
         AttendanceTaker.start(moduleSectionValue.get(), weekValue.get(), sessionStartTime);
         Router.changePage(PageName.DuringSession);
         Toast.show("Session started!", Toast.ToastType.SUCCESS);
@@ -72,6 +75,10 @@ public class StartSessionViewController extends PageController {
         }
         AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
             setModuleSectionSelections();
+            // Refresh the state
+            ModuleSection temp = moduleSectionValue.get();
+            moduleSectionValue.set(null);
+            moduleSectionValue.set(temp);
         });
 
         BooleanBinding shouldDisable = moduleSectionValue.isNull().or(weekValue.lessThanOrEqualTo(0))
@@ -79,8 +86,10 @@ public class StartSessionViewController extends PageController {
         btnStartSession.disableProperty().bind(shouldDisable);
 
         lblRoom.textProperty().bind(moduleSectionValue.map(ms -> String.format("Room: %s", ms.getRoom())));
-        lblExpectedStudents.textProperty().bind(moduleSectionValue.map(ms -> String.format("Expecting: %s students", ms.getStudents().size())));
-        lblTiming.textProperty().bind(moduleSectionValue.map(ms -> String.format("From: %s - %s", ms.getStartTime(), ms.getEndTime())));
+        lblExpectedStudents.textProperty().bind(
+                moduleSectionValue.map(ms -> String.format("Expecting: %s students", ms.getActiveStudents().size())));
+        lblTiming.textProperty()
+                .bind(moduleSectionValue.map(ms -> String.format("From: %s - %s", ms.getStartTime(), ms.getEndTime())));
     }
 
     @Override

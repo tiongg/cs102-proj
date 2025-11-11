@@ -17,4 +17,6 @@ public interface StudentRepository {
     boolean update(String studentId, String fullNameNullable, String emailNullable);
 
     boolean delete(String studentId);
+
+    boolean setStudentActive(String studentId, boolean isActive);
 }

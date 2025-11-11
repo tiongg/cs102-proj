@@ -67,3 +67,110 @@
 .student-info-icon {
     -fx-icon-color: #999999;
 }
+
+/* ============================================================================
+   INACTIVE STATE - Visual marker for inactive students
+   ============================================================================ */
+
+/* Inactive Student List Item - Grayed out styling */
+.student-list-item.inactive {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #d0d0d0;
+    -fx-opacity: 0.6;
+}
+
+/* Inactive Student List Item Hover - Subtle hover effect for inactive items */
+.student-list-item.inactive:hover {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #c8c8c8;
+}
+
+/* Inactive Avatar - Desaturated appearance */
+.student-list-item.inactive .avatar-circle {
+    -fx-fill: linear-gradient(to bottom right, #999999, #666666);
+}
+
+/* Inactive Avatar Initials - Lighter text for inactive state */
+.student-list-item.inactive .avatar-initials {
+    -fx-text-fill: #cccccc;
+}
+
+/* Inactive Student Name - Grayed out text */
+.student-list-item.inactive .student-name {
+    -fx-text-fill: #888888;
+}
+
+/* Inactive Student ID - Lighter gray text */
+.student-list-item.inactive .student-id {
+    -fx-text-fill: #999999;
+}
+
+/* Inactive Student Email - Lighter gray text */
+.student-list-item.inactive .student-email {
+    -fx-text-fill: #999999;
+}
+
+/* Inactive Student Info Icon - Lighter icon color */
+.student-list-item.inactive .student-info-icon {
+    -fx-icon-color: #b0b0b0;
+}
+
+/* ============================================================================
+   ACTION BUTTONS - Delete and Restore buttons
+   ============================================================================ */
+
+/* Student Action Button - Base styling for action buttons */
+.student-action-button {
+    -fx-padding: 8 12;
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 6;
+}
+
+/* Student Action Button Hover - Enhanced visual feedback on hover */
+.student-action-button:hover {
+    -fx-background-color: #e8e8e8;
+    -fx-border-color: #b0b0b0;
+    -fx-opacity: 0.9;
+}
+
+/* Student Action Button Pressed - Visual feedback when clicking */
+.student-action-button:pressed {
+    -fx-background-color: #e0e0e0;
+    -fx-opacity: 0.8;
+}
+
+/* Delete Button - Red styling for destructive action */
+.student-action-button.delete-button {
+    -fx-text-fill: #d32f2f;
+    -fx-border-color: #ffcdd2;
+    -fx-background-color: #ffebee;
+}
+
+/* Delete Button Hover - Darker red on hover */
+.student-action-button.delete-button:hover {
+    -fx-background-color: #ffcdd2;
+    -fx-border-color: #ef5350;
+    -fx-text-fill: #b71c1c;
+}
+
+/* Restore Button - Green styling for recovery action */
+.student-action-button.restore-button {
+    -fx-text-fill: #388e3c;
+    -fx-border-color: #c8e6c9;
+    -fx-background-color: #f1f8e9;
+}
+
+/* Restore Button Hover - Darker green on hover */
+.student-action-button.restore-button:hover {
+    -fx-background-color: #c8e6c9;
+    -fx-border-color: #66bb6a;
+    -fx-text-fill: #1b5e20;
+}

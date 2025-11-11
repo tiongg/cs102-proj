@@ -1,13 +1,13 @@
 package g1t1.models.sessions;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import g1t1.components.table.TableChipItem;
 import g1t1.db.module_sections.ModuleSectionRecord;
 import g1t1.models.users.Student;
 import g1t1.utils.DateUtils;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Module & Section. Used to uniquely identify a class.
@@ -50,7 +50,8 @@ public class ModuleSection implements TableChipItem {
      */
     private String id;
 
-    public ModuleSection(String module, String section, String term, String room, int day, String startTime, String endTime) {
+    public ModuleSection(String module, String section, String term, String room, int day, String startTime,
+            String endTime) {
         this.module = module;
         this.section = section;
         this.term = term;
@@ -61,7 +62,8 @@ public class ModuleSection implements TableChipItem {
         this.id = module + " - " + section;
     }
 
-    public ModuleSection(String id, String module, String section, String term, String room, int day, String startTime, String endTime) {
+    public ModuleSection(String id, String module, String section, String term, String room, int day, String startTime,
+            String endTime) {
         this(module, section, term, room, day, startTime, endTime);
         this.id = id;
     }
@@ -78,8 +80,7 @@ public class ModuleSection implements TableChipItem {
     }
 
     /**
-     * Gets current acad year and term in the format of:
-     * AYy1-y2T<term>
+     * Gets current acad year and term in the format of: AYy1-y2T<term>
      */
     public static String getCurrentAYTerm() {
         int currentMonth = LocalDateTime.now().getMonthValue();
@@ -137,6 +138,10 @@ public class ModuleSection implements TableChipItem {
         return this.students;
     }
 
+    public List<Student> getActiveStudents() {
+        return this.students.stream().filter(Student::getIsActive).toList();
+    }
+
     public String getStartTime() {
         return this.startTime;
     }
@@ -157,8 +162,8 @@ public class ModuleSection implements TableChipItem {
     @Override
     public String[] getChipData() {
         // "Module", "Section", "Day", "Time", "Enrolled"
-        return new String[]{this.module, this.section, DateUtils.dayOfWeekToWord(this.getDay()), formatClassDuration(),
-                Integer.toString(this.students.size())};
+        return new String[] { this.module, this.section, DateUtils.dayOfWeekToWord(this.getDay()),
+                formatClassDuration(), Integer.toString(this.students.size()) };
     }
 
     @Override
@@ -167,13 +172,8 @@ public class ModuleSection implements TableChipItem {
         int hours = Integer.parseInt(startTimeRaw[0]);
         int minutes = Integer.parseInt(startTimeRaw[1]);
         int totalMinutes = hours * 60 + minutes;
-        return new long[]{
-                this.module.hashCode(),
-                this.section.hashCode(),
-                this.getDay(),
-                totalMinutes,
-                this.students.size()
-        };
+        return new long[] { this.module.hashCode(), this.section.hashCode(), this.getDay(), totalMinutes,
+                this.students.size() };
     }
 
     @Override

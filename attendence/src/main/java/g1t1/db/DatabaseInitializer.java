@@ -1,13 +1,13 @@
 package g1t1.db;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class DatabaseInitializer {
     private static final String URL = "jdbc:sqlite:database.db";
@@ -143,6 +143,7 @@ public class DatabaseInitializer {
                 .column("student_id", SQLDataType.VARCHAR(8).notNull())
                 .column("full_name", SQLDataType.VARCHAR(255).notNull())
                 .column("email", SQLDataType.VARCHAR(255).notNull())
+                .column("is_active", SQLDataType.BOOLEAN.notNull())
                 .constraints(
                         DSL.constraint("pk_students").primaryKey("student_id"),
                         DSL.constraint("unique_email").unique("email")

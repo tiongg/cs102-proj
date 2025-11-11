@@ -18,6 +18,7 @@ import g1t1.models.sessions.ClassSession;
 import g1t1.models.sessions.ModuleSection;
 import g1t1.models.users.Student;
 import g1t1.props.IndividualClassViewProps;
+import g1t1.utils.events.authentication.OnUserUpdateEvent;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ListChangeListener;
@@ -99,6 +100,10 @@ public class IndividualClassViewController extends PageController<IndividualClas
         tblSessions.setOnChipClick((item) -> {
             Router.changePage(PageName.PastRecords, item);
         });
+
+        AuthenticationContext.emitter.subscribe(OnUserUpdateEvent.class, (e) -> {
+            setStudentList();
+        });
     }
 
     @Override
@@ -110,12 +115,8 @@ public class IndividualClassViewController extends PageController<IndividualClas
         this.tblSessions.setTableBody(sessions);
         this.lblClassHeader.setText(String.format("My classes - %s - %s", ms.getModule(), ms.getSection()));
 
-        // Store original student list for search/filtering
-        this.originalStudentList = ms.getStudents();
-        this.vbxStudentList.getChildren().clear();
-        this.vbxStudentList.getChildren().addAll(this.originalStudentList.stream().map(StudentListItem::new).toList());
+        setStudentList();
 
-        // Clear search field when switching classes
         tfStudentSearch.clear();
         resetSearchFields();
     }
@@ -147,6 +148,17 @@ public class IndividualClassViewController extends PageController<IndividualClas
     @FXML
     public void closeFilter() {
         stkFilterPane.visibleProperty().set(false);
+    }
+
+    private void setStudentList() {
+        if (this.props == null) {
+            return;
+        }
+
+        ModuleSection ms = this.props.moduleSection();
+        this.originalStudentList = ms.getStudents();
+        this.vbxStudentList.getChildren().clear();
+        this.vbxStudentList.getChildren().addAll(this.originalStudentList.stream().map(StudentListItem::new).toList());
     }
 
     private void resetSearchFields() {
@@ -181,12 +193,6 @@ public class IndividualClassViewController extends PageController<IndividualClas
         }
     }
 
-    /**
-     * Filters the student list based on the search query. Searches by student name,
-     * ID, or email (case-insensitive).
-     *
-     * @param query the search query string
-     */
     private void filterStudents(String query) {
         if (originalStudentList == null) {
             return;

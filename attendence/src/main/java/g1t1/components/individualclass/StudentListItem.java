@@ -1,9 +1,20 @@
 package g1t1.components.individualclass;
 
+import java.io.ByteArrayInputStream;
+import java.sql.SQLException;
+
+import org.jooq.exception.DataAccessException;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import g1t1.db.DSLInstance;
+import g1t1.db.students.StudentRepository;
+import g1t1.db.students.StudentRepositoryJooq;
+import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.Student;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,21 +23,27 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
-import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.io.ByteArrayInputStream;
 
 public class StudentListItem extends HBox {
+    private Student student;
 
     public StudentListItem(Student student) {
         super();
+
+        this.student = student;
         this.setSpacing(16);
         this.setPadding(new Insets(12, 16, 12, 16));
         this.getStyleClass().add("student-list-item");
+
+        // Apply inactive style if student is not active
+        if (!student.getIsActive()) {
+            this.getStyleClass().add("inactive");
+        }
+
         this.setAlignment(Pos.CENTER_LEFT);
 
         // Avatar with face image or fallback
-        StackPane avatar = createAvatar(student);
+        StackPane avatar = createAvatar();
 
         // Student details (name, ID, email)
         VBox studentDetails = new VBox(4);
@@ -55,7 +72,10 @@ public class StudentListItem extends HBox {
 
         studentDetails.getChildren().addAll(lblName, idRow, emailRow);
 
-        this.getChildren().addAll(avatar, studentDetails);
+        // Delete/Restore button
+        Button actionButton = createActionButton();
+
+        this.getChildren().addAll(avatar, studentDetails, actionButton);
     }
 
     private static ImageView getImageView(byte[] imageData) {
@@ -75,13 +95,13 @@ public class StudentListItem extends HBox {
         return imageView;
     }
 
-    private StackPane createAvatar(Student student) {
+    private StackPane createAvatar() {
         StackPane avatarContainer = new StackPane();
         avatarContainer.setPrefSize(56, 56);
         avatarContainer.setMinSize(56, 56);
         avatarContainer.setMaxSize(56, 56);
 
-        FaceData faceData = student.getFaceData();
+        FaceData faceData = this.student.getFaceData();
 
         if (faceData != null && !faceData.getFaceImages().isEmpty()) {
             // Get first face image
@@ -97,11 +117,11 @@ public class StudentListItem extends HBox {
             } catch (Exception e) {
                 // Fallback to initials if image fails to load
                 System.err.println("Failed to load face image: " + e.getMessage());
-                return createFallbackAvatar(student.getName());
+                return createFallbackAvatar(this.student.getName());
             }
         } else {
             // Fallback to initials
-            return createFallbackAvatar(student.getName());
+            return createFallbackAvatar(this.student.getName());
         }
 
         return avatarContainer;
@@ -132,5 +152,45 @@ public class StudentListItem extends HBox {
         } else {
             return (parts[0].charAt(0) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
         }
+    }
+
+    private Button createActionButton() {
+        Button button = new Button();
+        button.getStyleClass().add("student-action-button");
+
+        // Set icon and text based on active status
+        if (student.getIsActive()) {
+            FontIcon deleteIcon = new FontIcon("gmi-delete-outline");
+            deleteIcon.setIconSize(16);
+            button.setGraphic(deleteIcon);
+            button.setText("Delete");
+            button.getStyleClass().add("delete-button");
+        } else {
+            FontIcon restoreIcon = new FontIcon("gmi-restore");
+            restoreIcon.setIconSize(16);
+            button.setGraphic(restoreIcon);
+            button.setText("Restore");
+            button.getStyleClass().add("restore-button");
+        }
+
+        button.setOnAction((e) -> {
+            toggleActive();
+        });
+
+        return button;
+    }
+
+    private void toggleActive() {
+        student.setIsActive(!student.getIsActive());
+        try (DSLInstance dslInstance = new DSLInstance()) {
+            StudentRepository studentRepo = new StudentRepositoryJooq(dslInstance.dsl);
+            studentRepo.setStudentActive(student.getId().toString(), student.getIsActive());
+        } catch (SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+        } catch (DataAccessException e) {
+            System.out.println("Error during database operation: " + e.getMessage());
+        }
+
+        AuthenticationContext.triggerUserUpdate();
     }
 }
