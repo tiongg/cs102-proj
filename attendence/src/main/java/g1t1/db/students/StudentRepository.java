@@ -18,5 +18,5 @@ public interface StudentRepository {
 
     boolean delete(String studentId);
 
-    boolean softDelete(String studentId);
+    boolean setStudentActive(String studentId, boolean isActive);
 }

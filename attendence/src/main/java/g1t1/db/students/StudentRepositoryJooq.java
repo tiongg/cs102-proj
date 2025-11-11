@@ -92,9 +92,9 @@ public class StudentRepositoryJooq implements StudentRepository {
     }
 
     @Override
-    public boolean softDelete(String studentId) {
+    public boolean setStudentActive(String studentId, boolean isActive){
         Map<Field<?>, Object> changes = new HashMap<>();
-        changes.put(IS_ACTIVE, false);
+        changes.put(IS_ACTIVE, isActive);
         return dsl.update(STUDENTS_TABLE)
                 .set(changes)
                 .where(STUDENT_ID.eq(studentId))
