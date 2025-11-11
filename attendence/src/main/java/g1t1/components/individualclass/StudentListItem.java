@@ -1,5 +1,10 @@
 package g1t1.components.individualclass;
 
+import java.io.ByteArrayInputStream;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import g1t1.features.authentication.AuthenticationContext;
 import g1t1.models.users.FaceData;
 import g1t1.models.users.Student;
 import javafx.geometry.Insets;
@@ -12,21 +17,21 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
-import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.io.ByteArrayInputStream;
 
 public class StudentListItem extends HBox {
+    private Student student;
 
     public StudentListItem(Student student) {
         super();
+
+        this.student = student;
         this.setSpacing(16);
         this.setPadding(new Insets(12, 16, 12, 16));
         this.getStyleClass().add("student-list-item");
         this.setAlignment(Pos.CENTER_LEFT);
 
         // Avatar with face image or fallback
-        StackPane avatar = createAvatar(student);
+        StackPane avatar = createAvatar();
 
         // Student details (name, ID, email)
         VBox studentDetails = new VBox(4);
@@ -56,6 +61,9 @@ public class StudentListItem extends HBox {
         studentDetails.getChildren().addAll(lblName, idRow, emailRow);
 
         this.getChildren().addAll(avatar, studentDetails);
+        this.setOnMouseClicked((e) -> {
+            deleteSelf();
+        });
     }
 
     private static ImageView getImageView(byte[] imageData) {
@@ -75,13 +83,13 @@ public class StudentListItem extends HBox {
         return imageView;
     }
 
-    private StackPane createAvatar(Student student) {
+    private StackPane createAvatar() {
         StackPane avatarContainer = new StackPane();
         avatarContainer.setPrefSize(56, 56);
         avatarContainer.setMinSize(56, 56);
         avatarContainer.setMaxSize(56, 56);
 
-        FaceData faceData = student.getFaceData();
+        FaceData faceData = this.student.getFaceData();
 
         if (faceData != null && !faceData.getFaceImages().isEmpty()) {
             // Get first face image
@@ -97,11 +105,11 @@ public class StudentListItem extends HBox {
             } catch (Exception e) {
                 // Fallback to initials if image fails to load
                 System.err.println("Failed to load face image: " + e.getMessage());
-                return createFallbackAvatar(student.getName());
+                return createFallbackAvatar(this.student.getName());
             }
         } else {
             // Fallback to initials
-            return createFallbackAvatar(student.getName());
+            return createFallbackAvatar(this.student.getName());
         }
 
         return avatarContainer;
@@ -132,5 +140,11 @@ public class StudentListItem extends HBox {
         } else {
             return (parts[0].charAt(0) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
         }
+    }
+
+    private void deleteSelf() {
+        System.out.println("Deleted self");
+        student.setIsActive(false);
+        AuthenticationContext.triggerUserUpdate();
     }
 }

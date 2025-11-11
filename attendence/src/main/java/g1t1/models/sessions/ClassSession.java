@@ -1,5 +1,13 @@
 package g1t1.models.sessions;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+
 import g1t1.components.table.TableChipItem;
 import g1t1.config.SettingsManager;
 import g1t1.db.attendance.AttendanceRecord;
@@ -10,15 +18,6 @@ import g1t1.models.BaseEntity;
 import g1t1.models.ids.StudentID;
 import g1t1.models.users.Student;
 import g1t1.utils.DateUtils;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-
 
 /**
  * Class session
@@ -36,16 +35,13 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         this.sessionStatus = status;
         this.startTime = startTime;
         this.week = week;
-        for (Student student : moduleSection.getStudents()) {
+        for (Student student : moduleSection.getActiveStudents()) {
             studentAttendance.put(student.getId(), new SessionAttendance(student));
         }
     }
 
-    public ClassSession(SessionRecord sessionRecord,
-                        ModuleSection moduleSection,
-                        List<AttendanceRecord> attendanceRecords,
-                        HashMap<String, Student> enrollmentToStudents
-    ) {
+    public ClassSession(SessionRecord sessionRecord, ModuleSection moduleSection,
+            List<AttendanceRecord> attendanceRecords, HashMap<String, Student> enrollmentToStudents) {
         this.moduleSection = moduleSection;
         this.sessionStatus = SessionStatus.valueOfLabel(sessionRecord.status());
         this.week = sessionRecord.week();
@@ -156,13 +152,14 @@ public class ClassSession extends BaseEntity implements TableChipItem {
 
     @Override
     public String[] getChipData() {
-        return new String[]{this.formatModuleSection(), this.formatDate(), Integer.toString(this.getWeek()), this.formatStartTime(),
-                this.formatAttendance(), this.formatRate()};
+        return new String[] { this.formatModuleSection(), this.formatDate(), Integer.toString(this.getWeek()),
+                this.formatStartTime(), this.formatAttendance(), this.formatRate() };
     }
 
     @Override
     public long[] getComparatorKeys() {
-        long startDateMilliseconds = this.startTime.with(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long startDateMilliseconds = this.startTime.with(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant()
+                .toEpochMilli();
         long startTimeSeconds = this.startTime.getHour() * 60 + this.startTime.getMinute();
         AttendanceStats stats = attendanceStats();
 
@@ -170,13 +167,7 @@ public class ClassSession extends BaseEntity implements TableChipItem {
         if (stats.expected() != 0) {
             percent = (int) stats.percent();
         }
-        return new long[]{
-                this.formatModuleSection().length(),
-                startDateMilliseconds,
-                this.getWeek(),
-                startTimeSeconds,
-                stats.present(),
-                percent
-        };
+        return new long[] { this.formatModuleSection().length(), startDateMilliseconds, this.getWeek(),
+                startTimeSeconds, stats.present(), percent };
     }
 }
