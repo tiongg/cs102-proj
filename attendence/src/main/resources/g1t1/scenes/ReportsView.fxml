@@ -1,170 +1,170 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import org.controlsfx.control.CheckComboBox?>
 <?import g1t1.components.Navbar?>
 <?import g1t1.components.table.Table?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.CheckComboBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="900.0" prefWidth="1440.0"
-    xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.ReportsViewController">
-    <Navbar />
+            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="g1t1.scenes.ReportsViewController">
+    <Navbar/>
     <AnchorPane layoutX="250.0" prefHeight="900.0" prefWidth="818.0" AnchorPane.bottomAnchor="0.0"
-        AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
         <!-- Header Section -->
         <HBox alignment="CENTER_LEFT" spacing="16" AnchorPane.leftAnchor="40.0"
-            AnchorPane.rightAnchor="40.0"
-            AnchorPane.topAnchor="32.0">
+              AnchorPane.rightAnchor="40.0"
+              AnchorPane.topAnchor="32.0">
             <Label fx:id="pastReports" text="Past Reports">
                 <font>
-                    <Font name="Inter Semi Bold" size="26.0" />
+                    <Font name="Inter Semi Bold" size="26.0"/>
                 </font>
             </Label>
 
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                 <Button fx:id="reportsBackBtn" minWidth="100.0" onAction="#reportsBack"
-                    styleClass="flat-button"
-                    text="Back" />
+                        styleClass="flat-button"
+                        text="Back"/>
             </HBox>
         </HBox>
 
         <!-- Reports Table Section -->
         <VBox spacing="16" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="40.0"
-            AnchorPane.rightAnchor="40.0"
-            AnchorPane.topAnchor="90.0">
+              AnchorPane.rightAnchor="40.0"
+              AnchorPane.topAnchor="90.0">
             <!-- Table Header -->
             <HBox alignment="CENTER_LEFT" minHeight="40.0" spacing="12">
                 <Label fx:id="allPastReports" text="All Past Reports">
                     <font>
-                        <Font name="Inter Semi Bold" size="16.0" />
+                        <Font name="Inter Semi Bold" size="14.0"/>
                     </font>
                 </Label>
                 <HBox alignment="CENTER_RIGHT" maxHeight="40" HBox.hgrow="ALWAYS">
                     <HBox fx:id="filter" alignment="CENTER" onMouseClicked="#search" spacing="8.0"
-                        styleClass="flat-button" visible="true">
-                        <FontIcon iconLiteral="gmi-filter-list-alt" iconSize="18" />
-                        <Label text="Filter" />
+                          styleClass="flat-button">
+                        <FontIcon iconLiteral="gmi-filter-list-alt" iconSize="18"/>
+                        <Label text="Filter"/>
                         <padding>
-                            <Insets left="12.0" right="12.0" />
+                            <Insets left="12.0" right="12.0"/>
                         </padding>
                         <HBox.margin>
-                            <Insets bottom="4.0" top="4.0" />
+                            <Insets bottom="4.0" top="4.0"/>
                         </HBox.margin>
                     </HBox>
                 </HBox>
             </HBox>
 
-            <StackPane fx:id="attendanceChartHolder" prefHeight="320" maxHeight="360">
+            <StackPane fx:id="attendanceChartHolder" prefHeight="260" maxHeight="280">
             </StackPane>
 
             <!-- Reports Table -->
             <Table fx:id="reportsTable" VBox.vgrow="ALWAYS" emptyMessage="No reports!"
-                emptyMessageDescription="Start a session, and access the past reports here!" />
+                   emptyMessageDescription="Start a session, and access the past reports here!"/>
         </VBox>
 
         <!-- Export Options Footer -->
         <HBox fx:id="footerBar" alignment="CENTER_LEFT" prefHeight="80.0" spacing="20"
-            styleClass="footer-bar"
-            visible="false" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="40.0"
-            AnchorPane.rightAnchor="40.0">
+              styleClass="footer-bar"
+              visible="false" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="40.0"
+              AnchorPane.rightAnchor="40.0">
 
             <!-- Format Selection -->
             <VBox spacing="4" alignment="CENTER_LEFT">
-                <Label text="Export Format" styleClass="filter-section-label" />
+                <Label text="Export Format" styleClass="filter-section-label"/>
                 <MenuButton fx:id="formatBtn" minWidth="150" styleClass="flat-input" text="PDF"
-                    visible="false">
+                            visible="false">
                     <items>
-                        <MenuItem onAction="#choosePdf" text="PDF" />
-                        <MenuItem onAction="#chooseCsv" text="CSV" />
-                        <MenuItem onAction="#chooseXlsx" text="XLSX" />
+                        <MenuItem onAction="#choosePdf" text="PDF"/>
+                        <MenuItem onAction="#chooseCsv" text="CSV"/>
+                        <MenuItem onAction="#chooseXlsx" text="XLSX"/>
                     </items>
                 </MenuButton>
             </VBox>
 
             <!-- Export Options -->
             <VBox spacing="4" alignment="CENTER_LEFT" fx:id="vbExportOptions">
-                <Label text="Include Additional Fields" styleClass="filter-section-label" />
+                <Label text="Include Additional Fields" styleClass="filter-section-label"/>
                 <HBox spacing="12">
-                    <CheckBox fx:id="cbTimestamp" text="Timestamp" />
-                    <CheckBox fx:id="cbConfidence" text="Confidence" />
-                    <CheckBox fx:id="cbMethod" text="Method" />
+                    <CheckBox fx:id="cbTimestamp" text="Timestamp"/>
+                    <CheckBox fx:id="cbConfidence" text="Confidence"/>
+                    <CheckBox fx:id="cbMethod" text="Method"/>
                 </HBox>
             </VBox>
 
             <!-- Directory picker -->
             <VBox spacing="4" alignment="CENTER_LEFT">
-                <Label text="Save Location" styleClass="filter-section-label" />
+                <Label text="Save Location" styleClass="filter-section-label"/>
                 <HBox spacing="8" alignment="CENTER_LEFT">
-                    <Label fx:id="statusLabel" text="no directory selected" HBox.hgrow="ALWAYS" />
-                    <Button onAction="#onChoose" styleClass="button-cancel" text="Choose..." />
+                    <Label fx:id="statusLabel" text="no directory selected" HBox.hgrow="ALWAYS"/>
+                    <Button onAction="#onChoose" styleClass="button-cancel" text="Choose..."/>
                 </HBox>
             </VBox>
 
             <!-- Spacer to push Export button to the right -->
-            <Pane HBox.hgrow="ALWAYS" />
+            <Pane HBox.hgrow="ALWAYS"/>
 
             <!-- Export Button -->
             <Button fx:id="exportBtn" minWidth="100" onAction="#export" styleClass="button-primary"
-                text="Export" visible="false" />
+                    text="Export" visible="false"/>
         </HBox>
 
 
     </AnchorPane>
 
     <StackPane fx:id="stkFilterPane" prefHeight="Infinity" prefWidth="Infinity"
-        styleClass="dialog-overlay" visible="false" AnchorPane.bottomAnchor="0.0"
-        AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               styleClass="dialog-overlay" visible="false" AnchorPane.bottomAnchor="0.0"
+               AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <VBox maxHeight="500" maxWidth="700" spacing="20" styleClass="dialog-content">
             <!-- Dialog Title -->
             <Label text="Filter Past Reports" textAlignment="CENTER"
-                styleClass="filter-dialog-title" />
+                   styleClass="filter-dialog-title"/>
 
             <!-- Filter Controls Container -->
             <VBox spacing="16" VBox.vgrow="ALWAYS">
                 <!--Class
                 Filter-->
                 <VBox spacing="8">
-                    <Label text="Select Class" styleClass="filter-section-label" />
-                    <Label text="Filter reports by class" styleClass="filter-helper-text" />
+                    <Label text="Select Class" styleClass="filter-section-label"/>
+                    <Label text="Filter reports by class" styleClass="filter-helper-text"/>
                     <MenuButton fx:id="mbUserClass" minWidth="200" styleClass="flat-input"
-                        text="All">
+                                text="All">
                         <padding>
-                            <Insets top="8" bottom="8" left="12" right="12" />
+                            <Insets top="8" bottom="8" left="12" right="12"/>
                         </padding>
                     </MenuButton>
                 </VBox>
 
                 <!-- Attendance Rate Filter -->
                 <VBox spacing="8">
-                    <Label text="Minimum Attendance Rate" styleClass="filter-section-label" />
+                    <Label text="Minimum Attendance Rate" styleClass="filter-section-label"/>
                     <Label text="Filter reports by student attendance percentage"
-                        styleClass="filter-helper-text" />
+                           styleClass="filter-helper-text"/>
                     <MenuButton fx:id="mbMinAttendanceRate" minWidth="200" styleClass="flat-input"
-                        text="All">
+                                text="All">
                         <padding>
-                            <Insets top="8" bottom="8" left="12" right="12" />
+                            <Insets top="8" bottom="8" left="12" right="12"/>
                         </padding>
                     </MenuButton>
                 </VBox>
 
                 <!-- Weeks Filter -->
                 <VBox spacing="8">
-                    <Label text="Select Weeks" styleClass="filter-section-label" />
+                    <Label text="Select Weeks" styleClass="filter-section-label"/>
                     <Label text="Choose which weeks to include in results"
-                        styleClass="filter-helper-text" />
-                    <CheckComboBox fx:id="cbSelectedWeeks" styleClass="flat-input" prefHeight="40" />
+                           styleClass="filter-helper-text"/>
+                    <CheckComboBox fx:id="cbSelectedWeeks" styleClass="flat-input" prefHeight="40"/>
                 </VBox>
             </VBox>
 
             <!-- Action Buttons -->
             <HBox alignment="CENTER_RIGHT" spacing="12">
                 <Button minWidth="100" onMouseClicked="#closeFilter" styleClass="button-cancel"
-                    text="Cancel" />
+                        text="Cancel"/>
                 <Button minWidth="100" onMouseClicked="#filter" styleClass="button-primary"
-                    text="Apply Filter" />
+                        text="Apply Filter"/>
             </HBox>
         </VBox>
     </StackPane>
