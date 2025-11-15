@@ -4,5 +4,7 @@
   "lateThresholdMinutes": 15,
   "cameraDevice": 0,
   "logPath": "logs/",
-  "livenessEnabled": true
+  "livenessEnabled": true,
+  "laplacianVarianceThreshold": 250.0,
+  "textureRatioThreshold": 0.06
 }

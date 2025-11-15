@@ -11,6 +11,8 @@ public class AppSettings {
     private int cameraDevice;
     private String logPath;
     private boolean livenessEnabled;
+    private double laplacianVarianceThreshold;
+    private double textureRatioThreshold;
 
     /**
      * Constructor with default values
@@ -22,6 +24,8 @@ public class AppSettings {
         this.cameraDevice = 0;
         this.logPath = "logs/";
         this.livenessEnabled = true;
+        this.laplacianVarianceThreshold = 250.0;
+        this.textureRatioThreshold = 0.06;
     }
 
     public int getDetectionThreshold() {
@@ -70,5 +74,21 @@ public class AppSettings {
 
     public void setLivenessEnabled(boolean newVal) {
         this.livenessEnabled = newVal;
+    }
+
+    public double getLaplacianVarianceThreshold() {
+        return laplacianVarianceThreshold;
+    }
+
+    public void setLaplacianVarianceThreshold(double laplacianVarianceThreshold) {
+        this.laplacianVarianceThreshold = laplacianVarianceThreshold;
+    }
+
+    public double getTextureRatioThreshold() {
+        return textureRatioThreshold;
+    }
+
+    public void setTextureRatioThreshold(double textureRatioThreshold) {
+        this.textureRatioThreshold = textureRatioThreshold;
     }
 }

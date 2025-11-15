@@ -47,6 +47,12 @@ public class SettingsViewController extends PageController {
     private Button btnChooseLogPath;
 
     @FXML
+    private TextField tfVarianceThreshold;
+
+    @FXML
+    private TextField tfTextureRatioThreshold;
+
+    @FXML
     private ToggleSwitch tsLivenessEnabled;
 
     @FXML
@@ -57,6 +63,16 @@ public class SettingsViewController extends PageController {
 
             // Load current settings
             loadSettings();
+
+            // Bind liveness threshold fields to liveness enabled toggle
+            tsLivenessEnabled.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                tfVarianceThreshold.setDisable(!newVal);
+                tfTextureRatioThreshold.setDisable(!newVal);
+            });
+
+            // Set initial state
+            tfVarianceThreshold.setDisable(!tsLivenessEnabled.isSelected());
+            tfTextureRatioThreshold.setDisable(!tsLivenessEnabled.isSelected());
         } catch (Exception e) {
             System.err.println("Error initializing Settings page: " + e.getMessage());
             e.printStackTrace();
@@ -67,6 +83,10 @@ public class SettingsViewController extends PageController {
             cbCameraDevice.setValue(0);
             tfLogPath.setText("logs/");
             tsLivenessEnabled.setSelected(true);
+            tfVarianceThreshold.setText("250");
+            tfTextureRatioThreshold.setText("0.06");
+            tfVarianceThreshold.setDisable(false);
+            tfTextureRatioThreshold.setDisable(false);
         }
     }
 
@@ -149,6 +169,8 @@ public class SettingsViewController extends PageController {
             cbCameraDevice.setValue(settings.getCameraDevice());
             tfLogPath.setText(settings.getLogPath());
             tsLivenessEnabled.setSelected(settings.getLivenessEnabled());
+            tfVarianceThreshold.setText(String.valueOf(settings.getLaplacianVarianceThreshold()));
+            tfTextureRatioThreshold.setText(String.valueOf(settings.getTextureRatioThreshold()));
         } catch (Exception e) {
             System.err.println("Error loading settings: " + e.getMessage());
             throw e;
@@ -167,6 +189,8 @@ public class SettingsViewController extends PageController {
             int lateThreshold = Integer.parseInt(tfLateThreshold.getText());
             Integer cameraDevice = cbCameraDevice.getValue();
             String logPath = tfLogPath.getText();
+            double varianceThreshold = Double.parseDouble(tfVarianceThreshold.getText());
+            double textureRatioThreshold = Double.parseDouble(tfTextureRatioThreshold.getText());
 
             // Basic validation
             if (detectionThreshold < 0 || detectionThreshold > 100) {
@@ -199,6 +223,16 @@ public class SettingsViewController extends PageController {
                 return;
             }
 
+            if (varianceThreshold < 0) {
+                Toast.show("Variance threshold must be positive", Toast.ToastType.ERROR);
+                return;
+            }
+
+            if (textureRatioThreshold < 0) {
+                Toast.show("Texture ratio threshold must be positive", Toast.ToastType.ERROR);
+                return;
+            }
+
             // Save to SettingsManager
             AppSettings settings = SettingsManager.getInstance().getSettings();
             settings.setDetectionThreshold(detectionThreshold);
@@ -206,6 +240,8 @@ public class SettingsViewController extends PageController {
             settings.setCameraDevice(cameraDevice);
             settings.setLogPath(logPath);
             settings.setLivenessEnabled(tsLivenessEnabled.isSelected());
+            settings.setLaplacianVarianceThreshold(varianceThreshold);
+            settings.setTextureRatioThreshold(textureRatioThreshold);
 
             SettingsManager.getInstance().saveSettings();
 

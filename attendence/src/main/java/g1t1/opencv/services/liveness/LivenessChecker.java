@@ -15,6 +15,29 @@ import g1t1.opencv.models.LivenessResult;
  */
 public class LivenessChecker {
 
+    private final double laplacianVarianceThreshold;
+    private final double textureRatioThreshold;
+
+    /**
+     * Constructor with default thresholds
+     */
+    public LivenessChecker() {
+        this(250.0, 0.06);
+    }
+
+    /**
+     * Constructor with custom thresholds
+     *
+     * @param laplacianVarianceThreshold threshold for laplacian variance (typically
+     *                                   250.0)
+     * @param textureRatioThreshold      threshold for texture ratio (typically
+     *                                   0.06)
+     */
+    public LivenessChecker(double laplacianVarianceThreshold, double textureRatioThreshold) {
+        this.laplacianVarianceThreshold = laplacianVarianceThreshold;
+        this.textureRatioThreshold = textureRatioThreshold;
+    }
+
     /**
      * Multi-metric liveness check combining texture and edge analysis.
      */
@@ -61,18 +84,18 @@ public class LivenessChecker {
         highFreq.release();
 
         // Combined scoring - calibrated thresholds
-        // Photos: low variance (< 250), low texture ratio (< 0.06)
-        // Real faces: high variance (> 350), high texture ratio (> 0.08)
+        // Photos: low variance (< threshold), low texture ratio (< threshold)
+        // Real faces: high variance (> threshold), high texture ratio (> threshold)
 
-        double varianceScore = laplacianVariance > 250.0 ? 1.0 : 0.0;
-        double textureScore = textureRatio > 0.06 ? 1.0 : 0.0;
+        double varianceScore = laplacianVariance > laplacianVarianceThreshold ? 1.0 : 0.0;
+        double textureScore = textureRatio > textureRatioThreshold ? 1.0 : 0.0;
 
         // BOTH metrics MUST pass for live detection
         boolean isLive = (varianceScore + textureScore) >= 2.0;
         double confidence = ((varianceScore + textureScore) / 2.0) * 100.0;
 
-        String reason = String.format("Var=%.0f Ratio=%.3f -> %s",
-            laplacianVariance, textureRatio, isLive ? "LIVE" : "PHOTO");
+        String reason = String.format("Var=%.0f Ratio=%.3f -> %s", laplacianVariance, textureRatio,
+                isLive ? "LIVE" : "PHOTO");
 
         return new LivenessResult(isLive, confidence, reason);
     }

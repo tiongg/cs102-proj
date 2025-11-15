@@ -170,6 +170,48 @@
                 </rowConstraints>
             </GridPane>
 
+            <!-- Laplacian Variance Threshold -->
+            <GridPane hgap="20.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="180.0" prefWidth="180.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="50.0"/>
+                </columnConstraints>
+
+                <Label text="Variance Threshold" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="tfVarianceThreshold" promptText="250" styleClass="flat-input" GridPane.columnIndex="1"
+                           GridPane.rowIndex="0"/>
+                <Region GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <rowConstraints>
+                    <RowConstraints/>
+                </rowConstraints>
+            </GridPane>
+
+            <!-- Texture Ratio Threshold -->
+            <GridPane hgap="20.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="180.0" prefWidth="180.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="50.0"/>
+                </columnConstraints>
+
+                <Label text="Texture Ratio Threshold" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <font>
+                        <Font name="Inter" size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="tfTextureRatioThreshold" promptText="0.06" styleClass="flat-input" GridPane.columnIndex="1"
+                           GridPane.rowIndex="0"/>
+                <Region GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <rowConstraints>
+                    <RowConstraints/>
+                </rowConstraints>
+            </GridPane>
+
             <!-- Save Button -->
             <HBox alignment="BOTTOM_RIGHT" spacing="20.0">
                 <padding>

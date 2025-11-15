@@ -57,7 +57,16 @@ public class FaceRecognitionService {
         this.histogramRecognizer = new HistogramRecognizer();
         this.maskAwareRecognizer = new MaskAwareRecognizer();
         this.maskDetector = new MaskDetector();
-        this.livenessChecker = new LivenessChecker();
+
+        // Initialize LivenessChecker with configurable thresholds from settings
+        try {
+            double varianceThreshold = SettingsManager.getInstance().getSettings().getLaplacianVarianceThreshold();
+            double textureThreshold = SettingsManager.getInstance().getSettings().getTextureRatioThreshold();
+            this.livenessChecker = new LivenessChecker(varianceThreshold, textureThreshold);
+        } catch (Exception e) {
+            // Fall back to default thresholds if settings are not available
+            this.livenessChecker = new LivenessChecker();
+        }
     }
 
     /**
