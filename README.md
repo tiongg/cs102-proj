@@ -1,6 +1,14 @@
 # Project Description
 
-Blah blah blah write this later
+This is an attendance taking app that uses face recognition to mark students as present
+
+# Features
+
+- Multi-user setup: Register as a teacher and save your classes and sessions, without worrying about other users
+- Face registration: Additional face registration steps to accurately provide sample images to the recognition engine
+- Liveness detection: Advanced face detection algorithms to determine if detected face is an image
+- In-app Configuration: Configuration for core functionalities
+- Admin view: When the registered teacher is detected, an admin view comes up to allow for manual override of attendance
 
 # Setup
 
