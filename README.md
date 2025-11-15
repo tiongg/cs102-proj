@@ -40,6 +40,8 @@ mvn compile -Dexec.mainClass=g1t1.other.MainFile exec:java
 > [!TIP]
 > Alternatively, we can just do `./dev.sh` in the root folder (Using bash)
 
+User guide can be found [here](./user-guide.md)
+
 # Building
 
 From the root directory (`cs102-proj`), navigate to the attendance folder:
